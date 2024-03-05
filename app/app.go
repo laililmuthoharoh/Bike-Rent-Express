@@ -135,7 +135,7 @@ func RunService() {
 	// gin recovery for handle panic
 	r.Use(gin.Recovery())
 
-	// initializeDomainModule(r, conn)
+	initializeDomainModule(r, conn)
 
 	version := "0.0.1"
 	log.Info().Msg(fmt.Sprintf("Service Running version %s", version))
