@@ -35,6 +35,17 @@ func (e *employeeRepository) Add(employee employeeDto.CreateEmployeeRequest) (em
 	return employee, nil
 }
 
+func (e *employeeRepository) GetByUsername(username string) (employeeDto.Employee, error) {
+	var employee employeeDto.Employee
+	query := "SELECT SELECT id, name, telp, username, password FROM employee WHERE username = $1 AND deleted_at IS NULL;"
+
+	if err := e.db.QueryRow(query, username).Scan(&employee.ID, &employee.Name, &employee.Telp, &employee.Password); err != nil {
+		return employee, err
+	}
+
+	return employee, nil
+}
+
 func (e *employeeRepository) UsernameIsReady(username string) (bool, error) {
 	query := "SELECT COUNT(username) FROM employee WHERE username = $1"
 
