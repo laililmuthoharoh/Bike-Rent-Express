@@ -37,7 +37,7 @@ func (e *employeeDelivery) AddEmployee(c *gin.Context) {
 		return
 	}
 
-	resultEmployee, err := e.employeeUC.AddEmployee(addEmployeeRequest)
+	resultEmployee, err := e.employeeUC.Register(addEmployeeRequest)
 	if err != nil {
 		if err.Error() == "1" {
 			json.NewResponseSuccess(c, nil, "username already in use", "01", "01")

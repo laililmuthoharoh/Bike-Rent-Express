@@ -5,7 +5,6 @@ import (
 	"bike-rent-express/src/transaction"
 	"database/sql"
 	"errors"
-	"fmt"
 	"time"
 )
 
@@ -46,10 +45,7 @@ func (t *transactionRepository) Add(transactionRequest transactionDto.AddTransac
 		tx.Rollback()
 		return transactionRequest, errors.New("motor not available")
 	}
-	fmt.Println(difference)
-	fmt.Println(priceMotor)
 	priceMotor *= int(difference)
-	fmt.Println(priceMotor)
 
 	query = "SELECT amount FROM balance WHERE user_id = $1;"
 	userBalance := 0
@@ -67,7 +63,6 @@ func (t *transactionRepository) Add(transactionRequest transactionDto.AddTransac
 
 	result := userBalance - priceMotor
 
-	fmt.Println("a", result)
 	query = "UPDATE balance SET amount = $1 WHERE user_id = $2;"
 	_, err = tx.Exec(query, result, transactionRequest.UserID)
 	if err != nil {
@@ -93,3 +88,7 @@ func (t *transactionRepository) Add(transactionRequest transactionDto.AddTransac
 
 	return transactionRequest, nil
 }
+
+func (t *transactionRepository) GetById() {}
+
+func (t *transactionRepository) GetAll() {}

@@ -16,7 +16,7 @@ type transactionDelivery struct {
 func NewTransactionUsecase(v1Group *gin.RouterGroup, transactionUC transaction.TransactionUsecase) {
 	handler := transactionDelivery{transactionUC}
 
-	transactionGroup := v1Group.Group("/transaction")
+	transactionGroup := v1Group.Group("/user/transaction")
 	{
 		transactionGroup.POST("", handler.CreateTransaction)
 	}

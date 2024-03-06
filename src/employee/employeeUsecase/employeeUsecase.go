@@ -17,7 +17,7 @@ func NewEmployeeUsecase(employeRepository employee.EmployeeRepository) employee.
 	return &employeeUsecase{employeRepository}
 }
 
-func (e *employeeUsecase) AddEmployee(employee employeeDto.CreateEmployeeRequest) (employeeDto.CreateEmployeeRequest, error) {
+func (e *employeeUsecase) Register(employee employeeDto.CreateEmployeeRequest) (employeeDto.CreateEmployeeRequest, error) {
 	password, err := bcrypt.GenerateFromPassword([]byte(employee.Password), bcrypt.DefaultCost)
 
 	if err != nil {
@@ -75,4 +75,18 @@ func (e *employeeUsecase) Delete(id string) (string, error) {
 	}
 
 	return resultDelete, nil
+}
+
+func (e *employeeUsecase) Login(loginRequest employeeDto.LoginRequest) (employeeDto.LoginResponse, error) {
+	employee, err := e.employeeRepository.GetByUsername(loginRequest.Username)
+	if err != nil {
+		return employeeDto.LoginResponse{}, err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(employee.Password), []byte(loginRequest.Password))
+	if err != nil {
+		return employeeDto.LoginResponse{}, errors.New("1")
+	}
+
+	return employeeDto.LoginResponse{}, nil
 }

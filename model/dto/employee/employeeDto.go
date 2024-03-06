@@ -6,6 +6,7 @@ type (
 		Name     string `json:"name"`
 		Telp     string `json:"telp"`
 		Username string `json:"username"`
+		Password string `json:"-"`
 	}
 
 	UpdateEmployeeRequest struct {
@@ -21,5 +22,15 @@ type (
 		Telp     string `json:"telp" validate:"required"`
 		Username string `json:"username" validate:"required"`
 		Password string `json:"password" validate:"required"`
+	}
+
+	LoginRequest struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+
+	LoginResponse struct {
+		AccessToken string   `json:"access_token"`
+		Employee    Employee `json:"employee"`
 	}
 )
