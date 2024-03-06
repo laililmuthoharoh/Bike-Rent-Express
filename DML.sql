@@ -7,7 +7,7 @@ INSERT INTO users(name, username, password, address, role, telp) VALUES ('admin'
 INSERT INTO balance(amount, user_id) VALUES (0, 'c11ac713-19be-4d73-874e-e748ea6d2738');
 
 -- insert motor_vechile
-INSERT INTO motor_vechile(name, type, price, plat, production_year, status)
+INSERT INTO motor_vehicle(name, type, price, plat, production_year, status)
 VALUES('Honda ct 125', 'KOPLING', 150000, 'BB2423KG', '2019', 'AVAILABLE');
 
 --insert employee
