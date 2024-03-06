@@ -1,10 +1,14 @@
-package motorVehicledto
+package motorVehicleDto
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type (
 	MotorVehicle struct {
-		Id             string    `json:"id,omitempty"`
+		Id             uuid.UUID `json:"id,omitempty"`
 		Name           string    `json:"name,omitempty"`
 		Type           string    `json:"type,omitempty"`
 		Price          int       `json:"price,omitempty"`
@@ -13,6 +17,7 @@ type (
 		UpdatedAt      time.Time `json:"updated_at,omitempty"`
 		ProductionYear string    `json:"production_year,omitempty"`
 		Status         string    `json:"status,omitempty"`
+		DeletedAt      time.Time `json:"deleted_at,omitempty"`
 	}
 
 	CreateMotorVehicle struct {
