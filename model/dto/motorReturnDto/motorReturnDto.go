@@ -13,7 +13,10 @@ type (
 	}
 
 	CreateMotorReturnRequest struct {
-		ID string
-		// Transaction
+		ID             string
+		TransactionID  string `json:"transaction_id"`
+		ExtraCharge    int    `json:"extra_charge"`
+		ConditionMotor string `json:"condition_motor"`
+		Description    string `json:"description"`
 	}
 )
