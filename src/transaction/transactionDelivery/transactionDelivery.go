@@ -1,4 +1,4 @@
-package transactiondelivery
+package transactionDelivery
 
 import (
 	"bike-rent-express/model/dto/json"
