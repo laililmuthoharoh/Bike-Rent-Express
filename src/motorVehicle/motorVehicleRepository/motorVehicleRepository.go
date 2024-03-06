@@ -17,7 +17,6 @@ func NewMotorVehicleRepository(db *sql.DB) motorVehicle.MotorVechileRepository {
 }
 
 // get all motor vehicle
-// get all cust
 func (mr motorVehicleRepository) RetrieveAllMotorVehicle() ([]motorVehicleDto.MotorVehicle, error) {
 
 	query := "SELECT id, name, type, price, plat, production_year, status FROM motor_vehicle;"
@@ -40,7 +39,7 @@ func scanMotorVehicle(rows *sql.Rows) ([]motorVehicleDto.MotorVehicle, error) {
 
 	for rows.Next() {
 		motor := motorVehicleDto.MotorVehicle{}
-		err := rows.Scan(&motor.Id, &motor.Name, &motor.Type, &motor.Price, &motor.Plat, &motor.CreatedAt, &motor.UpdatedAt, &motor.ProductionYear, &motor.Status, &motor.DeletedAt)
+		err := rows.Scan(&motor.Id, &motor.Name, &motor.Type, &motor.Price, &motor.Plat, &motor.ProductionYear, &motor.Status)
 		if err != nil {
 			return nil, err
 		}
@@ -90,7 +89,7 @@ func (mr *motorVehicleRepository) ChangeMotorVehicle(id uuid.UUID, motor motorVe
 
 func (mr *motorVehicleRepository) DropMotorVehicle(id uuid.UUID) error {
 
-	query := "DELETE FROM customer WHERE id = $1;"
+	query := "DELETE FROM motor_vehicle WHERE id = $1;"
 	_, err := mr.db.Exec(query, id)
 	if err != nil {
 		return err
