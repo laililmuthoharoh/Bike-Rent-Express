@@ -4,7 +4,7 @@ CREATE DATABASE bike_rent_express;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TYPE user_role AS ENUM ('ADMIN', 'USER');
-CREATE TYPE vechile_status AS ENUM ('AVAILABLE', 'NOT_AVAILABLE');
+CREATE TYPE vehicle_status AS ENUM ('AVAILABLE', 'NOT_AVAILABLE');
 
 -- tabel user
 CREATE TABLE users(
@@ -40,8 +40,8 @@ CREATE TABLE employee(
 	deleted_at DATE NULL
 );
 
--- tabel motor_vechile
-CREATE TABLE motor_vechile(
+-- tabel motor_vehicle
+CREATE TABLE motor_vehicle(
 	id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
 	name VARCHAR(255) NOT NULL,
 	type VARCHAR(255) NOT NULL,
@@ -50,7 +50,7 @@ CREATE TABLE motor_vechile(
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	production_year VARCHAR(255) NOT NULL,
-	status vechile_status NOT NULL,
+	status vehicle_status NOT NULL,
 	deleted_at DATE NULL
 );
 
@@ -58,7 +58,7 @@ CREATE TABLE motor_vechile(
 CREATE TABLE transaction(
 	id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
 	user_id uuid NOT NULL REFERENCES users(id),
-	motor_vechile_id uuid NOT NULL REFERENCES motor_vechile(id),
+	motor_vehicle_id uuid NOT NULL REFERENCES motor_vehicle(id),
 	start_date DATE NOT NULL,
 	end_date DATE NOT NULL,
 	price INTEGER NOT NULL,
