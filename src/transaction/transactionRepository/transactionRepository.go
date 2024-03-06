@@ -38,7 +38,7 @@ func (t *transactionRepository) Add(transactionRequest transactionDto.AddTransac
 
 	difference := endDate.Sub(startDate).Hours() / 24
 
-	query := "SELECT price FROM motor_vechile WHERE id = $1 AND status = 'AVAILABLE';"
+	query := "SELECT price FROM motor_vehicle WHERE id = $1 AND status = 'AVAILABLE';"
 	priceMotor := 0
 
 	err = tx.QueryRow(query, transactionRequest.MotorVehicleId).Scan(&priceMotor)
@@ -75,14 +75,14 @@ func (t *transactionRepository) Add(transactionRequest transactionDto.AddTransac
 		return transactionRequest, err
 	}
 
-	query = "UPDATE motor_vechile SET status = 'NOT_AVAILABLE' WHERE id = $1"
+	query = "UPDATE motor_vehicle SET status = 'NOT_AVAILABLE' WHERE id = $1"
 	_, err = tx.Exec(query, transactionRequest.MotorVehicleId)
 	if err != nil {
 		tx.Rollback()
 		return transactionRequest, err
 	}
 
-	query = "INSERT INTO transaction(user_id, motor_vechile_id, employee_id, start_date, end_date, price ) VALUES($1, $2, $3, $4, $5, $6) RETURNING id;"
+	query = "INSERT INTO transaction(user_id, motor_vehicle_id, employee_id, start_date, end_date, price ) VALUES($1, $2, $3, $4, $5, $6) RETURNING id;"
 
 	err = tx.QueryRow(query, transactionRequest.UserID, transactionRequest.MotorVehicleId, transactionRequest.EmployeeId, startDate, endDate, priceMotor).Scan(&transactionRequest.ID)
 	if err != nil {

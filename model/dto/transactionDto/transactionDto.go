@@ -17,6 +17,13 @@ type AddTransactionRequest struct {
 	UserID         string `json:"user_id" validate:"required"`
 	MotorVehicleId string `json:"motor_vehicle_id" validate:"required"`
 	EmployeeId     string `json:"employee_id" validate:"required"`
-	StartDate      string `json:"start_date" validate:"required"`
-	EndDate        string `json:"end_date" validate:"required,datetime"`
+	StartDate      string `json:"start_date" validate:"required,format-date"`
+	EndDate        string `json:"end_date" validate:"required,format-date"`
+}
+
+type ResponseTransaction struct {
+	ID        string `json:"id"`
+	StartDate string `json:"start_date"`
+	EndDate   string `json:"end_date"`
+	Price     int    `json:"price"`
 }
