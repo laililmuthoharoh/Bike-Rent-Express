@@ -96,7 +96,6 @@ func (t *transactionRepository) GetById(id string) (transactionDto.Transaction, 
 	if err := t.db.QueryRow(query, id).Scan(&transaction.ID, &transaction.UserID, &transaction.MotorVehicleId, &transaction.StartDate, &transaction.EndDate, &transaction.Price, &transaction.CreatedAt, &transaction.UpdatedAt, &transaction.EmployeeId); err != nil {
 		return transaction, err
 	}
-
 	return transaction, nil
 }
 

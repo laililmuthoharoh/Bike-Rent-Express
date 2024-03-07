@@ -6,6 +6,7 @@ import (
 	"bike-rent-express/pkg/middleware"
 	"bike-rent-express/pkg/utils"
 	"bike-rent-express/src/transaction"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 )
@@ -48,13 +49,19 @@ func (t *transactionDelivery) CreateTransaction(c *gin.Context) {
 func (t *transactionDelivery) GetTransactionById(c *gin.Context) {
 	id := c.Param("id")
 
+	fmt.Println(id)
 	transactionDetail, err := t.transactionUC.GetTransactionById(id)
+	fmt.Println(transactionDetail)
 	if err != nil {
+		if err.Error() == "1" {
+			json.NewResponseSuccess(c, nil, "Data not found", "02", "01")
+			return
+		}
 		json.NewResponseError(c, err.Error(), "02", "01")
 		return
 	}
 
-	json.NewResponseSuccess(c, transactionDetail, "Success get transaction by id", "02", "01")
+	json.NewResponseSuccess(c, transactionDetail, "Success get transaction by id", "02", "02")
 }
 
 func (t *transactionDelivery) GetTransactionAll(c *gin.Context) {
@@ -64,5 +71,10 @@ func (t *transactionDelivery) GetTransactionAll(c *gin.Context) {
 		return
 	}
 
-	json.NewResponseSuccess(c, transactionsDetail, "Success get all transaction", "02", "01")
+	if len(transactionsDetail) == 0 {
+		json.NewResponseSuccess(c, nil, "Data empty", "02", "01")
+		return
+	}
+
+	json.NewResponseSuccess(c, transactionsDetail, "Success get all transaction", "02", "02")
 }

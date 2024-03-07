@@ -90,7 +90,12 @@ func (c *usersUC) RegisterUsers(newUsers dto.RegisterUsers) error {
 	}
 	newUsers.Created_at = time.Now().Format("2006-01-02")
 
-	fmt.Println(newUsers)
+	encryptPassword, err := bcrypt.GenerateFromPassword([]byte(newUsers.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	newUsers.Password = string(encryptPassword)
 
 	return c.usersRepo.RegisterUsers(newUsers)
 }
@@ -101,14 +106,16 @@ func (c *usersUC) LoginUsers(loginRequest model.LoginRequest) (dto.LoginResponse
 	if err != nil {
 		return loginResponse, err
 	}
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password),[]byte(loginRequest.Password))
+
+	fmt.Println(user)
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginRequest.Password))
 	if err != nil {
-		return loginResponse, err 
+		return loginResponse, err
 	}
-	
-	token, err := middleware.GenerateTokenJwt(user.Username,user.Role)
+
+	token, err := middleware.GenerateTokenJwt(user.Username, user.Role)
 	if err != nil {
-		return loginResponse, err 
+		return loginResponse, err
 	}
 	loginResponse.User = user
 	loginResponse.AccesToken = token
