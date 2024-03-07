@@ -89,6 +89,15 @@ func (t *transactionRepository) Add(transactionRequest transactionDto.AddTransac
 	return transactionRequest, nil
 }
 
-func (t *transactionRepository) GetById() {}
+func (t *transactionRepository) GetById(id string) (transactionDto.Transaction, error) {
+	var transaction transactionDto.Transaction
+	query := "SELECT id, user_id, motor_vehicle_id, start_date, end_date, price, created_at, updated_at, employee_id FROM transaction WHERE id = $1;"
+
+	if err := t.db.QueryRow(query, id).Scan(&transaction.ID, &transaction.UserID, &transaction.MotorVehicleId, &transaction.StartDate, &transaction.EndDate, &transaction.Price, &transaction.CreatedAt, &transaction.UpdatedAt, &transaction.EmployeeId); err != nil {
+		return transaction, err
+	}
+
+	return transaction, nil
+}
 
 func (t *transactionRepository) GetAll() {}
