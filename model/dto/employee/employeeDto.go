@@ -10,10 +10,9 @@ type (
 	}
 
 	UpdateEmployeeRequest struct {
-		ID       string `json:"id"`
-		Name     string `json:"name" validate:"required"`
-		Telp     string `json:"telp" validate:"required"`
-		Password string `json:"password" validate:"required"`
+		ID   string `json:"id"`
+		Name string `json:"name" validate:"required"`
+		Telp string `json:"telp" validate:"required"`
 	}
 
 	CreateEmployeeRequest struct {
@@ -25,8 +24,8 @@ type (
 	}
 
 	LoginRequest struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
+		Username string `json:"username" validate:"required"`
+		Password string `json:"password" validate:"required"`
 	}
 
 	LoginResponse struct {

@@ -2,7 +2,9 @@ package employeeUsecase
 
 import (
 	employeeDto "bike-rent-express/model/dto/employee"
+	"bike-rent-express/pkg/middleware"
 	"bike-rent-express/src/employee"
+	"database/sql"
 	"errors"
 	"strings"
 
@@ -80,13 +82,26 @@ func (e *employeeUsecase) Delete(id string) (string, error) {
 func (e *employeeUsecase) Login(loginRequest employeeDto.LoginRequest) (employeeDto.LoginResponse, error) {
 	employee, err := e.employeeRepository.GetByUsername(loginRequest.Username)
 	if err != nil {
+		if err == sql.ErrNoRows || err.Error() == "invalid input syntax for type uuid" {
+			return employeeDto.LoginResponse{}, errors.New("1")
+		}
 		return employeeDto.LoginResponse{}, err
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(employee.Password), []byte(loginRequest.Password))
 	if err != nil {
-		return employeeDto.LoginResponse{}, errors.New("1")
+		return employeeDto.LoginResponse{}, errors.New("2")
 	}
 
-	return employeeDto.LoginResponse{}, nil
+	token, err := middleware.GenerateTokenJwt(employee.Username, "EMPLOYEE")
+	if err != nil {
+		return employeeDto.LoginResponse{}, err
+	}
+
+	loginResponse := employeeDto.LoginResponse{
+		AccessToken: token,
+		Employee:    employee,
+	}
+
+	return loginResponse, nil
 }
