@@ -21,7 +21,7 @@ func NewEmployeeDelivery(v1Group *gin.RouterGroup, employeeUC employee.EmployeeU
 
 	employeeGroup := v1Group.Group("employee")
 	{
-		employeeGroup.POST("/register", middleware.JWTAuth("ADMIN"), handler.AddEmployee)
+		employeeGroup.POST("/register", handler.AddEmployee)
 		employeeGroup.POST("/login", handler.LoginEmployee)
 		employeeGroup.PUT("/:id/change-password", middleware.JWTAuth("ADMIN", "EMPLOYEE"), handler.ChangePassword)
 		employeeGroup.GET("/:id", middleware.JWTAuth("ADMIN", "EMPLOYEE"), handler.GetEmployeById)

@@ -38,6 +38,8 @@ CREATE TABLE employee(
 	username VARCHAR(255) NOT NULL,
 	password VARCHAR(255) NOT NULL,
 	deleted_at DATE NULL
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- tabel motor_vehicle
