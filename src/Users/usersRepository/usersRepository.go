@@ -14,7 +14,7 @@ func NewUsersRepository(db *sql.DB) Users.UsersRepository {
 	return &usersRepository{db}
 }
 
-func (r *usersRepository) GetByID(uuid string) (*dto.GetUsers, error) {
+func (r *usersRepository) GetByID(uuid string) (dto.GetUsers, error) {
 	query := `SELECT id, name, username, address, role, can_rent,created_at, updated_at,telp FROM users WHERE id = $1`
 	var usersItem dto.GetUsers
 	if err := r.db.QueryRow(query, uuid).Scan(
@@ -28,7 +28,7 @@ func (r *usersRepository) GetByID(uuid string) (*dto.GetUsers, error) {
 		&usersItem.Updated_at,
 		&usersItem.Telp,
 	); err != nil {
-		return nil, err
+		return usersItem, err
 	}
 
 	// hashedPassword, err := bcrypt.GenerateFromPassword([]byte(usersItem.Password), bcrypt.DefaultCost)
@@ -38,10 +38,10 @@ func (r *usersRepository) GetByID(uuid string) (*dto.GetUsers, error) {
 
 	// usersItem.Password = string(hashedPassword)
 
-	return &usersItem, nil
+	return usersItem, nil
 }
 
-func (r *usersRepository) GetAll() ([]*dto.GetUsers, error) {
+func (r *usersRepository) GetAll() ([]dto.GetUsers, error) {
 	query := `SELECT id, name, username, address, role, can_rent, created_at, updated_at, telp FROM users`
 	rows, err := r.db.Query(query)
 	if err != nil {
@@ -49,7 +49,7 @@ func (r *usersRepository) GetAll() ([]*dto.GetUsers, error) {
 	}
 	defer rows.Close()
 
-	var users []*dto.GetUsers
+	var users []dto.GetUsers
 	for rows.Next() {
 		var user dto.GetUsers
 		if err := rows.Scan(
@@ -66,7 +66,7 @@ func (r *usersRepository) GetAll() ([]*dto.GetUsers, error) {
 			return nil, err
 		}
 
-		users = append(users, &user)
+		users = append(users, user)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -75,7 +75,7 @@ func (r *usersRepository) GetAll() ([]*dto.GetUsers, error) {
 	return users, nil
 }
 
-func (r *usersRepository) UpdateUsers(usersUpdate *dto.Users) error {
+func (r *usersRepository) UpdateUsers(usersUpdate dto.Users) error {
 	query := `
         UPDATE users
         SET name = $1, 
@@ -108,7 +108,7 @@ func (r *usersRepository) UpdateUsers(usersUpdate *dto.Users) error {
 	return nil
 }
 
-func (c *usersRepository) RegisterUsers(newUsers *dto.RegisterUsers) error {
+func (c *usersRepository) RegisterUsers(newUsers dto.RegisterUsers) error {
 
 	query := `INSERT INTO users (name, username, password, address, role, can_rent,created_at, telp)
 	values ($1,$2,$3,$4,$5,$6,$7,$8)`
