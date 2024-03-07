@@ -23,6 +23,7 @@ func NewEmployeeDelivery(v1Group *gin.RouterGroup, employeeUC employee.EmployeeU
 	{
 		employeeGroup.POST("/register", middleware.JWTAuth("ADMIN"), handler.AddEmployee)
 		employeeGroup.POST("/login", handler.LoginEmployee)
+		employeeGroup.PUT("/:id/change-password", middleware.JWTAuth("ADMIN", "EMPLOYEE"), handler.ChangePassword)
 		employeeGroup.GET("/:id", middleware.JWTAuth("ADMIN", "EMPLOYEE"), handler.GetEmployeById)
 		employeeGroup.GET("", middleware.JWTAuth("ADMIN"), handler.GetEmployeeAll)
 		employeeGroup.PUT("/:id", middleware.JWTAuth("ADMIN", "EMPLOYEE"), handler.UpdateEmployeeById)
@@ -140,4 +141,31 @@ func (e *employeeDelivery) LoginEmployee(c *gin.Context) {
 	}
 
 	json.NewResponseSuccess(c, loginResponse, "Login successfully", "06", "03")
+}
+
+func (e *employeeDelivery) ChangePassword(c *gin.Context) {
+	var changePasswordRequest employeeDto.ChangePasswordRequest
+
+	c.BindJSON(&changePasswordRequest)
+	id := c.Param("id")
+
+	if err := utils.Validated(changePasswordRequest); err != nil {
+		json.NewResponseBadRequest(c, err, "Bad Request", "07", "01")
+		return
+	}
+
+	err := e.employeeUC.ChangePassword(id, changePasswordRequest)
+	if err != nil {
+		if err.Error() == "1" {
+			json.NewResponseSuccess(c, nil, "Incorrect username or password", "07", "01")
+			return
+		} else if err.Error() == "2" {
+			json.NewResponseSuccess(c, nil, "Incorrect username or password", "07", "02")
+			return
+		}
+		json.NewResponseError(c, err.Error(), "07", "01")
+		return
+	}
+
+	json.NewResponseSuccess(c, nil, "Success updated password", "07", "03")
 }

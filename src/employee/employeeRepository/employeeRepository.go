@@ -81,8 +81,8 @@ func (e *employeeRepository) Get() ([]employeeDto.Employee, error) {
 func (e *employeeRepository) GetById(id string) (employeeDto.Employee, error) {
 
 	var employee employeeDto.Employee
-	query := "SELECT id, name, telp, username FROM employee WHERE id = $1 AND deleted_at IS NULL;"
-	if err := e.db.QueryRow(query, id).Scan(&employee.ID, &employee.Name, &employee.Telp, &employee.Username); err != nil {
+	query := "SELECT id, name, telp, username, password FROM employee WHERE id = $1 AND deleted_at IS NULL;"
+	if err := e.db.QueryRow(query, id).Scan(&employee.ID, &employee.Name, &employee.Telp, &employee.Username, &employee.Password); err != nil {
 		return employee, err
 	}
 
@@ -113,4 +113,11 @@ func (e *employeeRepository) Delete(id string) (string, error) {
 	}
 
 	return "Sucessfully delete employee", nil
+}
+
+func (e *employeeRepository) UpdatePassword(employee employeeDto.Employee) error {
+	query := "UPDATE employee SET password = $1 WHERE id = $2 AND deleted_at IS NULL"
+
+	_, err := e.db.Exec(query, employee.Password, employee.ID)
+	return err
 }

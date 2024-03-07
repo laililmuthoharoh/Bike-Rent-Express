@@ -105,3 +105,25 @@ func (e *employeeUsecase) Login(loginRequest employeeDto.LoginRequest) (employee
 
 	return loginResponse, nil
 }
+
+func (e *employeeUsecase) ChangePassword(id string, changePasswordRequest employeeDto.ChangePasswordRequest) error {
+	employee, err := e.employeeRepository.GetById(id)
+	if err != nil {
+		return errors.New("1")
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(employee.Password), []byte(changePasswordRequest.PasswordOld))
+	if err != nil {
+		return errors.New("2")
+	}
+
+	encryptPass, err := bcrypt.GenerateFromPassword([]byte(changePasswordRequest.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	employee.Password = string(encryptPass)
+	err = e.employeeRepository.UpdatePassword(employee)
+
+	return err
+}
