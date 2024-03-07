@@ -10,6 +10,7 @@ type (
 		GetByUsername(username string) (employeeDto.Employee, error)
 		GetById(id string) (employeeDto.Employee, error)
 		Update(employeeUpdateRequest employeeDto.UpdateEmployeeRequest) (employeeDto.Employee, error)
+		UpdatePassword(employee employeeDto.Employee) error
 		Delete(id string) (string, error)
 	}
 	EmployeeUsecase interface {
@@ -19,5 +20,6 @@ type (
 		Update(employeUpdateRequest employeeDto.UpdateEmployeeRequest) (employeeDto.Employee, error)
 		Delete(id string) (string, error)
 		Login(loginRequest employeeDto.LoginRequest) (employeeDto.LoginResponse, error)
+		ChangePassword(id string, changePasswordRequest employeeDto.ChangePasswordRequest) error
 	}
 )

@@ -34,7 +34,7 @@ func (mu motorVehicleUsecase) GetMotorVehicleById(id string) (motorVehicleDto.Mo
 }
 
 func (mu motorVehicleUsecase) CreateMotorVehicle(motor motorVehicleDto.CreateMotorVehicle) (motorVehicleDto.MotorVehicle, error) {
-	dt, err := mu.motorVehicleRepo.InsertMotorVehicle(motorVehicleDto.MotorVehicle{
+	newMotor, err := mu.motorVehicleRepo.InsertMotorVehicle(motorVehicleDto.MotorVehicle{
 		Name:           motor.Name,
 		Type:           motor.Type,
 		Price:          motor.Price,
@@ -43,10 +43,10 @@ func (mu motorVehicleUsecase) CreateMotorVehicle(motor motorVehicleDto.CreateMot
 		Status:         motor.Status,
 	})
 	if err != nil {
-		return dt, err
+		return newMotor, err
 	}
 
-	return dt, nil
+	return newMotor, nil
 }
 
 func (mu motorVehicleUsecase) UpdateMotorVehicle(id string, input motorVehicleDto.UpdateMotorVehicle) (motorVehicleDto.MotorVehicle, error) {
@@ -76,22 +76,17 @@ func (mu motorVehicleUsecase) UpdateMotorVehicle(id string, input motorVehicleDt
 
 	data, err := mu.motorVehicleRepo.ChangeMotorVehicle(id, motor)
 	if err != nil {
-		return data, nil
+		return data, err
 	}
 	return data, nil
 }
 
-func (mu motorVehicleUsecase) DeleteMotorVehicle(id string, input motorVehicleDto.MotorVehicle) (motorVehicleDto.MotorVehicle, error) {
-	motor, err := mu.motorVehicleRepo.RetrieveMotorVehicleById(id)
+func (mu motorVehicleUsecase) DeleteMotorVehicle(id string) error {
+	err := mu.motorVehicleRepo.DropMotorVehicle(id)
 	if err != nil {
-		return motor, err
+		return err
 	}
 
-	data, err := mu.motorVehicleRepo.DropMotorVehicle(id, motor)
-	if err != nil {
-		return data, err
-	}
-
-	return data, nil
+	return nil
 
 }

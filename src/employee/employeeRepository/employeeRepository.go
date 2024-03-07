@@ -37,9 +37,9 @@ func (e *employeeRepository) Add(employee employeeDto.CreateEmployeeRequest) (em
 
 func (e *employeeRepository) GetByUsername(username string) (employeeDto.Employee, error) {
 	var employee employeeDto.Employee
-	query := "SELECT SELECT id, name, telp, username, password FROM employee WHERE username = $1 AND deleted_at IS NULL;"
+	query := "SELECT id, name, telp, username, password FROM employee WHERE username = $1 AND deleted_at IS NULL;"
 
-	if err := e.db.QueryRow(query, username).Scan(&employee.ID, &employee.Name, &employee.Telp, &employee.Password); err != nil {
+	if err := e.db.QueryRow(query, username).Scan(&employee.ID, &employee.Name, &employee.Telp, &employee.Username, &employee.Password); err != nil {
 		return employee, err
 	}
 
@@ -90,6 +90,8 @@ func (e *employeeRepository) GetById(id string) (employeeDto.Employee, error) {
 }
 
 func (e *employeeRepository) Update(employeeUpdateRequest employeeDto.UpdateEmployeeRequest) (employeeDto.Employee, error) {
+	query := "UPDATE employee SET name = $1, telp = $2 WHERE id = $3 AND deleted_at IS NULL;"
+	_, err := e.db.Exec(query, employeeUpdateRequest.Name, employeeUpdateRequest.Telp, employeeUpdateRequest.ID)
 	query := "UPDATE employee SET name = $1, telp = $2, password=$3, updated_at= $4 WHERE id = $5 AND deleted_at IS NULL;"
 	now := time.Now()
 	_, err := e.db.Exec(query, employeeUpdateRequest.Name, employeeUpdateRequest.Telp, employeeUpdateRequest.Password, now, employeeUpdateRequest.ID)
@@ -114,4 +116,11 @@ func (e *employeeRepository) Delete(id string) (string, error) {
 	}
 
 	return "Sucessfully delete employee", nil
+}
+
+func (e *employeeRepository) UpdatePassword(employee employeeDto.Employee) error {
+	query := "UPDATE employee SET password = $1 WHERE id = $2 AND deleted_at IS NULL"
+
+	_, err := e.db.Exec(query, employee.Password, employee.ID)
+	return err
 }
