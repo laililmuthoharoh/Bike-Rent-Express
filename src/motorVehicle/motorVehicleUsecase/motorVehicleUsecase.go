@@ -59,15 +59,20 @@ func (mu motorVehicleUsecase) UpdateMotorVehicle(id uuid.UUID, input motorVehicl
 
 	if input.Name != "" {
 		motor.Name = input.Name
-	} else if input.Type != "" {
+	}
+	if input.Type != "" {
 		motor.Type = input.Type
-	} else if input.Price != 0 {
+	}
+	if input.Price != 0 {
 		motor.Price = input.Price
-	} else if input.Plat != "" {
+	}
+	if input.Plat != "" {
 		motor.Plat = input.Plat
-	} else if input.ProductionYear != "" {
+	}
+	if input.ProductionYear != "" {
 		motor.ProductionYear = input.ProductionYear
-	} else if input.Status != "" {
+	}
+	if input.Status != "" {
 		motor.Status = input.Status
 	}
 
