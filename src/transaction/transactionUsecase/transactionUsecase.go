@@ -51,10 +51,10 @@ func (t *transactionUsecase) GetTransactionById(id string) (transactionDto.Respo
 		return transactionDetail, err
 	}
 
-	customer, err := t.userRepository.GetByID(transaction.ID)
-	if err != nil {
-		return transactionDetail, err
-	}
+	// customer, err := t.userRepository.GetByID(transaction.ID)
+	// if err != nil {
+	// 	return transactionDetail, err
+	// }
 
 	transactionDetail.ID = transaction.ID
 	transactionDetail.StartDate = transaction.StartDate
@@ -62,7 +62,7 @@ func (t *transactionUsecase) GetTransactionById(id string) (transactionDto.Respo
 	transactionDetail.Price = transaction.Price
 	transactionDetail.MotorVehicle = motorVehicle
 	transactionDetail.Employee = employee
-	transactionDetail.Customer = customer
+	// transactionDetail.Customer = customer
 	transactionDetail.CreatedAt = transaction.CreatedAt
 	transaction.UpdatedAt = transaction.UpdatedAt
 
@@ -95,10 +95,10 @@ func (t *transactionUsecase) GetTransactionAll() ([]transactionDto.ResponseTrans
 			return transactionsDetail, err
 		}
 
-		customer, err := t.userRepository.GetByID(transaction.ID)
-		if err != nil {
-			return transactionsDetail, err
-		}
+		// customer, err := t.userRepository.GetByID(transaction.ID)
+		// if err != nil {
+		// 	return transactionsDetail, err
+		// }
 
 		transactionDetail.ID = transaction.ID
 		transactionDetail.StartDate = transaction.StartDate
@@ -106,7 +106,7 @@ func (t *transactionUsecase) GetTransactionAll() ([]transactionDto.ResponseTrans
 		transactionDetail.Price = transaction.Price
 		transactionDetail.MotorVehicle = motorVehicle
 		transactionDetail.Employee = employee
-		transactionDetail.Customer = customer
+		// transactionDetail.Customer = customer
 		transactionDetail.CreatedAt = transaction.CreatedAt
 		transaction.UpdatedAt = transaction.UpdatedAt
 

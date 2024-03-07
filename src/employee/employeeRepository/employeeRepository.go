@@ -37,9 +37,9 @@ func (e *employeeRepository) Add(employee employeeDto.CreateEmployeeRequest) (em
 
 func (e *employeeRepository) GetByUsername(username string) (employeeDto.Employee, error) {
 	var employee employeeDto.Employee
-	query := "SELECT id, name, telp, username, password FROM employee WHERE username = $1 AND deleted_at IS NULL;"
+	query := "SELECT id, name, telp, username, password, created_at, updated_at FROM employee WHERE username = $1 AND deleted_at IS NULL;"
 
-	if err := e.db.QueryRow(query, username).Scan(&employee.ID, &employee.Name, &employee.Telp, &employee.Username, &employee.Password); err != nil {
+	if err := e.db.QueryRow(query, username).Scan(&employee.ID, &employee.Name, &employee.Telp, &employee.Username, &employee.Password, &employee.CreatedAt, &employee.UpdatedAt); err != nil {
 		return employee, err
 	}
 
@@ -81,8 +81,8 @@ func (e *employeeRepository) Get() ([]employeeDto.Employee, error) {
 func (e *employeeRepository) GetById(id string) (employeeDto.Employee, error) {
 
 	var employee employeeDto.Employee
-	query := "SELECT id, name, telp, username, created_at, updated_at FROM employee WHERE id = $1 AND deleted_at IS NULL;"
-	if err := e.db.QueryRow(query, id).Scan(&employee.ID, &employee.Name, &employee.Telp, &employee.Username, &employee.CreatedAt, &employee.UpdatedAt); err != nil {
+	query := "SELECT id, name, telp, username, password,created_at, updated_at FROM employee WHERE id = $1 AND deleted_at IS NULL;"
+	if err := e.db.QueryRow(query, id).Scan(&employee.ID, &employee.Name, &employee.Telp, &employee.Username, &employee.Password, &employee.CreatedAt, &employee.UpdatedAt); err != nil {
 		return employee, err
 	}
 
@@ -90,7 +90,7 @@ func (e *employeeRepository) GetById(id string) (employeeDto.Employee, error) {
 }
 
 func (e *employeeRepository) Update(employeeUpdateRequest employeeDto.UpdateEmployeeRequest) (employeeDto.Employee, error) {
-	query := "UPDATE employee SET name = $1, telp = $2, updated_at= $4 WHERE id = $5 AND deleted_at IS NULL;"
+	query := "UPDATE employee SET name = $1, telp = $2, updated_at= $3 WHERE id = $4 AND deleted_at IS NULL;"
 	now := time.Now()
 	_, err := e.db.Exec(query, employeeUpdateRequest.Name, employeeUpdateRequest.Telp, now, employeeUpdateRequest.ID)
 	if err != nil {
