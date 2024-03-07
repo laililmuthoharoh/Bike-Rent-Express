@@ -42,7 +42,7 @@ func (r *usersRepository) GetByID(uuid string) (dto.GetUsers, error) {
 }
 
 func (r *usersRepository) GetAll() ([]dto.GetUsers, error) {
-	query := `SELECT id, name, username, address, role, can_rent, created_at, updated_at, telp FROM users`
+	query := `SELECT id, name, username, address, role, can_rent, created_at, updated_at, telp FROM users WHERE role = 'USER'`
 	rows, err := r.db.Query(query)
 	if err != nil {
 		return nil, err
@@ -135,8 +135,8 @@ func (c *usersRepository) RegisterUsers(newUsers dto.RegisterUsers) error {
 
 func (c *usersRepository) GetByUsername(username string) (dto.Users, error) {
 	var user dto.Users
-	query := `SELECT id, name, username, address, role, can_rent,updated_at,telp FROM users WHERE username = $1`
-	if err := c.db.QueryRow(query, username).Scan(&user.Uuid, &user.Name, &user.Username, &user.Address, &user.Role, &user.Can_rent, &user.Updated_at, &user.Telp); err != nil {
+	query := `SELECT id, name, username, password, address, role, can_rent,updated_at,telp FROM users WHERE username = $1`
+	if err := c.db.QueryRow(query, username).Scan(&user.Uuid, &user.Name, &user.Username, &user.Password, &user.Address, &user.Role, &user.Can_rent, &user.Updated_at, &user.Telp); err != nil {
 		return user, err
 	}
 	return user, nil

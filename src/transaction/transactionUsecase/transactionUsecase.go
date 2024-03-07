@@ -6,6 +6,9 @@ import (
 	"bike-rent-express/src/employee"
 	"bike-rent-express/src/motorVehicle"
 	"bike-rent-express/src/transaction"
+	"database/sql"
+	"errors"
+	"strings"
 )
 
 type transactionUsecase struct {
@@ -38,6 +41,9 @@ func (t *transactionUsecase) GetTransactionById(id string) (transactionDto.Respo
 
 	transaction, err := t.transactionRepository.GetById(id)
 	if err != nil {
+		if err == sql.ErrNoRows || strings.Contains(err.Error(), "invalid input syntax for type uuid") {
+			return transactionDetail, errors.New("1")
+		}
 		return transactionDetail, err
 	}
 
@@ -46,12 +52,12 @@ func (t *transactionUsecase) GetTransactionById(id string) (transactionDto.Respo
 		return transactionDetail, err
 	}
 
-	employee, err := t.employeeRepository.GetById(transaction.UserID)
+	employee, err := t.employeeRepository.GetById(transaction.EmployeeId)
 	if err != nil {
 		return transactionDetail, err
 	}
 
-	customer, err := t.userRepository.GetByID(transaction.ID)
+	customer, err := t.userRepository.GetByID(transaction.UserID)
 	if err != nil {
 		return transactionDetail, err
 	}
@@ -90,12 +96,12 @@ func (t *transactionUsecase) GetTransactionAll() ([]transactionDto.ResponseTrans
 			return transactionsDetail, err
 		}
 
-		employee, err := t.employeeRepository.GetById(transaction.UserID)
+		employee, err := t.employeeRepository.GetById(transaction.EmployeeId)
 		if err != nil {
 			return transactionsDetail, err
 		}
 
-		customer, err := t.userRepository.GetByID(transaction.ID)
+		customer, err := t.userRepository.GetByID(transaction.UserID)
 		if err != nil {
 			return transactionsDetail, err
 		}
