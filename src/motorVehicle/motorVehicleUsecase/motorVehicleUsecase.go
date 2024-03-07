@@ -78,13 +78,10 @@ func (mu motorVehicleUsecase) UpdateMotorVehicle(id uuid.UUID, input motorVehicl
 	return data, nil
 }
 
-func (mu motorVehicleUsecase) DeleteMotorVehicle(id uuid.UUID) (motorVehicleDto.MotorVehicle, error) {
-	data, err := mu.motorVehicleRepo.RetrieveMotorVehicleById(id)
-	if err != nil {
-		return data, err
-	}
+func (mu motorVehicleUsecase) DeleteMotorVehicle(id uuid.UUID, input motorVehicleDto.MotorVehicle) (motorVehicleDto.MotorVehicle, error) {
+	motor, err := mu.motorVehicleRepo.RetrieveMotorVehicleById(id)
 
-	err = mu.motorVehicleRepo.DropMotorVehicle(id)
+	data, err := mu.motorVehicleRepo.DropMotorVehicle(id, motor)
 	if err != nil {
 		return data, err
 	}
