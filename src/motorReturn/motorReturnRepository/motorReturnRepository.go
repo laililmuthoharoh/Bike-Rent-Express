@@ -72,5 +72,25 @@ func (m *motorReturnRepository) GetById(id string) (motorReturnDto.MotorReturn, 
 	}
 
 	return motorReturn, nil
+}
 
+func (m *motorReturnRepository) GetAll() ([]motorReturnDto.MotorReturn, error) {
+	var motorsReturn []motorReturnDto.MotorReturn
+
+	query := "SELECT id, transaction_id, return_date, extra_charge, condition_motor, description, created_at, updated_at FROM motor_return;"
+
+	rows, err := m.db.Query(query)
+	if err != nil {
+		return motorsReturn, err
+	}
+
+	for rows.Next() {
+		var motorReturn motorReturnDto.MotorReturn
+		if err := rows.Scan(&motorReturn.ID, &motorReturn.TrasactionID, &motorReturn.ReturnDate, &motorReturn.ExtraCharge, &motorReturn.ConditionMotor, &motorReturn, &motorReturn.Descrption); err != nil {
+			return motorsReturn, err
+		}
+		motorsReturn = append(motorsReturn, motorReturn)
+	}
+
+	return motorsReturn, nil
 }

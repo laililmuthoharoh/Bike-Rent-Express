@@ -14,9 +14,12 @@ type motorReturnDelivery struct {
 }
 
 func NewMotorReturnDelivey(v1Group *gin.RouterGroup, motorReturnUC motorReturn.MotorReturnUsecase) {
-	// handler := motorReturnDelivery{motorReturnUC}
+	handler := motorReturnDelivery{motorReturnUC}
 
-	// motorReturnGroup := v1Group.Group("/employee/")
+	motorReturnGroup := v1Group.Group("/employee/:id")
+	{
+		motorReturnGroup.POST("", handler.CreateMotorReturn)
+	}
 }
 
 func (m *motorReturnDelivery) CreateMotorReturn(c *gin.Context) {
@@ -27,5 +30,7 @@ func (m *motorReturnDelivery) CreateMotorReturn(c *gin.Context) {
 		json.NewResponseBadRequest(c, err, "Bad Request", "01", "01")
 		return
 	}
+
+	motorReturnCreated := m.motorReturnUC.
 
 }
