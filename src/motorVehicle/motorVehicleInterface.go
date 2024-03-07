@@ -10,7 +10,7 @@ type (
 		RetrieveMotorVehicleById(id string) (motorVehicleDto.MotorVehicle, error)
 		InsertMotorVehicle(motor motorVehicleDto.MotorVehicle) (motorVehicleDto.MotorVehicle, error)
 		ChangeMotorVehicle(id string, motor motorVehicleDto.MotorVehicle) (motorVehicleDto.MotorVehicle, error)
-		DropMotorVehicle(id string, motor motorVehicleDto.MotorVehicle) (motorVehicleDto.MotorVehicle, error)
+		DropMotorVehicle(id string) error
 	}
 
 	MotorVechileUsecase interface {
@@ -18,6 +18,6 @@ type (
 		GetMotorVehicleById(id string) (motorVehicleDto.MotorVehicle, error)
 		CreateMotorVehicle(motor motorVehicleDto.CreateMotorVehicle) (motorVehicleDto.MotorVehicle, error)
 		UpdateMotorVehicle(id string, motor motorVehicleDto.UpdateMotorVehicle) (motorVehicleDto.MotorVehicle, error)
-		DeleteMotorVehicle(id string, input motorVehicleDto.MotorVehicle) (motorVehicleDto.MotorVehicle, error)
+		DeleteMotorVehicle(id string) error
 	}
 )
