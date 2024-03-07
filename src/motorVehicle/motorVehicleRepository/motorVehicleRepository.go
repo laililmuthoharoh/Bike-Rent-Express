@@ -70,13 +70,13 @@ func (mr *motorVehicleRepository) ChangeMotorVehicle(id string, motor motorVehic
 	return mr.RetrieveMotorVehicleById(motor.Id)
 }
 
-func (mr *motorVehicleRepository) DropMotorVehicle(id string, motor motorVehicleDto.MotorVehicle) (motorVehicleDto.MotorVehicle, error) {
+func (mr *motorVehicleRepository) DropMotorVehicle(id string) error {
 
 	query := "UPDATE motor_vehicle SET deleted_at = CURRENT_DATE WHERE id = $1;"
 	_, err := mr.db.Exec(query, id)
 	if err != nil {
-		return motor, err
+		return err
 	}
 
-	return motor, err
+	return err
 }

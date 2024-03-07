@@ -3,6 +3,7 @@ package motorVehicleDelivery
 import (
 	"bike-rent-express/model/dto/json"
 	"bike-rent-express/model/dto/motorVehicleDto"
+	"bike-rent-express/pkg/utils"
 	"bike-rent-express/src/motorVehicle"
 	"database/sql"
 	"errors"
@@ -43,32 +44,34 @@ func (md motorVehicleDelivery) getMotorVehicleById(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	data, err := md.motorVehicleUC.GetMotorVehicleById(id)
-	if err != nil && errors.Is(sql.ErrNoRows, err) {
-		json.NewResponseBadRequest(ctx, nil, err.Error(), "01", "01")
-		return
-	} else if err != nil {
-		json.NewResponseError(ctx, err.Error(), "01", "01")
+	if err != nil {
+		if errors.Is(sql.ErrNoRows, err) {
+			json.NewResponseSuccess(ctx, nil, "Data not found", "02", "01")
+			return
+		}
+		json.NewResponseError(ctx, err.Error(), "02", "01")
 		return
 	}
 
-	json.NewResponseSuccess(ctx, data, "success", "01", "01")
+	json.NewResponseSuccess(ctx, data, "success get data by id", "02", "02")
 }
 
 func (md motorVehicleDelivery) createMotorVehicle(ctx *gin.Context) {
 	var input motorVehicleDto.CreateMotorVehicle
 
-	if err := ctx.ShouldBindJSON(&input); err != nil {
-		json.NewResponseError(ctx, err.Error(), "01", "01")
+	ctx.ShouldBindJSON(&input)
+	if err := utils.Validated(input); err != nil {
+		json.NewResponseBadRequest(ctx, err, "Bad Request", "03", "01")
 		return
 	}
 
 	data, err := md.motorVehicleUC.CreateMotorVehicle(input)
 	if err != nil {
-		json.NewResponseError(ctx, err.Error(), "01", "01")
+		json.NewResponseError(ctx, err.Error(), "03", "01")
 		return
 	}
 
-	json.NewResponseSuccess(ctx, data, "created", "01", "01")
+	json.NewResponseCreated(ctx, data, "motor vehicle created", "03", "01")
 
 }
 
@@ -77,36 +80,29 @@ func (md motorVehicleDelivery) updateMotorVehicle(ctx *gin.Context) {
 
 	id := ctx.Param("id")
 
-	if err := ctx.ShouldBindJSON(&input); err != nil {
-		json.NewResponseError(ctx, err.Error(), "01", "01")
+	ctx.ShouldBindJSON(&input)
+	if err := utils.Validated(input); err != nil {
+		json.NewResponseBadRequest(ctx, err, "Bad Request", "04", "01")
 		return
 	}
 
-	data, err := md.motorVehicleUC.UpdateMotorVehicle(id, input)
-	if err != nil && errors.Is(sql.ErrNoRows, err) {
-		json.NewResponseBadRequest(ctx, nil, err.Error(), "01", "01")
-		return
-	} else if err != nil {
-		json.NewResponseError(ctx, err.Error(), "01", "01")
+	motor, err := md.motorVehicleUC.UpdateMotorVehicle(id, input)
+	if err != nil {
+		json.NewResponseError(ctx, err.Error(), "04", "01")
 		return
 	}
 
-	json.NewResponseSuccess(ctx, data, "updated", "01", "01")
+	json.NewResponseSuccess(ctx, motor, "motor vehicle updated", "04", "01")
 }
 
 func (md motorVehicleDelivery) deleteMotorVehicle(ctx *gin.Context) {
-	var input motorVehicleDto.MotorVehicle
-
 	id := ctx.Param("id")
 
-	data, err := md.motorVehicleUC.DeleteMotorVehicle(id, input)
-	if err != nil && errors.Is(sql.ErrNoRows, err) {
-		json.NewResponseBadRequest(ctx, nil, err.Error(), "01", "01")
-		return
-	} else if err != nil {
-		json.NewResponseError(ctx, err.Error(), "01", "01")
+	err := md.motorVehicleUC.DeleteMotorVehicle(id)
+	if err != nil {
+		json.NewResponseError(ctx, err.Error(), "05", "01")
 		return
 	}
 
-	json.NewResponseSuccess(ctx, data, "deleted", "01", "01")
+	json.NewResponseSuccess(ctx, nil, "Sucessfully deleted motor vehicle", "05", "01")
 }
