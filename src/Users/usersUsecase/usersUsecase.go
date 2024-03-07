@@ -1,11 +1,15 @@
 package usersUsecase
 
 import (
+	"bike-rent-express/model"
 	"bike-rent-express/model/dto"
+	"bike-rent-express/pkg/middleware"
 	"bike-rent-express/src/Users"
 	"errors"
 	"fmt"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type usersUC struct {
@@ -89,4 +93,25 @@ func (c *usersUC) RegisterUsers(newUsers *dto.RegisterUsers) error {
 	fmt.Println(newUsers)
 
 	return c.usersRepo.RegisterUsers(newUsers)
+}
+
+func (c *usersUC) LoginUsers(loginRequest model.LoginRequest) (dto.LoginResponse, error) {
+	var loginResponse dto.LoginResponse
+	user, err := c.usersRepo.GetByUsername(loginRequest.Username)
+	if err != nil {
+		return loginResponse, err
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password),[]byte(loginRequest.Password))
+	if err != nil {
+		return loginResponse, err 
+	}
+	
+	token, err := middleware.GenerateTokenJwt(user.Username,user.Role)
+	if err != nil {
+		return loginResponse, err 
+	}
+	loginResponse.User = user
+	loginResponse.AccesToken = token
+
+	return loginResponse, nil
 }
