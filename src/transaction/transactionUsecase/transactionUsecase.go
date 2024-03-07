@@ -3,7 +3,6 @@ package transactionUsecase
 import (
 	"bike-rent-express/model/dto/transactionDto"
 	"bike-rent-express/src/transaction"
-	"fmt"
 )
 
 type transactionUsecase struct {
@@ -15,7 +14,6 @@ func NewTransactionRepository(transactionRepository transaction.TransactionRepos
 }
 
 func (t *transactionUsecase) AddTransaction(transactionRequest transactionDto.AddTransactionRequest) (transactionDto.Transaction, error) {
-	fmt.Println("ceks")
 	resultTransactionCreated, err := t.transactionRepository.Add(transactionRequest)
 	if err != nil {
 		return transactionDto.Transaction{}, err

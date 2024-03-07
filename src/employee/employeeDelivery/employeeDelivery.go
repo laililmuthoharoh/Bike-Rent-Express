@@ -3,6 +3,7 @@ package employeeDelivery
 import (
 	employeeDto "bike-rent-express/model/dto/employee"
 	"bike-rent-express/model/dto/json"
+	"bike-rent-express/pkg/middleware"
 	"bike-rent-express/pkg/utils"
 	"bike-rent-express/src/employee"
 	"database/sql"
@@ -20,12 +21,12 @@ func NewEmployeeDelivery(v1Group *gin.RouterGroup, employeeUC employee.EmployeeU
 
 	employeeGroup := v1Group.Group("employee")
 	{
-		employeeGroup.POST("/register", handler.AddEmployee)
-		employeeGroup.POST("/login")
-		employeeGroup.GET("/:id", handler.GetEmployeById)
-		employeeGroup.GET("", handler.GetEmployeeAll)
-		employeeGroup.PUT("/:id", handler.UpdateEmployeeById)
-		employeeGroup.DELETE("/:id", handler.DeleteEmployeeById)
+		employeeGroup.POST("/register", middleware.JWTAuth("ADMIN"), handler.AddEmployee)
+		employeeGroup.POST("/login", handler.LoginEmployee)
+		employeeGroup.GET("/:id", middleware.JWTAuth("ADMIN", "EMPLOYEE"), handler.GetEmployeById)
+		employeeGroup.GET("", middleware.JWTAuth("ADMIN"), handler.GetEmployeeAll)
+		employeeGroup.PUT("/:id", middleware.JWTAuth("ADMIN", "EMPLOYEE"), handler.UpdateEmployeeById)
+		employeeGroup.DELETE("/:id", middleware.JWTAuth("ADMIN"), handler.DeleteEmployeeById)
 	}
 }
 
@@ -112,4 +113,31 @@ func (e *employeeDelivery) DeleteEmployeeById(c *gin.Context) {
 	}
 
 	json.NewResponseSuccess(c, nil, msg, "05", "01")
+}
+
+func (e *employeeDelivery) LoginEmployee(c *gin.Context) {
+	var loginRequest employeeDto.LoginRequest
+
+	c.BindJSON(&loginRequest)
+
+	if err := utils.Validated(loginRequest); err != nil {
+		json.NewResponseBadRequest(c, err, "Bad Request", "06", "01")
+		return
+	}
+
+	loginResponse, err := e.employeeUC.Login(loginRequest)
+	if err != nil {
+		if err.Error() == "1" {
+			json.NewResponseSuccess(c, nil, "Incorrect username or password", "06", "01")
+			return
+		} else if err.Error() == "2" {
+			json.NewResponseSuccess(c, nil, "Incorrect username or password", "06", "02")
+			return
+		}
+
+		json.NewResponseError(c, err.Error(), "06", "01")
+		return
+	}
+
+	json.NewResponseSuccess(c, loginResponse, "Login successfully", "06", "03")
 }
