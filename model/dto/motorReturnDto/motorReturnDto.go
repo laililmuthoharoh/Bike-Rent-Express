@@ -23,13 +23,13 @@ type (
 	}
 
 	MotorReturnResponse struct {
-		ID             string    `json:"id"`
-		ReturnDate     string    `json:"return_date"`
-		ExtraCharge    int       `json:"extra_charge"`
-		ConditionMotor string    `json:"condition_motor"`
-		Descrption     string    `json:"description"`
-		Customer       dto.Users `json:"customer"`
-		CreatedAt      string    `json:"created_at"`
-		UpdatedAt      string    `json:"updatad_at"`
+		ID             string       `json:"id"`
+		ReturnDate     string       `json:"return_date"`
+		ExtraCharge    int          `json:"extra_charge"`
+		ConditionMotor string       `json:"condition_motor"`
+		Descrption     string       `json:"description"`
+		Customer       dto.GetUsers `json:"customer"`
+		CreatedAt      string       `json:"created_at"`
+		UpdatedAt      string       `json:"updatad_at"`
 	}
 )

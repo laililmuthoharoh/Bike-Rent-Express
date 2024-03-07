@@ -3,6 +3,7 @@ package motorReturnDelivery
 import (
 	"bike-rent-express/model/dto/json"
 	"bike-rent-express/model/dto/motorReturnDto"
+	"bike-rent-express/pkg/middleware"
 	"bike-rent-express/pkg/utils"
 	"bike-rent-express/src/motorReturn"
 
@@ -18,9 +19,9 @@ func NewMotorReturnDelivey(v1Group *gin.RouterGroup, motorReturnUC motorReturn.M
 
 	motorReturnGroup := v1Group.Group("/employee/:employee-id/motor-return")
 	{
-		motorReturnGroup.POST("", handler.CreateMotorReturn)
-		motorReturnGroup.GET("/:id", handler.GetMotorReturnById)
-		motorReturnGroup.GET("", handler.GetAllMotorReturn)
+		motorReturnGroup.POST("", middleware.JWTAuth("EMPLOYEE"), handler.CreateMotorReturn)
+		motorReturnGroup.GET("/:id", middleware.JWTAuth("EMPLOYEE", "ADMIN"), handler.GetMotorReturnById)
+		motorReturnGroup.GET("", middleware.JWTAuth("EMPLOYEE", "ADMIN"), handler.GetAllMotorReturn)
 	}
 }
 
