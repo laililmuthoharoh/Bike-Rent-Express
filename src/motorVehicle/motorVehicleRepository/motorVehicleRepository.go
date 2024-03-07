@@ -4,8 +4,6 @@ import (
 	"bike-rent-express/model/dto/motorVehicleDto"
 	"bike-rent-express/src/motorVehicle"
 	"database/sql"
-
-	"github.com/google/uuid"
 )
 
 type motorVehicleRepository struct {
@@ -39,7 +37,7 @@ func (mr motorVehicleRepository) RetrieveAllMotorVehicle() ([]motorVehicleDto.Mo
 }
 
 // get by id
-func (mr *motorVehicleRepository) RetrieveMotorVehicleById(id uuid.UUID) (motorVehicleDto.MotorVehicle, error) {
+func (mr *motorVehicleRepository) RetrieveMotorVehicleById(id string) (motorVehicleDto.MotorVehicle, error) {
 
 	var motor motorVehicleDto.MotorVehicle
 	query := "SELECT id, name, type, price, plat, production_year, status FROM motor_vehicle WHERE id = $1 AND deleted_at IS NULL"
@@ -62,7 +60,7 @@ func (mr *motorVehicleRepository) InsertMotorVehicle(motor motorVehicleDto.Motor
 	return mr.RetrieveMotorVehicleById(motor.Id)
 }
 
-func (mr *motorVehicleRepository) ChangeMotorVehicle(id uuid.UUID, motor motorVehicleDto.MotorVehicle) (motorVehicleDto.MotorVehicle, error) {
+func (mr *motorVehicleRepository) ChangeMotorVehicle(id string, motor motorVehicleDto.MotorVehicle) (motorVehicleDto.MotorVehicle, error) {
 
 	query := "UPDATE motor_vehicle SET name = $1, type = $2, price = $3, plat = $4, production_year = $5, status = $6 WHERE id = $7;"
 	_, err := mr.db.Exec(query, motor.Name, motor.Type, motor.Price, motor.Plat, motor.ProductionYear, motor.Status, id)
@@ -72,7 +70,7 @@ func (mr *motorVehicleRepository) ChangeMotorVehicle(id uuid.UUID, motor motorVe
 	return mr.RetrieveMotorVehicleById(motor.Id)
 }
 
-func (mr *motorVehicleRepository) DropMotorVehicle(id uuid.UUID, motor motorVehicleDto.MotorVehicle) (motorVehicleDto.MotorVehicle, error) {
+func (mr *motorVehicleRepository) DropMotorVehicle(id string, motor motorVehicleDto.MotorVehicle) (motorVehicleDto.MotorVehicle, error) {
 
 	query := "UPDATE motor_vehicle SET deleted_at = CURRENT_DATE WHERE id = $1;"
 	_, err := mr.db.Exec(query, id)

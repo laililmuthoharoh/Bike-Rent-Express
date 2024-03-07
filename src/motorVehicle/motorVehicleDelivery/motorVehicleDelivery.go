@@ -8,7 +8,6 @@ import (
 	"errors"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 type motorVehicleDelivery struct {
@@ -25,7 +24,7 @@ func NewMotorVehicleDelivery(v1Group *gin.RouterGroup, motorVehicleUC motorVehic
 		motorVehicleGroup.GET("/:id", handler.getMotorVehicleById)
 		motorVehicleGroup.POST("/", handler.createMotorVehicle)
 		motorVehicleGroup.PUT("/:id", handler.updateMotorVehicle)
-		motorVehicleGroup.PUT("delete/:id", handler.deleteMotorVehicle)
+		motorVehicleGroup.DELETE("/:id", handler.deleteMotorVehicle)
 	}
 }
 
@@ -41,8 +40,8 @@ func (md motorVehicleDelivery) getAllMotorVehicle(ctx *gin.Context) {
 }
 
 func (md motorVehicleDelivery) getMotorVehicleById(ctx *gin.Context) {
-	idParam := ctx.Param("id")
-	id, _ := uuid.Parse(idParam)
+	id := ctx.Param("id")
+
 	data, err := md.motorVehicleUC.GetMotorVehicleById(id)
 	if err != nil && errors.Is(sql.ErrNoRows, err) {
 		json.NewResponseBadRequest(ctx, nil, err.Error(), "01", "01")
@@ -76,8 +75,8 @@ func (md motorVehicleDelivery) createMotorVehicle(ctx *gin.Context) {
 func (md motorVehicleDelivery) updateMotorVehicle(ctx *gin.Context) {
 	var input motorVehicleDto.UpdateMotorVehicle
 
-	idParam := ctx.Param("id")
-	id, _ := uuid.Parse(idParam)
+	id := ctx.Param("id")
+
 	if err := ctx.ShouldBindJSON(&input); err != nil {
 		json.NewResponseError(ctx, err.Error(), "01", "01")
 		return
@@ -98,8 +97,7 @@ func (md motorVehicleDelivery) updateMotorVehicle(ctx *gin.Context) {
 func (md motorVehicleDelivery) deleteMotorVehicle(ctx *gin.Context) {
 	var input motorVehicleDto.MotorVehicle
 
-	idParam := ctx.Param("id")
-	id, _ := uuid.Parse(idParam)
+	id := ctx.Param("id")
 
 	data, err := md.motorVehicleUC.DeleteMotorVehicle(id, input)
 	if err != nil && errors.Is(sql.ErrNoRows, err) {
@@ -110,5 +108,5 @@ func (md motorVehicleDelivery) deleteMotorVehicle(ctx *gin.Context) {
 		return
 	}
 
-	json.NewResponseSuccess(ctx, data, "soft deleted", "01", "01")
+	json.NewResponseSuccess(ctx, data, "deleted", "01", "01")
 }

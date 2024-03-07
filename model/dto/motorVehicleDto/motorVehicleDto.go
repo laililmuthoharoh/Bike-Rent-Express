@@ -1,18 +1,14 @@
 package motorVehicleDto
 
-import (
-	"github.com/google/uuid"
-)
-
 type (
 	MotorVehicle struct {
-		Id             uuid.UUID `json:"id,omitempty"`
-		Name           string    `json:"name,omitempty"`
-		Type           string    `json:"type,omitempty"`
-		Price          int       `json:"price,omitempty"`
-		Plat           string    `json:"plat,omitempty"`
-		ProductionYear string    `json:"production_year,omitempty"`
-		Status         string    `json:"status,omitempty"`
+		Id             string `json:"id,omitempty"`
+		Name           string `json:"name,omitempty"`
+		Type           string `json:"type,omitempty"`
+		Price          int    `json:"price,omitempty"`
+		Plat           string `json:"plat,omitempty"`
+		ProductionYear string `json:"production_year,omitempty"`
+		Status         string `json:"status,omitempty"`
 	}
 
 	CreateMotorVehicle struct {
