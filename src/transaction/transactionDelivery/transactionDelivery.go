@@ -3,6 +3,7 @@ package transactionDelivery
 import (
 	"bike-rent-express/model/dto/json"
 	"bike-rent-express/model/dto/transactionDto"
+	"bike-rent-express/pkg/middleware"
 	"bike-rent-express/pkg/utils"
 	"bike-rent-express/src/transaction"
 
@@ -18,9 +19,9 @@ func NewTransactionUsecase(v1Group *gin.RouterGroup, transactionUC transaction.T
 
 	transactionGroup := v1Group.Group("/user/transaction")
 	{
-		transactionGroup.POST("", handler.CreateTransaction)
-		transactionGroup.GET("/:id", handler.CreateTransaction)
-		transactionGroup.GET("", handler.CreateTransaction)
+		transactionGroup.POST("", middleware.JWTAuth("ADMIN", "USER"), handler.CreateTransaction)
+		transactionGroup.GET("/:id", middleware.JWTAuth("ADMIN", "USER"), handler.GetTransactionById)
+		transactionGroup.GET("", middleware.JWTAuth("ADMIN"), handler.GetTransactionAll)
 	}
 }
 
