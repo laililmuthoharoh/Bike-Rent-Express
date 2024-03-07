@@ -64,7 +64,7 @@ func (t *transactionUsecase) GetTransactionById(id string) (transactionDto.Respo
 	transactionDetail.Employee = employee
 	// transactionDetail.Customer = customer
 	transactionDetail.CreatedAt = transaction.CreatedAt
-	transaction.UpdatedAt = transaction.UpdatedAt
+	transactionDetail.UpdatedAt = transaction.UpdatedAt
 
 	return transactionDetail, nil
 }
@@ -108,10 +108,10 @@ func (t *transactionUsecase) GetTransactionAll() ([]transactionDto.ResponseTrans
 		transactionDetail.Employee = employee
 		// transactionDetail.Customer = customer
 		transactionDetail.CreatedAt = transaction.CreatedAt
-		transaction.UpdatedAt = transaction.UpdatedAt
+		transactionns.UpdatedAt = transaction.UpdatedAt
 
 		transactionsDetail = append(transactionsDetail, transactionDetail)
 	}
 
-	return []transactionDto.ResponseTransaction{}, nil
+	return transactionsDetail, nil
 }
