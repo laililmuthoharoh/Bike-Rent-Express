@@ -36,4 +36,9 @@ type (
 		Updated_at string
 		Telp       string `json:"telepon"`
 	}
+
+	LoginResponse struct {
+		AccesToken string `json:"acces_token"`
+		User       Users  `json:"user"`
+	}
 )

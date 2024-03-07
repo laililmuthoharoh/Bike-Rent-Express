@@ -21,6 +21,7 @@ func NewEmployeeDelivery(v1Group *gin.RouterGroup, employeeUC employee.EmployeeU
 	employeeGroup := v1Group.Group("employee")
 	{
 		employeeGroup.POST("/register", handler.AddEmployee)
+		employeeGroup.POST("/login")
 		employeeGroup.GET("/:id", handler.GetEmployeById)
 		employeeGroup.GET("", handler.GetEmployeeAll)
 		employeeGroup.PUT("/:id", handler.UpdateEmployeeById)
