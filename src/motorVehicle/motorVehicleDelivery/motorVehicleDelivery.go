@@ -3,6 +3,7 @@ package motorVehicleDelivery
 import (
 	"bike-rent-express/model/dto/json"
 	"bike-rent-express/model/dto/motorVehicleDto"
+	"bike-rent-express/pkg/middleware"
 	"bike-rent-express/pkg/utils"
 	"bike-rent-express/src/motorVehicle"
 	"database/sql"
@@ -18,14 +19,13 @@ type motorVehicleDelivery struct {
 func NewMotorVehicleDelivery(v1Group *gin.RouterGroup, motorVehicleUC motorVehicle.MotorVechileUsecase) {
 	handler := motorVehicleDelivery{
 		motorVehicleUC}
-	motorVehicleGroup := v1Group.Group("/motorVehicles")
-	//motorVehicleGroup.Use(middleware.BasicAuth)
+	motorVehicleGroup := v1Group.Group("/motor-vehicles")
 	{
-		motorVehicleGroup.GET("/", handler.getAllMotorVehicle)
-		motorVehicleGroup.GET("/:id", handler.getMotorVehicleById)
-		motorVehicleGroup.POST("/", handler.createMotorVehicle)
-		motorVehicleGroup.PUT("/:id", handler.updateMotorVehicle)
-		motorVehicleGroup.DELETE("/:id", handler.deleteMotorVehicle)
+		motorVehicleGroup.GET("/", middleware.JWTAuth("ADMIN", "USER"), handler.getAllMotorVehicle)
+		motorVehicleGroup.GET("/:id", middleware.JWTAuth("ADMIN", "USER"), handler.getMotorVehicleById)
+		motorVehicleGroup.POST("/", middleware.JWTAuth("ADMIN"), handler.createMotorVehicle)
+		motorVehicleGroup.PUT("/:id", middleware.JWTAuth("ADMIN"), handler.updateMotorVehicle)
+		motorVehicleGroup.DELETE("/:id", middleware.JWTAuth("ADMIN"), handler.deleteMotorVehicle)
 	}
 }
 
