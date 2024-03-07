@@ -2,11 +2,13 @@ package employeeDto
 
 type (
 	Employee struct {
-		ID       string `json:"id"`
-		Name     string `json:"name"`
-		Telp     string `json:"telp"`
-		Username string `json:"username"`
-		Password string `json:"-"`
+		ID        string `json:"id"`
+		Name      string `json:"name"`
+		Telp      string `json:"telp"`
+		Username  string `json:"username"`
+		Password  string `json:"-"`
+		CreatedAt string `json:"created_at"`
+		UpdatedAt string `json:"updated_at"`
 	}
 
 	UpdateEmployeeRequest struct {

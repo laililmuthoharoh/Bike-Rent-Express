@@ -18,7 +18,7 @@ type motorVehicleDelivery struct {
 func NewMotorVehicleDelivery(v1Group *gin.RouterGroup, motorVehicleUC motorVehicle.MotorVechileUsecase) {
 	handler := motorVehicleDelivery{
 		motorVehicleUC}
-	motorVehicleGroup := v1Group.Group("/motorVehicles")
+	motorVehicleGroup := v1Group.Group("/motor-vehicles")
 	//motorVehicleGroup.Use(middleware.BasicAuth)
 	{
 		motorVehicleGroup.GET("/", handler.getAllMotorVehicle)
