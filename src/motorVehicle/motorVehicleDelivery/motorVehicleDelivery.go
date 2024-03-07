@@ -24,7 +24,7 @@ func NewMotorVehicleDelivery(v1Group *gin.RouterGroup, motorVehicleUC motorVehic
 		motorVehicleGroup.GET("/:id", handler.getMotorVehicleById)
 		motorVehicleGroup.POST("/", handler.createMotorVehicle)
 		motorVehicleGroup.PUT("/:id", handler.updateMotorVehicle)
-		motorVehicleGroup.PUT("delete/:id", handler.deleteMotorVehicle)
+		motorVehicleGroup.DELETE("/:id", handler.deleteMotorVehicle)
 	}
 }
 
@@ -108,5 +108,5 @@ func (md motorVehicleDelivery) deleteMotorVehicle(ctx *gin.Context) {
 		return
 	}
 
-	json.NewResponseSuccess(ctx, data, "soft deleted", "01", "01")
+	json.NewResponseSuccess(ctx, data, "deleted", "01", "01")
 }
