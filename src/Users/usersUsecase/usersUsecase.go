@@ -12,7 +12,7 @@ type usersUC struct {
 	usersRepo Users.UsersRepository
 }
 
-func (uc *usersUC) GetAllUsers() ([]*dto.GetUsers, error) {
+func (uc *usersUC) GetAllUsers() ([]dto.GetUsers, error) {
 	// Call the repository method to fetch all users
 	users, err := uc.usersRepo.GetAll()
 	if err != nil {
@@ -21,7 +21,7 @@ func (uc *usersUC) GetAllUsers() ([]*dto.GetUsers, error) {
 	return users, nil
 }
 
-func (uc *usersUC) UpdateUsers(updateUsers *dto.Users) error {
+func (uc *usersUC) UpdateUsers(updateUsers dto.Users) error {
 
 	if updateUsers.Name == "" {
 		return errors.New("transaction Type cannot be empty")
@@ -52,7 +52,7 @@ func (uc *usersUC) UpdateUsers(updateUsers *dto.Users) error {
 	return uc.usersRepo.UpdateUsers(updateUsers)
 }
 
-func (uc *usersUC) GetByIDs(id string) (*dto.GetUsers, error) {
+func (uc *usersUC) GetByIDs(id string) (dto.GetUsers, error) {
 	return uc.usersRepo.GetByID(id)
 }
 
@@ -60,29 +60,29 @@ func NewUsersUsecase(usersRepo Users.UsersRepository) Users.UsersUsecase {
 	return &usersUC{usersRepo}
 }
 
-func (c *usersUC) RegisterUsers(newUsers *dto.RegisterUsers) error {
+func (c *usersUC) RegisterUsers(newUsers dto.RegisterUsers) error {
 
 	if newUsers.Name == "" {
-		return errors.New("transaction Type cannot be empty")
+		return errors.New("name Type cannot be empty")
 	}
 	if newUsers.Username == "" {
-		return errors.New("transaction Type cannot be empty")
+		return errors.New("username Type cannot be empty")
 	}
 
 	if newUsers.Password == "" {
-		return errors.New("description cannot be empty")
+		return errors.New("password cannot be empty")
 	}
 	if newUsers.Address == "" {
-		return errors.New("transaction Type cannot be empty")
+		return errors.New("address Type cannot be empty")
 	}
 	if newUsers.Role == "" {
-		return errors.New("transaction Type cannot be empty")
+		return errors.New("role Type cannot be empty")
 	}
 	if newUsers.Can_rent == "" {
-		return errors.New("transaction Type cannot be empty")
+		return errors.New("can rent Type cannot be empty")
 	}
 	if newUsers.Telp == "" {
-		return errors.New("transaction Type cannot be empty")
+		return errors.New("phone Type cannot be empty")
 	}
 	newUsers.Created_at = time.Now().Format("2006-01-02")
 

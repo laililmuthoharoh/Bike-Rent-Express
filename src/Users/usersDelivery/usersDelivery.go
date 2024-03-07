@@ -41,7 +41,7 @@ func (h *usersDelivery) GetAllUsers(ctx *gin.Context) {
 
 func (h *usersDelivery) UpdateUsers(ctx *gin.Context) {
 	var newUsers dto.Users
-	if err := ctx.ShouldBindJSON(&newUsers); err != nil {
+	if err := ctx.ShouldBindJSON(newUsers); err != nil {
 		json.NewResponseError(ctx, "Invalid request body", "02", "01")
 		fmt.Println(err)
 		return
@@ -49,7 +49,7 @@ func (h *usersDelivery) UpdateUsers(ctx *gin.Context) {
 	}
 
 	// Call usecase to update the expense
-	if err := h.usersUC.UpdateUsers(&newUsers); err != nil {
+	if err := h.usersUC.UpdateUsers(newUsers); err != nil {
 		json.NewResponseError(ctx, err.Error(), "01", "01")
 		fmt.Println(err)
 		return
@@ -82,7 +82,7 @@ func (c *usersDelivery) RegisterUsers(ctx *gin.Context) {
 	}
 
 	// Call usecase to create the expense
-	if err := c.usersUC.RegisterUsers(&newUsers); err != nil {
+	if err := c.usersUC.RegisterUsers(newUsers); err != nil {
 		json.NewResponseError(ctx, err.Error(), "01", "01")
 		fmt.Println(err)
 		return
