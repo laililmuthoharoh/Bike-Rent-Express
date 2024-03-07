@@ -132,3 +132,12 @@ func (c *usersRepository) RegisterUsers(newUsers dto.RegisterUsers) error {
 
 	return nil
 }
+
+func (c *usersRepository) GetByUsername(username string) (dto.Users, error) {
+	var user dto.Users
+	query := `SELECT id, name, username, address, role, can_rent,updated_at,telp FROM users WHERE username = $1`
+	if err := c.db.QueryRow(query, username).Scan(&user.Uuid, &user.Name, &user.Username, &user.Address, &user.Role, &user.Can_rent, &user.Updated_at, &user.Telp); err != nil {
+		return user, err
+	}
+	return user, nil
+}

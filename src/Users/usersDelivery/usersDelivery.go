@@ -1,8 +1,10 @@
 package usersDelivery
 
 import (
+	"bike-rent-express/model"
 	"bike-rent-express/model/dto"
 	"bike-rent-express/model/dto/json"
+	"bike-rent-express/pkg/utils"
 	"bike-rent-express/src/Users"
 	"fmt"
 
@@ -25,6 +27,7 @@ func NewUsersDelivery(v1Group *gin.RouterGroup, usersUC Users.UsersUsecase) {
 		usersGroup.GET("/:id", handler.getByID)
 
 		usersGroup.POST("/regist", handler.RegisterUsers)
+		usersGroup.POST("/login",handler.LoginUsers)
 
 	}
 }
@@ -91,4 +94,23 @@ func (c *usersDelivery) RegisterUsers(ctx *gin.Context) {
 
 	// Respond with success
 	json.NewResponseSuccess(ctx, "", "Account Created", "01", "01")
+}
+
+
+func (c *usersDelivery) LoginUsers(ctx *gin.Context) {
+	var loginRequest model.LoginRequest 
+	ctx.BindJSON(&loginRequest)
+	if err := utils.Validated(loginRequest); err != nil {
+		json.NewResponseBadRequest(ctx,err,"bad request","01", "01")
+		return
+	}
+
+	loginResponse, err := c.usersUC.LoginUsers(loginRequest) 
+	if err != nil {
+		json.NewResponseError(ctx,err.Error(),"01", "01")
+		return
+	}
+
+	json.NewResponseSuccess(ctx,loginResponse, "login succes", "01", "01")
+	
 }

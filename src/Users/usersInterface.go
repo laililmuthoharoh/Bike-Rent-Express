@@ -1,6 +1,9 @@
 package Users
 
-import "bike-rent-express/model/dto"
+import (
+	"bike-rent-express/model"
+	"bike-rent-express/model/dto"
+)
 
 type UsersRepository interface {
 	RegisterUsers(newUsers dto.RegisterUsers) error
