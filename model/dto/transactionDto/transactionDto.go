@@ -34,7 +34,7 @@ type ResponseTransaction struct {
 	Price        int                          `json:"price"`
 	MotorVehicle motorVehicleDto.MotorVehicle `json:"motor_vehicle"`
 	Employee     employeeDto.Employee         `json:"employee"`
-	Customer     *dto.Users                   `json:"customer"`
+	Customer     dto.GetUsers                 `json:"customer"`
 	CreatedAt    string                       `json:"created_at"`
 	UpdatedAt    string                       `json:"updated_at"`
 }
