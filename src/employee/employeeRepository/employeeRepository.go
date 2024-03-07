@@ -90,11 +90,9 @@ func (e *employeeRepository) GetById(id string) (employeeDto.Employee, error) {
 }
 
 func (e *employeeRepository) Update(employeeUpdateRequest employeeDto.UpdateEmployeeRequest) (employeeDto.Employee, error) {
-	query := "UPDATE employee SET name = $1, telp = $2 WHERE id = $3 AND deleted_at IS NULL;"
-	_, err := e.db.Exec(query, employeeUpdateRequest.Name, employeeUpdateRequest.Telp, employeeUpdateRequest.ID)
-	query := "UPDATE employee SET name = $1, telp = $2, password=$3, updated_at= $4 WHERE id = $5 AND deleted_at IS NULL;"
+	query := "UPDATE employee SET name = $1, telp = $2, updated_at= $4 WHERE id = $5 AND deleted_at IS NULL;"
 	now := time.Now()
-	_, err := e.db.Exec(query, employeeUpdateRequest.Name, employeeUpdateRequest.Telp, employeeUpdateRequest.Password, now, employeeUpdateRequest.ID)
+	_, err := e.db.Exec(query, employeeUpdateRequest.Name, employeeUpdateRequest.Telp, now, employeeUpdateRequest.ID)
 	if err != nil {
 		return employeeDto.Employee{}, err
 	}
