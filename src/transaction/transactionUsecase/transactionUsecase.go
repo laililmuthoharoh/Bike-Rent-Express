@@ -41,7 +41,7 @@ func (t *transactionUsecase) GetTransactionById(id string) (transactionDto.Respo
 		return transactionDetail, err
 	}
 
-	// motorVehicle, err := t.vehicleRepository.RetrieveMotorVehicleById(transaction.MotorVehicleId)
+	motorVehicle, err := t.vehicleRepository.RetrieveMotorVehicleById(transaction.MotorVehicleId)
 	if err != nil {
 		return transactionDetail, err
 	}
@@ -51,7 +51,7 @@ func (t *transactionUsecase) GetTransactionById(id string) (transactionDto.Respo
 		return transactionDetail, err
 	}
 
-	// customer, err := t.userRepository.GetByID(transaction.ID)
+	customer, err := t.userRepository.GetByID(transaction.ID)
 	if err != nil {
 		return transactionDetail, err
 	}
@@ -60,9 +60,9 @@ func (t *transactionUsecase) GetTransactionById(id string) (transactionDto.Respo
 	transactionDetail.StartDate = transaction.StartDate
 	transactionDetail.EndDate = transaction.EndDate
 	transactionDetail.Price = transaction.Price
-	// transactionDetail.MotorVehicle = motorVehicles
+	transactionDetail.MotorVehicle = motorVehicles
 	transactionDetail.Employee = employee
-	// transactionDetail.Customer = customer
+	transactionDetail.Customer = customer
 	transactionDetail.CreatedAt = transaction.CreatedAt
 	transaction.UpdatedAt = transaction.UpdatedAt
 
@@ -85,28 +85,28 @@ func (t *transactionUsecase) GetTransactionAll() ([]transactionDto.ResponseTrans
 			return transactionsDetail, err
 		}
 
-		// motorVehicle, err := t.vehicleRepository.RetrieveMotorVehicleById(transaction.MotorVehicleId)
-		// if err != nil {
-		// 	return transactionsDetail, err
-		// }
+		motorVehicle, err := t.vehicleRepository.RetrieveMotorVehicleById(transaction.MotorVehicleId)
+		if err != nil {
+			return transactionsDetail, err
+		}
 
 		employee, err := t.employeeRepository.GetById(transaction.UserID)
 		if err != nil {
 			return transactionsDetail, err
 		}
 
-		// customer, err := t.userRepository.GetByID(transaction.ID)
-		// if err != nil {
-		// 	return transactionsDetail, err
-		// }
+		customer, err := t.userRepository.GetByID(transaction.ID)
+		if err != nil {
+			return transactionsDetail, err
+		}
 
 		transactionDetail.ID = transaction.ID
 		transactionDetail.StartDate = transaction.StartDate
 		transactionDetail.EndDate = transaction.EndDate
 		transactionDetail.Price = transaction.Price
-		// transactionDetail.MotorVehicle = motorVehicle
+		transactionDetail.MotorVehicle = motorVehicle
 		transactionDetail.Employee = employee
-		// transactionDetail.Customer = *customer
+		transactionDetail.Customer = customer
 		transactionDetail.CreatedAt = transaction.CreatedAt
 		transaction.UpdatedAt = transaction.UpdatedAt
 
