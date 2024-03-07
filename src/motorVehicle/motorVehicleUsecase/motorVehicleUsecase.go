@@ -3,8 +3,6 @@ package motorVehicleUsecase
 import (
 	"bike-rent-express/model/dto/motorVehicleDto"
 	"bike-rent-express/src/motorVehicle"
-
-	"github.com/google/uuid"
 )
 
 type motorVehicleUsecase struct {
@@ -26,7 +24,7 @@ func (mu motorVehicleUsecase) GetAllMotorVehicle() ([]motorVehicleDto.MotorVehic
 }
 
 // get by id
-func (mu motorVehicleUsecase) GetMotorVehicleById(id uuid.UUID) (motorVehicleDto.MotorVehicle, error) {
+func (mu motorVehicleUsecase) GetMotorVehicleById(id string) (motorVehicleDto.MotorVehicle, error) {
 	motor, err := mu.motorVehicleRepo.RetrieveMotorVehicleById(id)
 	if err != nil {
 		return motor, err
@@ -51,7 +49,7 @@ func (mu motorVehicleUsecase) CreateMotorVehicle(motor motorVehicleDto.CreateMot
 	return dt, nil
 }
 
-func (mu motorVehicleUsecase) UpdateMotorVehicle(id uuid.UUID, input motorVehicleDto.UpdateMotorVehicle) (motorVehicleDto.MotorVehicle, error) {
+func (mu motorVehicleUsecase) UpdateMotorVehicle(id string, input motorVehicleDto.UpdateMotorVehicle) (motorVehicleDto.MotorVehicle, error) {
 	motor, err := mu.motorVehicleRepo.RetrieveMotorVehicleById(id)
 	if err != nil {
 		return motor, err
@@ -83,8 +81,11 @@ func (mu motorVehicleUsecase) UpdateMotorVehicle(id uuid.UUID, input motorVehicl
 	return data, nil
 }
 
-func (mu motorVehicleUsecase) DeleteMotorVehicle(id uuid.UUID, input motorVehicleDto.MotorVehicle) (motorVehicleDto.MotorVehicle, error) {
+func (mu motorVehicleUsecase) DeleteMotorVehicle(id string, input motorVehicleDto.MotorVehicle) (motorVehicleDto.MotorVehicle, error) {
 	motor, err := mu.motorVehicleRepo.RetrieveMotorVehicleById(id)
+	if err != nil {
+		return motor, err
+	}
 
 	data, err := mu.motorVehicleRepo.DropMotorVehicle(id, motor)
 	if err != nil {
