@@ -3,8 +3,6 @@ package motorVehicleUsecase
 import (
 	"bike-rent-express/model/dto/motorVehicleDto"
 	"bike-rent-express/src/motorVehicle"
-
-	"github.com/google/uuid"
 )
 
 type motorVehicleUsecase struct {
@@ -26,7 +24,7 @@ func (mu motorVehicleUsecase) GetAllMotorVehicle() ([]motorVehicleDto.MotorVehic
 }
 
 // get by id
-func (mu motorVehicleUsecase) GetMotorVehicleById(id uuid.UUID) (motorVehicleDto.MotorVehicle, error) {
+func (mu motorVehicleUsecase) GetMotorVehicleById(id string) (motorVehicleDto.MotorVehicle, error) {
 	motor, err := mu.motorVehicleRepo.RetrieveMotorVehicleById(id)
 	if err != nil {
 		return motor, err
@@ -36,7 +34,7 @@ func (mu motorVehicleUsecase) GetMotorVehicleById(id uuid.UUID) (motorVehicleDto
 }
 
 func (mu motorVehicleUsecase) CreateMotorVehicle(motor motorVehicleDto.CreateMotorVehicle) (motorVehicleDto.MotorVehicle, error) {
-	dt, err := mu.motorVehicleRepo.InsertMotorVehicle(motorVehicleDto.MotorVehicle{
+	newMotor, err := mu.motorVehicleRepo.InsertMotorVehicle(motorVehicleDto.MotorVehicle{
 		Name:           motor.Name,
 		Type:           motor.Type,
 		Price:          motor.Price,
@@ -45,13 +43,13 @@ func (mu motorVehicleUsecase) CreateMotorVehicle(motor motorVehicleDto.CreateMot
 		Status:         motor.Status,
 	})
 	if err != nil {
-		return dt, err
+		return newMotor, err
 	}
 
-	return dt, nil
+	return newMotor, nil
 }
 
-func (mu motorVehicleUsecase) UpdateMotorVehicle(id uuid.UUID, input motorVehicleDto.UpdateMotorVehicle) (motorVehicleDto.MotorVehicle, error) {
+func (mu motorVehicleUsecase) UpdateMotorVehicle(id string, input motorVehicleDto.UpdateMotorVehicle) (motorVehicleDto.MotorVehicle, error) {
 	motor, err := mu.motorVehicleRepo.RetrieveMotorVehicleById(id)
 	if err != nil {
 		return motor, err
@@ -59,33 +57,36 @@ func (mu motorVehicleUsecase) UpdateMotorVehicle(id uuid.UUID, input motorVehicl
 
 	if input.Name != "" {
 		motor.Name = input.Name
-	} else if input.Type != "" {
+	}
+	if input.Type != "" {
 		motor.Type = input.Type
-	} else if input.Price != 0 {
+	}
+	if input.Price != 0 {
 		motor.Price = input.Price
-	} else if input.Plat != "" {
+	}
+	if input.Plat != "" {
 		motor.Plat = input.Plat
-	} else if input.ProductionYear != "" {
+	}
+	if input.ProductionYear != "" {
 		motor.ProductionYear = input.ProductionYear
-	} else if input.Status != "" {
+	}
+	if input.Status != "" {
 		motor.Status = input.Status
 	}
 
 	data, err := mu.motorVehicleRepo.ChangeMotorVehicle(id, motor)
 	if err != nil {
-		return data, nil
+		return data, err
 	}
 	return data, nil
 }
 
-func (mu motorVehicleUsecase) DeleteMotorVehicle(id uuid.UUID, input motorVehicleDto.MotorVehicle) (motorVehicleDto.MotorVehicle, error) {
-	motor, err := mu.motorVehicleRepo.RetrieveMotorVehicleById(id)
-
-	data, err := mu.motorVehicleRepo.DropMotorVehicle(id, motor)
+func (mu motorVehicleUsecase) DeleteMotorVehicle(id string) error {
+	err := mu.motorVehicleRepo.DropMotorVehicle(id)
 	if err != nil {
-		return data, err
+		return err
 	}
 
-	return data, nil
+	return nil
 
 }

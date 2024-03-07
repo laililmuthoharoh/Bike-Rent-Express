@@ -1,5 +1,11 @@
 package transactionDto
 
+import (
+	"bike-rent-express/model/dto"
+	employeeDto "bike-rent-express/model/dto/employee"
+	"bike-rent-express/model/dto/motorVehicleDto"
+)
+
 type Transaction struct {
 	ID             string `json:"id"`
 	UserID         string `json:"user_id"`
@@ -7,7 +13,7 @@ type Transaction struct {
 	EmployeeId     string `json:"employee_id"`
 	StartDate      string `json:"start_date"`
 	EndDate        string `json:"end_date"`
-	Price          string `json:"price"`
+	Price          int    `json:"price"`
 	CreatedAt      string `json:"created_at"`
 	UpdatedAt      string `json:"updated_at"`
 }
@@ -22,8 +28,13 @@ type AddTransactionRequest struct {
 }
 
 type ResponseTransaction struct {
-	ID        string `json:"id"`
-	StartDate string `json:"start_date"`
-	EndDate   string `json:"end_date"`
-	Price     int    `json:"price"`
+	ID           string                       `json:"id"`
+	StartDate    string                       `json:"start_date"`
+	EndDate      string                       `json:"end_date"`
+	Price        int                          `json:"price"`
+	MotorVehicle motorVehicleDto.MotorVehicle `json:"motor_vehicle"`
+	Employee     employeeDto.Employee         `json:"employee"`
+	Customer     *dto.Users                   `json:"customer"`
+	CreatedAt    string                       `json:"created_at"`
+	UpdatedAt    string                       `json:"updated_at"`
 }

@@ -4,8 +4,8 @@ import (
 	"bike-rent-express/model/dto/motorVehicleDto"
 	"bike-rent-express/src/motorVehicle"
 	"database/sql"
-
-	"github.com/google/uuid"
+	"fmt"
+	"time"
 )
 
 type motorVehicleRepository struct {
@@ -18,7 +18,7 @@ func NewMotorVehicleRepository(db *sql.DB) motorVehicle.MotorVechileRepository {
 
 // get all motor vehicle
 func (mr motorVehicleRepository) RetrieveAllMotorVehicle() ([]motorVehicleDto.MotorVehicle, error) {
-	query := "SELECT id, name, type, price, plat, production_year, status FROM motor_vehicle WHERE deleted_at IS NULL;"
+	query := "SELECT id, name, type, price, plat, created_at, updated_at, production_year, status FROM motor_vehicle WHERE deleted_at IS NULL;"
 	rows, err := mr.db.Query(query)
 	if err != nil {
 		return nil, err
@@ -29,7 +29,7 @@ func (mr motorVehicleRepository) RetrieveAllMotorVehicle() ([]motorVehicleDto.Mo
 
 	for rows.Next() {
 		motor := motorVehicleDto.MotorVehicle{}
-		err := rows.Scan(&motor.Id, &motor.Name, &motor.Type, &motor.Price, &motor.Plat, &motor.ProductionYear, &motor.Status)
+		err := rows.Scan(&motor.Id, &motor.Name, &motor.Type, &motor.Price, &motor.Plat, &motor.CreatedAt, &motor.UpdatedAt, &motor.ProductionYear, &motor.Status)
 		if err != nil {
 			return nil, err
 		}
@@ -39,11 +39,11 @@ func (mr motorVehicleRepository) RetrieveAllMotorVehicle() ([]motorVehicleDto.Mo
 }
 
 // get by id
-func (mr *motorVehicleRepository) RetrieveMotorVehicleById(id uuid.UUID) (motorVehicleDto.MotorVehicle, error) {
+func (mr *motorVehicleRepository) RetrieveMotorVehicleById(id string) (motorVehicleDto.MotorVehicle, error) {
 
 	var motor motorVehicleDto.MotorVehicle
-	query := "SELECT id, name, type, price, plat, production_year, status FROM motor_vehicle WHERE id = $1 AND deleted_at IS NULL"
-	if err := mr.db.QueryRow(query, id).Scan(&motor.Id, &motor.Name, &motor.Type, &motor.Price, &motor.Plat, &motor.ProductionYear, &motor.Status); err != nil {
+	query := "SELECT id, name, type, price, plat, created_at, updated_at, production_year, status FROM motor_vehicle WHERE id = $1 AND deleted_at IS NULL"
+	if err := mr.db.QueryRow(query, id).Scan(&motor.Id, &motor.Name, &motor.Type, &motor.Price, &motor.Plat, &motor.CreatedAt, &motor.UpdatedAt, &motor.ProductionYear, &motor.Status); err != nil {
 		return motor, err
 	}
 
@@ -62,23 +62,27 @@ func (mr *motorVehicleRepository) InsertMotorVehicle(motor motorVehicleDto.Motor
 	return mr.RetrieveMotorVehicleById(motor.Id)
 }
 
-func (mr *motorVehicleRepository) ChangeMotorVehicle(id uuid.UUID, motor motorVehicleDto.MotorVehicle) (motorVehicleDto.MotorVehicle, error) {
+func (mr *motorVehicleRepository) ChangeMotorVehicle(id string, motor motorVehicleDto.MotorVehicle) (motorVehicleDto.MotorVehicle, error) {
 
-	query := "UPDATE motor_vehicle SET name = $1, type = $2, price = $3, plat = $4, production_year = $5, status = $6 WHERE id = $7;"
-	_, err := mr.db.Exec(query, motor.Name, motor.Type, motor.Price, motor.Plat, motor.ProductionYear, motor.Status, id)
+	fmt.Println("id: ", id, "type:", motor)
+	now := time.Now()
+	// .Format("2006-01-02")
+
+	query := "UPDATE motor_vehicle SET name = $1, type = $2, price = $3, plat = $4, production_year = $5, status = $6, updated_at = $7 WHERE id = $8;"
+	_, err := mr.db.Exec(query, motor.Name, motor.Type, motor.Price, motor.Plat, motor.ProductionYear, motor.Status, now, id)
 	if err != nil {
 		return motor, err
 	}
 	return mr.RetrieveMotorVehicleById(motor.Id)
 }
 
-func (mr *motorVehicleRepository) DropMotorVehicle(id uuid.UUID, motor motorVehicleDto.MotorVehicle) (motorVehicleDto.MotorVehicle, error) {
+func (mr *motorVehicleRepository) DropMotorVehicle(id string) error {
 
 	query := "UPDATE motor_vehicle SET deleted_at = CURRENT_DATE WHERE id = $1;"
 	_, err := mr.db.Exec(query, id)
 	if err != nil {
-		return motor, err
+		return err
 	}
 
-	return motor, err
+	return err
 }
