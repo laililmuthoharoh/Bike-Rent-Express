@@ -60,7 +60,7 @@ func (t *transactionUsecase) GetTransactionById(id string) (transactionDto.Respo
 	transactionDetail.StartDate = transaction.StartDate
 	transactionDetail.EndDate = transaction.EndDate
 	transactionDetail.Price = transaction.Price
-	transactionDetail.MotorVehicle = motorVehicles
+	transactionDetail.MotorVehicle = motorVehicle
 	transactionDetail.Employee = employee
 	transactionDetail.Customer = customer
 	transactionDetail.CreatedAt = transaction.CreatedAt
