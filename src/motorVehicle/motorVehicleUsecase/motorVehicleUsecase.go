@@ -76,7 +76,7 @@ func (mu motorVehicleUsecase) UpdateMotorVehicle(id string, input motorVehicleDt
 
 	data, err := mu.motorVehicleRepo.ChangeMotorVehicle(id, motor)
 	if err != nil {
-		return data, nil
+		return data, err
 	}
 	return data, nil
 }

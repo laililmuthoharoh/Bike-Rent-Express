@@ -7,6 +7,8 @@ type (
 		Type           string `json:"type,omitempty"`
 		Price          int    `json:"price,omitempty"`
 		Plat           string `json:"plat,omitempty"`
+		CreatedAt      string `json:"created_at"`
+		UpdatedAt      string `json:"updated_at"`
 		ProductionYear string `json:"production_year,omitempty"`
 		Status         string `json:"status,omitempty"`
 	}
