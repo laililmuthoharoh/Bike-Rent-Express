@@ -32,4 +32,9 @@ type (
 		AccessToken string   `json:"access_token"`
 		Employee    Employee `json:"employee"`
 	}
+
+	ChangePasswordRequest struct {
+		PasswordOld string `json:"password_old" validate:"required"`
+		NewPassword string `json:"new_password" validate:"required"`
+	}
 )
