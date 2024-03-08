@@ -7,6 +7,9 @@ import (
 	"bike-rent-express/src/employee/employeeDelivery"
 	"bike-rent-express/src/employee/employeeRepository"
 	"bike-rent-express/src/employee/employeeUsecase"
+	"bike-rent-express/src/motorReturn/motorReturnDelivery"
+	"bike-rent-express/src/motorReturn/motorReturnRepository"
+	"bike-rent-express/src/motorReturn/motorReturnUsecase"
 	"bike-rent-express/src/motorVehicle/motorVehicleDelivery"
 	"bike-rent-express/src/motorVehicle/motorVehicleRepository"
 	"bike-rent-express/src/motorVehicle/motorVehicleUsecase"
@@ -35,4 +38,8 @@ func InitRoute(v1Group *gin.RouterGroup, db *sql.DB) {
 	transactionRepository := transactionRepository.NewTransactionRepository(db)
 	transactionUC := transactionUsecase.NewTransactionRepository(transactionRepository, usersRepo, employeeRepository, motorVehicleRepo)
 	transactionDelivery.NewTransactionUsecase(v1Group, transactionUC)
+
+	motorReturnRepository := motorReturnRepository.NewMotorRepository(db)
+	motorReturnUC := motorReturnUsecase.NewMotorReturnUseCase(motorReturnRepository, transactionRepository, usersRepo)
+	motorReturnDelivery.NewMotorReturnDelivey(v1Group, motorReturnUC)
 }

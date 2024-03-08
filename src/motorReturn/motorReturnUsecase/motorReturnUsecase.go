@@ -79,7 +79,6 @@ func (m *motorReturnUsecase) GetMotorReturnAll() ([]motorReturnDto.MotorReturnRe
 		if err != nil {
 			return motorsReturnDetail, err
 		}
-
 		motorReturnDetail.ID = motorReturn.ID
 		motorReturnDetail.ReturnDate = motorReturn.ReturnDate
 		motorReturnDetail.ExtraCharge = motorReturn.ExtraCharge

@@ -17,12 +17,14 @@ type motorReturnDelivery struct {
 func NewMotorReturnDelivey(v1Group *gin.RouterGroup, motorReturnUC motorReturn.MotorReturnUsecase) {
 	handler := motorReturnDelivery{motorReturnUC}
 
-	motorReturnGroup := v1Group.Group("/employee/:employee-id/motor-return")
+	motorReturnGroup := v1Group.Group("employee/:id/motor-return")
 	{
 		motorReturnGroup.POST("", middleware.JWTAuth("EMPLOYEE"), handler.CreateMotorReturn)
-		motorReturnGroup.GET("/:id", middleware.JWTAuth("EMPLOYEE", "ADMIN"), handler.GetMotorReturnById)
-		motorReturnGroup.GET("", middleware.JWTAuth("EMPLOYEE", "ADMIN"), handler.GetAllMotorReturn)
+		motorReturnGroup.GET("/:motor-return-id", middleware.JWTAuth("EMPLOYEE", "ADMIN"), handler.GetMotorReturnById)
 	}
+
+	motorReturnGroup.GET("/users/motor-return", middleware.JWTAuth("ADMIN"), handler.GetAllMotorReturn)
+
 }
 
 func (m *motorReturnDelivery) CreateMotorReturn(c *gin.Context) {
@@ -44,7 +46,7 @@ func (m *motorReturnDelivery) CreateMotorReturn(c *gin.Context) {
 }
 
 func (m *motorReturnDelivery) GetMotorReturnById(c *gin.Context) {
-	id := c.Param("id")
+	id := c.Param("motor-return-id")
 	motorReturnDetail, err := m.motorReturnUC.GetMotorReturnById(id)
 	if err != nil {
 		json.NewResponseError(c, err.Error(), "02", "01")
@@ -55,6 +57,7 @@ func (m *motorReturnDelivery) GetMotorReturnById(c *gin.Context) {
 }
 
 func (m *motorReturnDelivery) GetAllMotorReturn(c *gin.Context) {
+
 	motorsReturn, err := m.motorReturnUC.GetMotorReturnAll()
 	if err != nil {
 		json.NewResponseError(c, err.Error(), "03", "01")
