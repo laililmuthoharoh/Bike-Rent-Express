@@ -26,7 +26,6 @@ func (uc *usersUC) GetAllUsers() ([]dto.GetUsers, error) {
 }
 
 func (uc *usersUC) UpdateUsers(updateUsers dto.Users) error {
-
 	if updateUsers.Name == "" {
 		return errors.New("transaction Type cannot be empty")
 	}

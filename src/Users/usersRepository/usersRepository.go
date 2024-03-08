@@ -4,6 +4,7 @@ import (
 	"bike-rent-express/model/dto"
 	"bike-rent-express/src/Users"
 	"database/sql"
+	"fmt"
 )
 
 type usersRepository struct {
@@ -76,6 +77,7 @@ func (r *usersRepository) GetAll() ([]dto.GetUsers, error) {
 }
 
 func (r *usersRepository) UpdateUsers(usersUpdate dto.Users) error {
+	fmt.Println("1")
 	query := `
         UPDATE users
         SET name = $1, 
@@ -87,6 +89,7 @@ func (r *usersRepository) UpdateUsers(usersUpdate dto.Users) error {
             telp = $7
         WHERE id = $8
     `
+	fmt.Println("1")
 	result, err := r.db.Exec(query,
 		usersUpdate.Name,
 		usersUpdate.Username,
@@ -97,6 +100,7 @@ func (r *usersRepository) UpdateUsers(usersUpdate dto.Users) error {
 		usersUpdate.Telp,
 		usersUpdate.Uuid,
 	)
+	fmt.Println("2")
 	if err != nil {
 		return err
 	}

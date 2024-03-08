@@ -49,7 +49,7 @@ func (h *usersDelivery) UpdateUsers(ctx *gin.Context) {
 	var newUsers dto.Users
 	newUsers.Uuid = id
 
-	if err := ctx.ShouldBindJSON(newUsers); err != nil {
+	if err := ctx.ShouldBindJSON(&newUsers); err != nil {
 		json.NewResponseError(ctx, "Invalid request body", "02", "01")
 		fmt.Println(err)
 		return
