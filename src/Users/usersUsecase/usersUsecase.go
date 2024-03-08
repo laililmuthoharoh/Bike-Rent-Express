@@ -28,22 +28,7 @@ func (uc *usersUC) GetAllUsers() ([]dto.GetUsers, error) {
 }
 
 func (uc *usersUC) UpdateUsers(updateUsers dto.Users) error {
-	if updateUsers.Name == "" {
-		return errors.New("transaction Type cannot be empty")
-	}
-	if updateUsers.Username == "" {
-		return errors.New("transaction Type cannot be empty")
-	}
 
-	if updateUsers.Address == "" {
-		return errors.New("transaction Type cannot be empty")
-	}
-	if updateUsers.Can_rent == "" {
-		return errors.New("transaction Type cannot be empty")
-	}
-	if updateUsers.Telp == "" {
-		return errors.New("transaction Type cannot be empty")
-	}
 	updateUsers.Updated_at = time.Now().Format("2006-01-02")
 
 	fmt.Println(updateUsers)
@@ -60,30 +45,15 @@ func NewUsersUsecase(usersRepo Users.UsersRepository) Users.UsersUsecase {
 }
 
 func (c *usersUC) RegisterUsers(newUsers dto.RegisterUsers) error {
+	usernameReady, err := c.usersRepo.UsernameIsReady(newUsers.Username)
 
-	if newUsers.Name == "" {
-		return errors.New("name Type cannot be empty")
-	}
-	if newUsers.Username == "" {
-		return errors.New("username Type cannot be empty")
+	if err != nil {
+		return err
 	}
 
-	if newUsers.Password == "" {
-		return errors.New("password cannot be empty")
+	if !usernameReady {
+		return errors.New("1")
 	}
-	if newUsers.Address == "" {
-		return errors.New("address Type cannot be empty")
-	}
-	if newUsers.Role == "" {
-		return errors.New("role Type cannot be empty")
-	}
-	if newUsers.Can_rent == "" {
-		return errors.New("can rent Type cannot be empty")
-	}
-	if newUsers.Telp == "" {
-		return errors.New("phone Type cannot be empty")
-	}
-	newUsers.Created_at = time.Now().Format("2006-01-02")
 
 	encryptPassword, err := bcrypt.GenerateFromPassword([]byte(newUsers.Password), bcrypt.DefaultCost)
 	if err != nil {
@@ -99,13 +69,16 @@ func (c *usersUC) LoginUsers(loginRequest model.LoginRequest) (dto.LoginResponse
 	var loginResponse dto.LoginResponse
 	user, err := c.usersRepo.GetByUsername(loginRequest.Username)
 	if err != nil {
+		if strings.Contains(err.Error(), "invalid input syntax for type uuid") || err == sql.ErrNoRows {
+			return loginResponse, errors.New("1")
+		}
 		return loginResponse, err
 	}
 
 	fmt.Println(user)
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginRequest.Password))
 	if err != nil {
-		return loginResponse, err
+		return loginResponse, errors.New("1")
 	}
 
 	token, err := middleware.GenerateTokenJwt(user.Username, user.Role)

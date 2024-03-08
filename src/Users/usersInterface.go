@@ -13,6 +13,7 @@ type UsersRepository interface {
 	GetByUsername(username string) (dto.Users, error)
 	UpdateBalance(topUpRequest dto.TopUpRequest) error
 	UpdatePassword(changePasswordRequest dto.ChangePassword) error
+	UsernameIsReady(username string) (bool, error)
 }
 
 type UsersUsecase interface {

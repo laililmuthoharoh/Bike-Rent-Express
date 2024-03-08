@@ -90,9 +90,9 @@ func (r *usersRepository) UpdateUsers(usersUpdate dto.Users) error {
 		usersUpdate.Name,
 		usersUpdate.Username,
 		usersUpdate.Address,
-		usersUpdate.Can_rent,
+		usersUpdate.CanRent,
 		usersUpdate.Telp,
-		usersUpdate.Uuid,
+		usersUpdate.ID,
 	)
 	if err != nil {
 		return err
@@ -112,24 +112,24 @@ func (c *usersRepository) RegisterUsers(newUsers dto.RegisterUsers) error {
 		return err
 	}
 
-	query := `INSERT INTO users (name, username, password, address, role, can_rent,created_at, telp)
-	values ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id;`
+	canRent := newUsers.Role == "USER"
+
+	query := `INSERT INTO users (name, username, password, address, role, can_rent, telp) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id;`
 	if err := tx.QueryRow(query,
 		newUsers.Name,
 		newUsers.Username,
 		newUsers.Password,
 		newUsers.Address,
 		newUsers.Role,
-		newUsers.Can_rent,
-		newUsers.Created_at,
-		newUsers.Telp).Scan(&newUsers.Uuid); err != nil {
+		canRent,
+		newUsers.Telp).Scan(&newUsers.ID); err != nil {
 		tx.Rollback()
 		return err
 	}
 
 	if newUsers.Role == "USER" {
 		query = "INSERT INTO balance (amount, user_id) VALUES(0, $1);"
-		_, err = tx.Exec(query, newUsers.Uuid)
+		_, err = tx.Exec(query, newUsers.ID)
 		if err != nil {
 			tx.Rollback()
 			return err
@@ -143,7 +143,7 @@ func (c *usersRepository) RegisterUsers(newUsers dto.RegisterUsers) error {
 func (c *usersRepository) GetByUsername(username string) (dto.Users, error) {
 	var user dto.Users
 	query := `SELECT id, name, username, password, address, role, can_rent,updated_at,telp FROM users WHERE username = $1`
-	if err := c.db.QueryRow(query, username).Scan(&user.Uuid, &user.Name, &user.Username, &user.Password, &user.Address, &user.Role, &user.Can_rent, &user.Updated_at, &user.Telp); err != nil {
+	if err := c.db.QueryRow(query, username).Scan(&user.ID, &user.Name, &user.Username, &user.Password, &user.Address, &user.Role, &user.CanRent, &user.Updated_at, &user.Telp); err != nil {
 		return user, err
 	}
 	return user, nil
@@ -159,4 +159,12 @@ func (c *usersRepository) UpdatePassword(changePasswordRequest dto.ChangePasswor
 	query := "UPDATE users SET password = $1 WHERE id = $2"
 	_, err := c.db.Exec(query, changePasswordRequest.NewPassword, changePasswordRequest.ID)
 	return err
+}
+
+func (c *usersRepository) UsernameIsReady(username string) (bool, error) {
+	query := "SELECT COUNT(username) FROM users WHERE username = $1;"
+	var result int
+
+	err := c.db.QueryRow(query, username).Scan(&result)
+	return result == 0, err
 }
