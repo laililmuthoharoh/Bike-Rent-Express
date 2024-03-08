@@ -4,7 +4,6 @@ import (
 	"bike-rent-express/model/dto"
 	"bike-rent-express/src/Users"
 	"database/sql"
-	"fmt"
 )
 
 type usersRepository struct {
@@ -16,12 +15,13 @@ func NewUsersRepository(db *sql.DB) Users.UsersRepository {
 }
 
 func (r *usersRepository) GetByID(uuid string) (dto.GetUsers, error) {
-	query := `SELECT id, name, username, address, role, can_rent,created_at, updated_at,telp FROM users WHERE id = $1`
+	query := `SELECT id, name, username, password,address, role, can_rent,created_at, updated_at,telp FROM users WHERE id = $1`
 	var usersItem dto.GetUsers
 	if err := r.db.QueryRow(query, uuid).Scan(
 		&usersItem.Uuid,
 		&usersItem.Name,
 		&usersItem.Username,
+		&usersItem.Password,
 		&usersItem.Address,
 		&usersItem.Role,
 		&usersItem.Can_rent,
@@ -77,30 +77,23 @@ func (r *usersRepository) GetAll() ([]dto.GetUsers, error) {
 }
 
 func (r *usersRepository) UpdateUsers(usersUpdate dto.Users) error {
-	fmt.Println("1")
 	query := `
         UPDATE users
         SET name = $1, 
             username = $2, 
-            password = $3, 
-            address = $4, 
-            role = $5, 
-            can_rent = $6, 
-            telp = $7
-        WHERE id = $8
+            address = $3, 
+            can_rent = $4, 
+            telp = $5
+        WHERE id = $6
     `
-	fmt.Println("1")
 	result, err := r.db.Exec(query,
 		usersUpdate.Name,
 		usersUpdate.Username,
-		usersUpdate.Password,
 		usersUpdate.Address,
-		usersUpdate.Role,
 		usersUpdate.Can_rent,
 		usersUpdate.Telp,
 		usersUpdate.Uuid,
 	)
-	fmt.Println("2")
 	if err != nil {
 		return err
 	}
@@ -113,10 +106,15 @@ func (r *usersRepository) UpdateUsers(usersUpdate dto.Users) error {
 }
 
 func (c *usersRepository) RegisterUsers(newUsers dto.RegisterUsers) error {
+	tx, err := c.db.Begin()
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
 
 	query := `INSERT INTO users (name, username, password, address, role, can_rent,created_at, telp)
-	values ($1,$2,$3,$4,$5,$6,$7,$8)`
-	result, err := c.db.Exec(query,
+	values ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id;`
+	if err := tx.QueryRow(query,
 		newUsers.Name,
 		newUsers.Username,
 		newUsers.Password,
@@ -124,15 +122,20 @@ func (c *usersRepository) RegisterUsers(newUsers dto.RegisterUsers) error {
 		newUsers.Role,
 		newUsers.Can_rent,
 		newUsers.Created_at,
-		newUsers.Telp,
-	)
-	if err != nil {
+		newUsers.Telp).Scan(&newUsers.Uuid); err != nil {
+		tx.Rollback()
 		return err
 	}
-	rowsAffected, _ := result.RowsAffected()
-	if rowsAffected == 0 {
-		return sql.ErrNoRows
+
+	if newUsers.Role == "USER" {
+		query = "INSERT INTO balance (amount, user_id) VALUES(0, $1);"
+		_, err = tx.Exec(query, newUsers.Uuid)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
 	}
+	tx.Commit()
 
 	return nil
 }
@@ -144,4 +147,16 @@ func (c *usersRepository) GetByUsername(username string) (dto.Users, error) {
 		return user, err
 	}
 	return user, nil
+}
+
+func (c *usersRepository) UpdateBalance(topUpRequest dto.TopUpRequest) error {
+	query := "UPDATE balance SET amount =$1, updated_at = CURRENT_TIMESTAMP WHERE user_id = $2;"
+	_, err := c.db.Exec(query, topUpRequest.Amount, topUpRequest.UserID)
+	return err
+}
+
+func (c *usersRepository) UpdatePassword(changePasswordRequest dto.ChangePassword) error {
+	query := "UPDATE users SET password = $1 WHERE id = $2"
+	_, err := c.db.Exec(query, changePasswordRequest.NewPassword, changePasswordRequest.ID)
+	return err
 }
