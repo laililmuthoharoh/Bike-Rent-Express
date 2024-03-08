@@ -4,6 +4,7 @@ import (
 	"bike-rent-express/model"
 	"bike-rent-express/model/dto"
 	"bike-rent-express/model/dto/json"
+	"bike-rent-express/pkg/middleware"
 	"bike-rent-express/pkg/utils"
 	"bike-rent-express/src/Users"
 	"fmt"
@@ -21,13 +22,13 @@ func NewUsersDelivery(v1Group *gin.RouterGroup, usersUC Users.UsersUsecase) {
 	}
 	usersGroup := v1Group.Group("/users")
 	{
-		usersGroup.GET("", handler.GetAllUsers)
-		usersGroup.PUT("/update", handler.UpdateUsers)
+		usersGroup.GET("", middleware.JWTAuth("ADMIN"), handler.GetAllUsers)
+		usersGroup.PUT("/:id", middleware.JWTAuth("ADMIN", "USER"), handler.UpdateUsers)
 
-		usersGroup.GET("/:id", handler.getByID)
+		usersGroup.GET("/:id", middleware.JWTAuth("ADMIN", "USER"), handler.getByID)
 
-		usersGroup.POST("/regist", handler.RegisterUsers)
-		usersGroup.POST("/login",handler.LoginUsers)
+		usersGroup.POST("/register", handler.RegisterUsers)
+		usersGroup.POST("/login", handler.LoginUsers)
 
 	}
 }
@@ -43,7 +44,11 @@ func (h *usersDelivery) GetAllUsers(ctx *gin.Context) {
 }
 
 func (h *usersDelivery) UpdateUsers(ctx *gin.Context) {
+	id := ctx.Param("id")
+
 	var newUsers dto.Users
+	newUsers.Uuid = id
+
 	if err := ctx.ShouldBindJSON(&newUsers); err != nil {
 		json.NewResponseError(ctx, "Invalid request body", "02", "01")
 		fmt.Println(err)
@@ -52,7 +57,7 @@ func (h *usersDelivery) UpdateUsers(ctx *gin.Context) {
 	}
 
 	// Call usecase to update the expense
-	if err := h.usersUC.UpdateUsers(&newUsers); err != nil {
+	if err := h.usersUC.UpdateUsers(newUsers); err != nil {
 		json.NewResponseError(ctx, err.Error(), "01", "01")
 		fmt.Println(err)
 		return
@@ -85,7 +90,7 @@ func (c *usersDelivery) RegisterUsers(ctx *gin.Context) {
 	}
 
 	// Call usecase to create the expense
-	if err := c.usersUC.RegisterUsers(&newUsers); err != nil {
+	if err := c.usersUC.RegisterUsers(newUsers); err != nil {
 		json.NewResponseError(ctx, err.Error(), "01", "01")
 		fmt.Println(err)
 		return
@@ -93,24 +98,23 @@ func (c *usersDelivery) RegisterUsers(ctx *gin.Context) {
 	}
 
 	// Respond with success
-	json.NewResponseSuccess(ctx, "", "Account Created", "01", "01")
+	json.NewResponseSuccess(ctx, newUsers, "Account Created", "01", "01")
 }
 
-
 func (c *usersDelivery) LoginUsers(ctx *gin.Context) {
-	var loginRequest model.LoginRequest 
+	var loginRequest model.LoginRequest
 	ctx.BindJSON(&loginRequest)
 	if err := utils.Validated(loginRequest); err != nil {
-		json.NewResponseBadRequest(ctx,err,"bad request","01", "01")
+		json.NewResponseBadRequest(ctx, err, "bad request", "01", "01")
 		return
 	}
 
-	loginResponse, err := c.usersUC.LoginUsers(loginRequest) 
+	loginResponse, err := c.usersUC.LoginUsers(loginRequest)
 	if err != nil {
-		json.NewResponseError(ctx,err.Error(),"01", "01")
+		json.NewResponseError(ctx, err.Error(), "01", "01")
 		return
 	}
 
-	json.NewResponseSuccess(ctx,loginResponse, "login succes", "01", "01")
-	
+	json.NewResponseSuccess(ctx, loginResponse, "login succes", "01", "01")
+
 }

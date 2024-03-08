@@ -4,6 +4,7 @@ import (
 	"bike-rent-express/model/dto"
 	"bike-rent-express/src/Users"
 	"database/sql"
+	"fmt"
 )
 
 type usersRepository struct {
@@ -14,7 +15,7 @@ func NewUsersRepository(db *sql.DB) Users.UsersRepository {
 	return &usersRepository{db}
 }
 
-func (r *usersRepository) GetByID(uuid string) (*dto.GetUsers, error) {
+func (r *usersRepository) GetByID(uuid string) (dto.GetUsers, error) {
 	query := `SELECT id, name, username, address, role, can_rent,created_at, updated_at,telp FROM users WHERE id = $1`
 	var usersItem dto.GetUsers
 	if err := r.db.QueryRow(query, uuid).Scan(
@@ -28,7 +29,7 @@ func (r *usersRepository) GetByID(uuid string) (*dto.GetUsers, error) {
 		&usersItem.Updated_at,
 		&usersItem.Telp,
 	); err != nil {
-		return nil, err
+		return usersItem, err
 	}
 
 	// hashedPassword, err := bcrypt.GenerateFromPassword([]byte(usersItem.Password), bcrypt.DefaultCost)
@@ -38,18 +39,18 @@ func (r *usersRepository) GetByID(uuid string) (*dto.GetUsers, error) {
 
 	// usersItem.Password = string(hashedPassword)
 
-	return &usersItem, nil
+	return usersItem, nil
 }
 
-func (r *usersRepository) GetAll() ([]*dto.GetUsers, error) {
-	query := `SELECT id, name, username, address, role, can_rent, created_at, updated_at, telp FROM users`
+func (r *usersRepository) GetAll() ([]dto.GetUsers, error) {
+	query := `SELECT id, name, username, address, role, can_rent, created_at, updated_at, telp FROM users WHERE role = 'USER'`
 	rows, err := r.db.Query(query)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var users []*dto.GetUsers
+	var users []dto.GetUsers
 	for rows.Next() {
 		var user dto.GetUsers
 		if err := rows.Scan(
@@ -66,7 +67,7 @@ func (r *usersRepository) GetAll() ([]*dto.GetUsers, error) {
 			return nil, err
 		}
 
-		users = append(users, &user)
+		users = append(users, user)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -75,7 +76,8 @@ func (r *usersRepository) GetAll() ([]*dto.GetUsers, error) {
 	return users, nil
 }
 
-func (r *usersRepository) UpdateUsers(usersUpdate *dto.Users) error {
+func (r *usersRepository) UpdateUsers(usersUpdate dto.Users) error {
+	fmt.Println("1")
 	query := `
         UPDATE users
         SET name = $1, 
@@ -87,6 +89,7 @@ func (r *usersRepository) UpdateUsers(usersUpdate *dto.Users) error {
             telp = $7
         WHERE id = $8
     `
+	fmt.Println("1")
 	result, err := r.db.Exec(query,
 		usersUpdate.Name,
 		usersUpdate.Username,
@@ -97,6 +100,7 @@ func (r *usersRepository) UpdateUsers(usersUpdate *dto.Users) error {
 		usersUpdate.Telp,
 		usersUpdate.Uuid,
 	)
+	fmt.Println("2")
 	if err != nil {
 		return err
 	}
@@ -108,7 +112,7 @@ func (r *usersRepository) UpdateUsers(usersUpdate *dto.Users) error {
 	return nil
 }
 
-func (c *usersRepository) RegisterUsers(newUsers *dto.RegisterUsers) error {
+func (c *usersRepository) RegisterUsers(newUsers dto.RegisterUsers) error {
 
 	query := `INSERT INTO users (name, username, password, address, role, can_rent,created_at, telp)
 	values ($1,$2,$3,$4,$5,$6,$7,$8)`
@@ -135,8 +139,8 @@ func (c *usersRepository) RegisterUsers(newUsers *dto.RegisterUsers) error {
 
 func (c *usersRepository) GetByUsername(username string) (dto.Users, error) {
 	var user dto.Users
-	query := `SELECT id, name, username, address, role, can_rent,updated_at,telp FROM users WHERE username = $1`
-	if err := c.db.QueryRow(query, username).Scan(&user.Uuid, &user.Name, &user.Username, &user.Address, &user.Role, &user.Can_rent, &user.Updated_at, &user.Telp); err != nil {
+	query := `SELECT id, name, username, password, address, role, can_rent,updated_at,telp FROM users WHERE username = $1`
+	if err := c.db.QueryRow(query, username).Scan(&user.Uuid, &user.Name, &user.Username, &user.Password, &user.Address, &user.Role, &user.Can_rent, &user.Updated_at, &user.Telp); err != nil {
 		return user, err
 	}
 	return user, nil

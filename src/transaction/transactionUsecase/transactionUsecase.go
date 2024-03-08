@@ -6,6 +6,9 @@ import (
 	"bike-rent-express/src/employee"
 	"bike-rent-express/src/motorVehicle"
 	"bike-rent-express/src/transaction"
+	"database/sql"
+	"errors"
+	"strings"
 )
 
 type transactionUsecase struct {
@@ -38,6 +41,9 @@ func (t *transactionUsecase) GetTransactionById(id string) (transactionDto.Respo
 
 	transaction, err := t.transactionRepository.GetById(id)
 	if err != nil {
+		if err == sql.ErrNoRows || strings.Contains(err.Error(), "invalid input syntax for type uuid") {
+			return transactionDetail, errors.New("1")
+		}
 		return transactionDetail, err
 	}
 
@@ -46,15 +52,15 @@ func (t *transactionUsecase) GetTransactionById(id string) (transactionDto.Respo
 		return transactionDetail, err
 	}
 
-	employee, err := t.employeeRepository.GetById(transaction.UserID)
+	employee, err := t.employeeRepository.GetById(transaction.EmployeeId)
 	if err != nil {
 		return transactionDetail, err
 	}
 
-	// customer, err := t.userRepository.GetByID(transaction.ID)
-	// if err != nil {
-	// 	return transactionDetail, err
-	// }
+	customer, err := t.userRepository.GetByID(transaction.UserID)
+	if err != nil {
+		return transactionDetail, err
+	}
 
 	transactionDetail.ID = transaction.ID
 	transactionDetail.StartDate = transaction.StartDate
@@ -62,9 +68,9 @@ func (t *transactionUsecase) GetTransactionById(id string) (transactionDto.Respo
 	transactionDetail.Price = transaction.Price
 	transactionDetail.MotorVehicle = motorVehicle
 	transactionDetail.Employee = employee
-	// transactionDetail.Customer = customer
+	transactionDetail.Customer = customer
 	transactionDetail.CreatedAt = transaction.CreatedAt
-	transaction.UpdatedAt = transaction.UpdatedAt
+	transactionDetail.UpdatedAt = transaction.UpdatedAt
 
 	return transactionDetail, nil
 }
@@ -90,15 +96,15 @@ func (t *transactionUsecase) GetTransactionAll() ([]transactionDto.ResponseTrans
 			return transactionsDetail, err
 		}
 
-		employee, err := t.employeeRepository.GetById(transaction.UserID)
+		employee, err := t.employeeRepository.GetById(transaction.EmployeeId)
 		if err != nil {
 			return transactionsDetail, err
 		}
 
-		// customer, err := t.userRepository.GetByID(transaction.ID)
-		// if err != nil {
-		// 	return transactionsDetail, err
-		// }
+		customer, err := t.userRepository.GetByID(transaction.UserID)
+		if err != nil {
+			return transactionsDetail, err
+		}
 
 		transactionDetail.ID = transaction.ID
 		transactionDetail.StartDate = transaction.StartDate
@@ -106,12 +112,12 @@ func (t *transactionUsecase) GetTransactionAll() ([]transactionDto.ResponseTrans
 		transactionDetail.Price = transaction.Price
 		transactionDetail.MotorVehicle = motorVehicle
 		transactionDetail.Employee = employee
-		// transactionDetail.Customer = customer
+		transactionDetail.Customer = customer
 		transactionDetail.CreatedAt = transaction.CreatedAt
-		transaction.UpdatedAt = transaction.UpdatedAt
+		transactionDetail.UpdatedAt = transaction.UpdatedAt
 
 		transactionsDetail = append(transactionsDetail, transactionDetail)
 	}
 
-	return []transactionDto.ResponseTransaction{}, nil
+	return transactionsDetail, nil
 }

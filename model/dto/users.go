@@ -20,8 +20,8 @@ type (
 		Address    string `json:"alamat"`
 		Role       string `json:"role"`
 		Can_rent   string `json:"sewa"`
-		Created_at string
-		Updated_at string
+		Created_at string `json:"created_at"`
+		Updated_at string `json:"updated_at"`
 		Telp       string `json:"telepon"`
 	}
 
