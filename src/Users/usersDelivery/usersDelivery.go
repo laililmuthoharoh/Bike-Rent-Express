@@ -7,7 +7,9 @@ import (
 	"bike-rent-express/pkg/middleware"
 	"bike-rent-express/pkg/utils"
 	"bike-rent-express/src/Users"
+	"database/sql"
 	"fmt"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -49,25 +51,25 @@ func (h *usersDelivery) UpdateUsers(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	var newUsers dto.Users
-	newUsers.Uuid = id
+	newUsers.ID = id
 
-	if err := ctx.ShouldBindJSON(&newUsers); err != nil {
-		json.NewResponseError(ctx, "Invalid request body", "02", "01")
-		fmt.Println(err)
+	ctx.ShouldBindJSON(&newUsers)
+	if err := utils.Validated(newUsers); err != nil {
+		json.NewResponseBadRequest(ctx, err, "Bad Request", "02", "01")
 		return
-
 	}
 
-	// Call usecase to update the expense
 	if err := h.usersUC.UpdateUsers(newUsers); err != nil {
+		if strings.Contains(err.Error(), "invalid input syntax for type uuid") || err == sql.ErrNoRows {
+			json.NewResponseSuccess(ctx, nil, "User not found", "02", "01")
+			return
+		}
 		json.NewResponseError(ctx, err.Error(), "02", "01")
-		fmt.Println(err)
 		return
 
 	}
 
-	// Respond with success
-	json.NewResponseSuccess(ctx, nil, "Account Updated", "02", "01")
+	json.NewResponseSuccess(ctx, nil, "Account Updated", "02", "02")
 }
 
 func (d *usersDelivery) getByID(ctx *gin.Context) {
@@ -75,6 +77,10 @@ func (d *usersDelivery) getByID(ctx *gin.Context) {
 	fmt.Println(id)
 	usersItem, err := d.usersUC.GetByID(id)
 	if err != nil {
+		if err.Error() == "1" {
+			json.NewResponseSuccess(ctx, nil, "User not found", "03", "01")
+			return
+		}
 		json.NewResponseError(ctx, err.Error(), "03", "01")
 		return
 	}
@@ -84,15 +90,18 @@ func (d *usersDelivery) getByID(ctx *gin.Context) {
 
 func (c *usersDelivery) RegisterUsers(ctx *gin.Context) {
 	var newUsers dto.RegisterUsers
-	if err := ctx.ShouldBindJSON(&newUsers); err != nil {
-		json.NewResponseError(ctx, "Invalid request body", "04", "01")
-		fmt.Println(err)
-		return
 
+	ctx.ShouldBindJSON(&newUsers)
+	if err := utils.Validated(newUsers); err != nil {
+		json.NewResponseBadRequest(ctx, err, "Bad Request", "04", "01")
+		return
 	}
 
-	// Call usecase to create the expense
 	if err := c.usersUC.RegisterUsers(newUsers); err != nil {
+		if err.Error() == "1" {
+			json.NewResponseSuccess(ctx, nil, "username already in use", "04", "01")
+			return
+		}
 		json.NewResponseError(ctx, err.Error(), "04", "02")
 		fmt.Println(err)
 		return
@@ -100,7 +109,7 @@ func (c *usersDelivery) RegisterUsers(ctx *gin.Context) {
 	}
 
 	// Respond with success
-	json.NewResponseSuccess(ctx, newUsers, "Account Created", "04", "01")
+	json.NewResponseSuccess(ctx, newUsers, "Account Created", "04", "02")
 }
 
 func (c *usersDelivery) LoginUsers(ctx *gin.Context) {
@@ -113,11 +122,15 @@ func (c *usersDelivery) LoginUsers(ctx *gin.Context) {
 
 	loginResponse, err := c.usersUC.LoginUsers(loginRequest)
 	if err != nil {
+		if err.Error() == "1" {
+			json.NewResponseSuccess(ctx, nil, "Incorrect username or password", "05", "01")
+			return
+		}
 		json.NewResponseError(ctx, err.Error(), "05", "01")
 		return
 	}
 
-	json.NewResponseSuccess(ctx, loginResponse, "login succes", "05", "01")
+	json.NewResponseSuccess(ctx, loginResponse, "login succes", "05", "02")
 
 }
 
