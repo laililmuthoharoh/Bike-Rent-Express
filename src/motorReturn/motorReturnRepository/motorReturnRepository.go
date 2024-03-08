@@ -23,7 +23,7 @@ func (m *motorReturnRepository) Add(createMotorReturnRequest motorReturnDto.Crea
 	}
 
 	var userId string
-	query := "SELECT user_id FORM transaction WHERE id = $1;"
+	query := "SELECT user_id FROM transaction WHERE id = $1;"
 	if err := tx.QueryRow(query, createMotorReturnRequest.TransactionID).Scan(&userId); err != nil {
 		tx.Rollback()
 		return createMotorReturnRequest, err
@@ -44,17 +44,25 @@ func (m *motorReturnRepository) Add(createMotorReturnRequest motorReturnDto.Crea
 
 	balanceUser -= createMotorReturnRequest.ExtraCharge
 
-	query = "UPDATE balance SET amount = $1 WHERE id = $2;"
+	query = "UPDATE balance SET amount = $1 WHERE user_id = $2;"
 	_, err = tx.Exec(query, balanceUser, userId)
 	if err != nil {
 		tx.Rollback()
 		return createMotorReturnRequest, err
 	}
+
+	query = "UPDATE motor_vehicle SET status = 'AVAILABLE';"
+	_, err = tx.Exec(query)
+	if err != nil {
+		tx.Rollback()
+		return createMotorReturnRequest, err
+	}
+
 	returnDate := time.Now()
 
-	query = "INSERT INTO motor_return(transaction_id, return_date, extra_charge, condition_motor, descripion) VALUES($1, $2, $3, $4, $5) RETURNING id;"
+	query = "INSERT INTO motor_return(transaction_id, return_date, extra_charge, condition_motor, description) VALUES($1, $2, $3, $4, $5) RETURNING id;"
 
-	if err := tx.QueryRow(query, createMotorReturnRequest.TransactionID, returnDate, createMotorReturnRequest.ConditionMotor, createMotorReturnRequest.Description).Scan(&createMotorReturnRequest.ID); err != nil {
+	if err := tx.QueryRow(query, createMotorReturnRequest.TransactionID, returnDate, createMotorReturnRequest.ExtraCharge, createMotorReturnRequest.ConditionMotor, createMotorReturnRequest.Description).Scan(&createMotorReturnRequest.ID); err != nil {
 		tx.Rollback()
 		return createMotorReturnRequest, err
 	}
@@ -67,7 +75,7 @@ func (m *motorReturnRepository) GetById(id string) (motorReturnDto.MotorReturn, 
 	var motorReturn motorReturnDto.MotorReturn
 	query := "SELECT id, transaction_id, return_date, extra_charge, condition_motor, description, created_at, updated_at FROM motor_return WHERE id = $1;"
 
-	if err := m.db.QueryRow(query, id).Scan(&motorReturn.ID, &motorReturn.TrasactionID, &motorReturn.ReturnDate, &motorReturn.ExtraCharge, &motorReturn.ConditionMotor, &motorReturn.ConditionMotor, &motorReturn.Descrption, &motorReturn.CreatedAt, &motorReturn.UpdatedAt); err != nil {
+	if err := m.db.QueryRow(query, id).Scan(&motorReturn.ID, &motorReturn.TrasactionID, &motorReturn.ReturnDate, &motorReturn.ExtraCharge, &motorReturn.ConditionMotor, &motorReturn.Descrption, &motorReturn.CreatedAt, &motorReturn.UpdatedAt); err != nil {
 		return motorReturn, err
 	}
 
@@ -86,7 +94,7 @@ func (m *motorReturnRepository) GetAll() ([]motorReturnDto.MotorReturn, error) {
 
 	for rows.Next() {
 		var motorReturn motorReturnDto.MotorReturn
-		if err := rows.Scan(&motorReturn.ID, &motorReturn.TrasactionID, &motorReturn.ReturnDate, &motorReturn.ExtraCharge, &motorReturn.ConditionMotor, &motorReturn, &motorReturn.Descrption); err != nil {
+		if err := rows.Scan(&motorReturn.ID, &motorReturn.TrasactionID, &motorReturn.ReturnDate, &motorReturn.ExtraCharge, &motorReturn.ConditionMotor, &motorReturn.Descrption, &motorReturn.CreatedAt, &motorReturn.UpdatedAt); err != nil {
 			return motorsReturn, err
 		}
 		motorsReturn = append(motorsReturn, motorReturn)

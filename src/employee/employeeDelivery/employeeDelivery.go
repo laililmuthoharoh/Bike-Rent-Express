@@ -18,7 +18,6 @@ type employeeDelivery struct {
 
 func NewEmployeeDelivery(v1Group *gin.RouterGroup, employeeUC employee.EmployeeUsecase) {
 	handler := employeeDelivery{employeeUC}
-
 	employeeGroup := v1Group.Group("employee")
 	{
 		employeeGroup.POST("/register", handler.AddEmployee)
