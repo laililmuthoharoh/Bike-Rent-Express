@@ -81,7 +81,7 @@ func (e *employeeRepository) Get() ([]employeeDto.Employee, error) {
 func (e *employeeRepository) GetById(id string) (employeeDto.Employee, error) {
 
 	var employee employeeDto.Employee
-	query := "SELECT id, name, telp, username, password,created_at, updated_at FROM employee WHERE id = $1 AND deleted_at IS NULL;"
+	query := "SELECT id, name, telp, username, password, created_at, updated_at FROM employee WHERE id = $1 AND deleted_at IS NULL;"
 	if err := e.db.QueryRow(query, id).Scan(&employee.ID, &employee.Name, &employee.Telp, &employee.Username, &employee.Password, &employee.CreatedAt, &employee.UpdatedAt); err != nil {
 		return employee, err
 	}
