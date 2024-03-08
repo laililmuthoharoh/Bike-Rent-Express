@@ -10,9 +10,9 @@ bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository
 bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:42.109,46.193 3 1
 bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:46.193,48.3 1 1
 bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:50.2,50.19 1 1
-bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:54.128,58.16 3 0
+bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:54.128,58.16 3 1
 bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:58.16,60.3 1 0
-bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:62.2,62.46 1 0
+bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:62.2,62.46 1 1
 bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:65.139,73.16 5 0
 bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:73.16,75.3 1 0
 bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:76.2,76.46 1 0
