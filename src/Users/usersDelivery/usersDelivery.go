@@ -26,6 +26,8 @@ func NewUsersDelivery(v1Group *gin.RouterGroup, usersUC Users.UsersUsecase) {
 		usersGroup.PUT("/:id", middleware.JWTAuth("ADMIN", "USER"), handler.UpdateUsers)
 
 		usersGroup.GET("/:id", middleware.JWTAuth("ADMIN", "USER"), handler.getByID)
+		usersGroup.PUT("/:id/change-password", middleware.JWTAuth("ADMIN", "USER"), handler.ChangePassword)
+		usersGroup.PUT("/:id/top-up", middleware.JWTAuth("USER"), handler.TopUp)
 
 		usersGroup.POST("/register", handler.RegisterUsers)
 		usersGroup.POST("/login", handler.LoginUsers)
@@ -58,32 +60,32 @@ func (h *usersDelivery) UpdateUsers(ctx *gin.Context) {
 
 	// Call usecase to update the expense
 	if err := h.usersUC.UpdateUsers(newUsers); err != nil {
-		json.NewResponseError(ctx, err.Error(), "01", "01")
+		json.NewResponseError(ctx, err.Error(), "02", "01")
 		fmt.Println(err)
 		return
 
 	}
 
 	// Respond with success
-	json.NewResponseSuccess(ctx, "", "Account Updated", "01", "01")
+	json.NewResponseSuccess(ctx, nil, "Account Updated", "02", "01")
 }
 
 func (d *usersDelivery) getByID(ctx *gin.Context) {
 	id := ctx.Param("id")
 	fmt.Println(id)
-	usersItem, err := d.usersUC.GetByIDs(id)
+	usersItem, err := d.usersUC.GetByID(id)
 	if err != nil {
-		json.NewResponseError(ctx, err.Error(), "01", "01")
+		json.NewResponseError(ctx, err.Error(), "03", "01")
 		return
 	}
 
-	json.NewResponseSuccess(ctx, usersItem, "Success", "01", "01")
+	json.NewResponseSuccess(ctx, usersItem, "Success", "03", "01")
 }
 
 func (c *usersDelivery) RegisterUsers(ctx *gin.Context) {
 	var newUsers dto.RegisterUsers
 	if err := ctx.ShouldBindJSON(&newUsers); err != nil {
-		json.NewResponseError(ctx, "Invalid request body", "02", "01")
+		json.NewResponseError(ctx, "Invalid request body", "04", "01")
 		fmt.Println(err)
 		return
 
@@ -91,30 +93,75 @@ func (c *usersDelivery) RegisterUsers(ctx *gin.Context) {
 
 	// Call usecase to create the expense
 	if err := c.usersUC.RegisterUsers(newUsers); err != nil {
-		json.NewResponseError(ctx, err.Error(), "01", "01")
+		json.NewResponseError(ctx, err.Error(), "04", "02")
 		fmt.Println(err)
 		return
 
 	}
 
 	// Respond with success
-	json.NewResponseSuccess(ctx, newUsers, "Account Created", "01", "01")
+	json.NewResponseSuccess(ctx, newUsers, "Account Created", "04", "01")
 }
 
 func (c *usersDelivery) LoginUsers(ctx *gin.Context) {
 	var loginRequest model.LoginRequest
 	ctx.BindJSON(&loginRequest)
 	if err := utils.Validated(loginRequest); err != nil {
-		json.NewResponseBadRequest(ctx, err, "bad request", "01", "01")
+		json.NewResponseBadRequest(ctx, err, "bad request", "05", "01")
 		return
 	}
 
 	loginResponse, err := c.usersUC.LoginUsers(loginRequest)
 	if err != nil {
-		json.NewResponseError(ctx, err.Error(), "01", "01")
+		json.NewResponseError(ctx, err.Error(), "05", "01")
 		return
 	}
 
-	json.NewResponseSuccess(ctx, loginResponse, "login succes", "01", "01")
+	json.NewResponseSuccess(ctx, loginResponse, "login succes", "05", "01")
 
+}
+
+func (c *usersDelivery) TopUp(ctx *gin.Context) {
+	id := ctx.Param("id")
+	var topupRequest dto.TopUpRequest
+
+	ctx.BindJSON(&topupRequest)
+	if err := utils.Validated(topupRequest); err != nil {
+		json.NewResponseBadRequest(ctx, err, "Bad Request", "06", "01")
+		return
+	}
+
+	topupRequest.UserID = id
+	err := c.usersUC.TopUp(topupRequest)
+	if err != nil {
+		json.NewResponseError(ctx, err.Error(), "06", "01")
+		return
+	}
+
+	json.NewResponseSuccess(ctx, nil, "Success Top Up", "06", "01")
+
+}
+
+func (c *usersDelivery) ChangePassword(ctx *gin.Context) {
+	id := ctx.Param("id")
+	var changePasswordRequest dto.ChangePassword
+
+	ctx.BindJSON(&changePasswordRequest)
+	if err := utils.Validated(changePasswordRequest); err != nil {
+		json.NewResponseBadRequest(ctx, err, "Bad Request", "07", "01")
+		return
+	}
+
+	changePasswordRequest.ID = id
+	err := c.usersUC.ChangePassword(changePasswordRequest)
+	if err != nil {
+		if err.Error() == "1" {
+			json.NewResponseSuccess(ctx, nil, "password does not match", "07", "01")
+			return
+		}
+		json.NewResponseError(ctx, err.Error(), "07", "01")
+		return
+	}
+
+	json.NewResponseSuccess(ctx, nil, "Success change password", "07", "02")
 }

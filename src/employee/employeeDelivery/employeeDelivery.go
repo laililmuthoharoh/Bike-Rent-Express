@@ -156,10 +156,7 @@ func (e *employeeDelivery) ChangePassword(c *gin.Context) {
 	err := e.employeeUC.ChangePassword(id, changePasswordRequest)
 	if err != nil {
 		if err.Error() == "1" {
-			json.NewResponseSuccess(c, nil, "Incorrect username or password", "07", "01")
-			return
-		} else if err.Error() == "2" {
-			json.NewResponseSuccess(c, nil, "Incorrect username or password", "07", "02")
+			json.NewResponseSuccess(c, nil, "password does not match", "07", "01")
 			return
 		}
 		json.NewResponseError(c, err.Error(), "07", "01")

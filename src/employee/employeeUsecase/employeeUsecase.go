@@ -114,7 +114,7 @@ func (e *employeeUsecase) ChangePassword(id string, changePasswordRequest employ
 
 	err = bcrypt.CompareHashAndPassword([]byte(employee.Password), []byte(changePasswordRequest.PasswordOld))
 	if err != nil {
-		return errors.New("2")
+		return errors.New("1")
 	}
 
 	encryptPass, err := bcrypt.GenerateFromPassword([]byte(changePasswordRequest.NewPassword), bcrypt.DefaultCost)

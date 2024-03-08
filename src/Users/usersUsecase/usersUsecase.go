@@ -33,13 +33,7 @@ func (uc *usersUC) UpdateUsers(updateUsers dto.Users) error {
 		return errors.New("transaction Type cannot be empty")
 	}
 
-	if updateUsers.Password == "" {
-		return errors.New("description cannot be empty")
-	}
 	if updateUsers.Address == "" {
-		return errors.New("transaction Type cannot be empty")
-	}
-	if updateUsers.Role == "" {
 		return errors.New("transaction Type cannot be empty")
 	}
 	if updateUsers.Can_rent == "" {
@@ -55,7 +49,7 @@ func (uc *usersUC) UpdateUsers(updateUsers dto.Users) error {
 	return uc.usersRepo.UpdateUsers(updateUsers)
 }
 
-func (uc *usersUC) GetByIDs(id string) (dto.GetUsers, error) {
+func (uc *usersUC) GetByID(id string) (dto.GetUsers, error) {
 	return uc.usersRepo.GetByID(id)
 }
 
@@ -120,4 +114,26 @@ func (c *usersUC) LoginUsers(loginRequest model.LoginRequest) (dto.LoginResponse
 	loginResponse.AccesToken = token
 
 	return loginResponse, nil
+}
+
+func (c *usersUC) TopUp(topUpRequest dto.TopUpRequest) error {
+	err := c.usersRepo.UpdateBalance(topUpRequest)
+	return err
+}
+
+func (c *usersUC) ChangePassword(changePasswordRequest dto.ChangePassword) error {
+	user, err := c.usersRepo.GetByID(changePasswordRequest.ID)
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(changePasswordRequest.OldPassword))
+	if err != nil {
+		return errors.New("1")
+	}
+	encryptPass, err := bcrypt.GenerateFromPassword([]byte(changePasswordRequest.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return errors.New("1")
+	}
+
+	changePasswordRequest.NewPassword = string(encryptPass)
+
+	err = c.usersRepo.UpdatePassword(changePasswordRequest)
+	return err
 }

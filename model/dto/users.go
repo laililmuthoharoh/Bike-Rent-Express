@@ -20,6 +20,7 @@ type (
 		Address    string `json:"alamat"`
 		Role       string `json:"role"`
 		Can_rent   string `json:"sewa"`
+		Password   string `json:"-"`
 		Created_at string `json:"created_at"`
 		Updated_at string `json:"updated_at"`
 		Telp       string `json:"telepon"`
@@ -40,5 +41,16 @@ type (
 	LoginResponse struct {
 		AccesToken string `json:"acces_token"`
 		User       Users  `json:"user"`
+	}
+
+	TopUpRequest struct {
+		Amount int `json:"amount" validate:"required"`
+		UserID string
+	}
+
+	ChangePassword struct {
+		ID          string
+		OldPassword string `json:"old_password" validate:"required"`
+		NewPassword string `json:"new_password" validate:"required"`
 	}
 )
