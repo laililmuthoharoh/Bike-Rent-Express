@@ -108,11 +108,15 @@ func (e *employeeDelivery) DeleteEmployeeById(c *gin.Context) {
 
 	msg, err := e.employeeUC.Delete(id)
 	if err != nil {
+		if err.Error() == "1" {
+			json.NewResponseSuccess(c, nil, "Data not found", "05", "01")
+			return
+		}
 		json.NewResponseError(c, err.Error(), "05", "01")
 		return
 	}
 
-	json.NewResponseSuccess(c, nil, msg, "05", "01")
+	json.NewResponseSuccess(c, nil, msg, "05", "02")
 }
 
 func (e *employeeDelivery) LoginEmployee(c *gin.Context) {
@@ -156,7 +160,11 @@ func (e *employeeDelivery) ChangePassword(c *gin.Context) {
 	err := e.employeeUC.ChangePassword(id, changePasswordRequest)
 	if err != nil {
 		if err.Error() == "1" {
-			json.NewResponseSuccess(c, nil, "password does not match", "07", "01")
+			json.NewResponseSuccess(c, nil, "Data not found", "07", "01")
+			return
+		}
+		if err.Error() == "2" {
+			json.NewResponseSuccess(c, nil, "password does not match", "07", "02")
 			return
 		}
 		json.NewResponseError(c, err.Error(), "07", "01")

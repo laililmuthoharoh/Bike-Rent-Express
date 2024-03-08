@@ -156,12 +156,16 @@ func (c *usersDelivery) ChangePassword(ctx *gin.Context) {
 	err := c.usersUC.ChangePassword(changePasswordRequest)
 	if err != nil {
 		if err.Error() == "1" {
-			json.NewResponseSuccess(ctx, nil, "password does not match", "07", "01")
+			json.NewResponseSuccess(ctx, nil, "Data not found", "07", "01")
 			return
 		}
-		json.NewResponseError(ctx, err.Error(), "07", "01")
+		if err.Error() == "2" {
+			json.NewResponseSuccess(ctx, nil, "password does not match", "07", "02")
+			return
+		}
+		json.NewResponseError(ctx, err.Error(), "07", "02")
 		return
 	}
 
-	json.NewResponseSuccess(ctx, nil, "Success change password", "07", "02")
+	json.NewResponseSuccess(ctx, nil, "Success change password", "07", "03")
 }
