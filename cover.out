@@ -10,9 +10,9 @@ bike-rent-express/src/employee/employeeRepository/employeeRepository.go:35.2,35.
 bike-rent-express/src/employee/employeeRepository/employeeRepository.go:38.91,42.188 3 1
 bike-rent-express/src/employee/employeeRepository/employeeRepository.go:42.188,44.3 1 1
 bike-rent-express/src/employee/employeeRepository/employeeRepository.go:46.2,46.22 1 1
-bike-rent-express/src/employee/employeeRepository/employeeRepository.go:49.77,53.69 3 0
-bike-rent-express/src/employee/employeeRepository/employeeRepository.go:53.69,55.3 1 0
-bike-rent-express/src/employee/employeeRepository/employeeRepository.go:57.2,57.25 1 0
+bike-rent-express/src/employee/employeeRepository/employeeRepository.go:49.77,53.69 3 1
+bike-rent-express/src/employee/employeeRepository/employeeRepository.go:53.69,55.3 1 1
+bike-rent-express/src/employee/employeeRepository/employeeRepository.go:57.2,57.25 1 1
 bike-rent-express/src/employee/employeeRepository/employeeRepository.go:60.68,65.16 4 0
 bike-rent-express/src/employee/employeeRepository/employeeRepository.go:65.16,67.3 1 0
 bike-rent-express/src/employee/employeeRepository/employeeRepository.go:69.2,69.17 1 0

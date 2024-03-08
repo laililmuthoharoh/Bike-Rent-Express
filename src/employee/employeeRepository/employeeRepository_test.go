@@ -97,6 +97,43 @@ func TestGetByUsername_Failed(t *testing.T) {
 	assert.NotEqual(t, expectEmployee, employee)
 }
 
+func TestUsernameIsReady_Success(t *testing.T) {
+	dbMock, mock, err := sqlmock.New()
+	expectResult := false
+	if err != nil {
+		t.Fatal("error DB:", err.Error())
+	}
+
+	defer dbMock.Close()
+	employeeRepository := NewEmployeeRepository(dbMock)
+	query := "SELECT COUNT(.+) FROM employee WHERE .+ = \\$1;"
+
+	rows := sqlmock.NewRows([]string{".+"}).AddRow("1")
+	mock.ExpectQuery(query).WillReturnRows(rows)
+
+	resultActual, err := employeeRepository.UsernameIsReady(expectEmployee.ID)
+	assert.Nil(t, err)
+	assert.Equal(t, expectResult, resultActual)
+}
+
+func TestUsernameIsReady_False(t *testing.T) {
+	dbMock, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal("error DB:", err.Error())
+	}
+	expectActual := false
+
+	defer dbMock.Close()
+	employeeRepository := NewEmployeeRepository(dbMock)
+	query := "SELECT COUNT(.+) FROM employee WHERE .+ = \\$1;"
+	mock.ExpectQuery(query)
+
+	resultActual, err := employeeRepository.UsernameIsReady(expectEmployee.Name)
+	assert.NotNil(t, err)
+	assert.Error(t, err)
+	assert.Equal(t, expectActual, resultActual)
+}
+
 // func TestAdd_Success(t *testing.T){
 // 	dbMock, mock, err := sqlmock.New()
 // 	if err != nil{

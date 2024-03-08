@@ -47,7 +47,7 @@ func (e *employeeRepository) GetByUsername(username string) (employeeDto.Employe
 }
 
 func (e *employeeRepository) UsernameIsReady(username string) (bool, error) {
-	query := "SELECT COUNT(username) FROM employee WHERE username = $1"
+	query := "SELECT COUNT(username) FROM employee WHERE username = $1;"
 
 	var result int
 	if err := e.db.QueryRow(query, username).Scan(&result); err != nil {
