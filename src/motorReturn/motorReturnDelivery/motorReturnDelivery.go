@@ -23,7 +23,7 @@ func NewMotorReturnDelivey(v1Group *gin.RouterGroup, motorReturnUC motorReturn.M
 		motorReturnGroup.GET("/:motor-return-id", middleware.JWTAuth("EMPLOYEE", "ADMIN"), handler.GetMotorReturnById)
 	}
 
-	motorReturnGroup.GET("/users/motor-return", middleware.JWTAuth("ADMIN"), handler.GetAllMotorReturn)
+	v1Group.GET("/users/motor-return", middleware.JWTAuth("ADMIN"), handler.GetAllMotorReturn)
 
 }
 

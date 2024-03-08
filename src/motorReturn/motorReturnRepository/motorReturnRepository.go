@@ -86,7 +86,6 @@ func (m *motorReturnRepository) GetAll() ([]motorReturnDto.MotorReturn, error) {
 	var motorsReturn []motorReturnDto.MotorReturn
 
 	query := "SELECT id, transaction_id, return_date, extra_charge, condition_motor, description, created_at, updated_at FROM motor_return;"
-
 	rows, err := m.db.Query(query)
 	if err != nil {
 		return motorsReturn, err
