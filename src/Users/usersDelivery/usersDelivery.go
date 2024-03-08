@@ -7,7 +7,9 @@ import (
 	"bike-rent-express/pkg/middleware"
 	"bike-rent-express/pkg/utils"
 	"bike-rent-express/src/Users"
+	"database/sql"
 	"fmt"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -58,14 +60,16 @@ func (h *usersDelivery) UpdateUsers(ctx *gin.Context) {
 	}
 
 	if err := h.usersUC.UpdateUsers(newUsers); err != nil {
+		if strings.Contains(err.Error(), "invalid input syntax for type uuid") || err == sql.ErrNoRows {
+			json.NewResponseSuccess(ctx, nil, "User not found", "02", "01")
+			return
+		}
 		json.NewResponseError(ctx, err.Error(), "02", "01")
-		fmt.Println(err)
 		return
 
 	}
 
-	// Respond with success
-	json.NewResponseSuccess(ctx, nil, "Account Updated", "02", "01")
+	json.NewResponseSuccess(ctx, nil, "Account Updated", "02", "02")
 }
 
 func (d *usersDelivery) getByID(ctx *gin.Context) {
@@ -73,6 +77,10 @@ func (d *usersDelivery) getByID(ctx *gin.Context) {
 	fmt.Println(id)
 	usersItem, err := d.usersUC.GetByID(id)
 	if err != nil {
+		if err.Error() == "1" {
+			json.NewResponseSuccess(ctx, nil, "User not found", "03", "01")
+			return
+		}
 		json.NewResponseError(ctx, err.Error(), "03", "01")
 		return
 	}

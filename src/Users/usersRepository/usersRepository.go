@@ -32,13 +32,6 @@ func (r *usersRepository) GetByID(uuid string) (dto.GetUsers, error) {
 		return usersItem, err
 	}
 
-	// hashedPassword, err := bcrypt.GenerateFromPassword([]byte(usersItem.Password), bcrypt.DefaultCost)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// usersItem.Password = string(hashedPassword)
-
 	return usersItem, nil
 }
 
@@ -80,15 +73,14 @@ func (r *usersRepository) UpdateUsers(usersUpdate dto.Users) error {
 	query := `
         UPDATE users
         SET name = $1, 
-            username = $2, 
-            address = $3, 
-            can_rent = $4, 
-            telp = $5
-        WHERE id = $6
+            address = $2, 
+            can_rent = $3, 
+            telp = $4,
+			updated_at = CURRENT_TIMESTAMP
+        WHERE id = $5
     `
 	result, err := r.db.Exec(query,
 		usersUpdate.Name,
-		usersUpdate.Username,
 		usersUpdate.Address,
 		usersUpdate.CanRent,
 		usersUpdate.Telp,

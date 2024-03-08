@@ -27,7 +27,7 @@ type (
 	Users struct {
 		ID         string `json:"id"`
 		Name       string `json:"name" validate:"required"`
-		Username   string `json:"username" validate:"required"`
+		Username   string `json:"username"`
 		Password   string `json:"password"`
 		Address    string `json:"address" validate:"required"`
 		Role       string `json:"role"`

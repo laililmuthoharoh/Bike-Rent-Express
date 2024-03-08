@@ -9,7 +9,6 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -29,15 +28,19 @@ func (uc *usersUC) GetAllUsers() ([]dto.GetUsers, error) {
 
 func (uc *usersUC) UpdateUsers(updateUsers dto.Users) error {
 
-	updateUsers.Updated_at = time.Now().Format("2006-01-02")
-
-	fmt.Println(updateUsers)
-
 	return uc.usersRepo.UpdateUsers(updateUsers)
 }
 
 func (uc *usersUC) GetByID(id string) (dto.GetUsers, error) {
-	return uc.usersRepo.GetByID(id)
+	user, err := uc.usersRepo.GetByID(id)
+	if err != nil {
+		if strings.Contains(err.Error(), "invalid input syntax for type uuid") || err == sql.ErrNoRows {
+			return user, errors.New("1")
+		}
+		return user, err
+	}
+
+	return user, nil
 }
 
 func NewUsersUsecase(usersRepo Users.UsersRepository) Users.UsersUsecase {
