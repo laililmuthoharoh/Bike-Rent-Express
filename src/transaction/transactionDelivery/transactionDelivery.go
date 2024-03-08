@@ -18,7 +18,7 @@ type transactionDelivery struct {
 func NewTransactionUsecase(v1Group *gin.RouterGroup, transactionUC transaction.TransactionUsecase) {
 	handler := transactionDelivery{transactionUC}
 
-	transactionGroup := v1Group.Group("/user/transaction")
+	transactionGroup := v1Group.Group("/users/transaction")
 	{
 		transactionGroup.POST("", middleware.JWTAuth("ADMIN", "USER"), handler.CreateTransaction)
 		transactionGroup.GET("/:id", middleware.JWTAuth("ADMIN", "USER"), handler.GetTransactionById)
