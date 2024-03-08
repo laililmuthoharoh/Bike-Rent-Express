@@ -71,6 +71,14 @@ func (e *employeeUsecase) Update(employeUpdateRequest employeeDto.UpdateEmployee
 }
 
 func (e *employeeUsecase) Delete(id string) (string, error) {
+	_, err := e.employeeRepository.GetById(id)
+	if err != nil {
+		if strings.Contains(err.Error(), "invalid input syntax for type uuid") || err == sql.ErrNoRows {
+			return "", errors.New("1")
+		}
+		return "", err
+	}
+
 	resultDelete, err := e.employeeRepository.Delete(id)
 	if err != nil {
 		return resultDelete, err
@@ -109,7 +117,10 @@ func (e *employeeUsecase) Login(loginRequest employeeDto.LoginRequest) (employee
 func (e *employeeUsecase) ChangePassword(id string, changePasswordRequest employeeDto.ChangePasswordRequest) error {
 	employee, err := e.employeeRepository.GetById(id)
 	if err != nil {
-		return errors.New("1")
+		if strings.Contains(err.Error(), "invalid input syntax for type uuid") || err == sql.ErrNoRows {
+			return errors.New("1")
+		}
+		return err
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(employee.Password), []byte(changePasswordRequest.PasswordOld))
