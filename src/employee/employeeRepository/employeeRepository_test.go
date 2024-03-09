@@ -4,7 +4,6 @@ import (
 	employeeDto "bike-rent-express/model/dto/employee"
 	"database/sql/driver"
 	"testing"
-	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
@@ -208,28 +207,6 @@ func TestGet_Failed(t *testing.T) {
 	assert.NotEqual(t, expectedAllEmployee, actualAllEmployee)
 }
 
-func TestUpdate_Success(t *testing.T) {
-	dbMock, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatal("error DB:", err.Error())
-	}
-	defer dbMock.Close()
-	employeeRepo := NewEmployeeRepository(dbMock)
-	expectEmployeeRequest := employeeDto.UpdateEmployeeRequest{
-		Name: "test",
-		Telp: "09123",
-		ID:   expectEmployee.ID,
-	}
-
-	query := "UPDATE employee"
-	now := time.Now()
-	mock.ExpectExec(query).WithArgs(expectEmployeeRequest.Name, now, expectEmployeeRequest.Telp, expectEmployeeRequest.ID).WillReturnResult(sqlmock.NewResult(0, 1))
-
-	actualEmployeeRequest, err := employeeRepo.Update(expectEmployeeRequest)
-	assert.Nil(t, err)
-	assert.Equal(t, expectEmployeeRequest, actualEmployeeRequest)
-}
-
 func TestAdd_Success(t *testing.T) {
 	dbMock, mock, err := sqlmock.New()
 	if err != nil {
@@ -262,10 +239,238 @@ func TestAdd_Success(t *testing.T) {
 	assert.Equal(t, expectCreatedEmployee, actualCreatedEmployee)
 }
 
-// func TestUpdatePassword_Success(t *testing.T){
-// 	dbMock, mock, err := sqlmock.New()
-// 	if err != nil{
-// 		t.Fatal("error DB:", err.Error())
-// 	}
+func TestAddUsernameIsReady_Failed(t *testing.T) {
+	dbMock, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal("error DB:", err.Error())
+	}
+	defer dbMock.Close()
 
-// }
+	expectCreatedEmployee := employeeDto.CreateEmployeeRequest{
+		ID:       expectEmployee.ID,
+		Name:     expectEmployee.Name,
+		Telp:     expectEmployee.Telp,
+		Username: expectEmployee.Username,
+		Password: expectEmployee.Password,
+	}
+
+	employeeRepository := NewEmployeeRepository(dbMock)
+
+	query := "SELECT COUNT(.+) FROM employees WHERE .+ = \\$1;"
+	rows := sqlmock.NewRows([]string{".+"}).AddRow(0)
+
+	mock.ExpectQuery(query).WillReturnRows(rows)
+
+	query = "INSERT INTO employee(.+) RETURNING .+;"
+	rows = sqlmock.NewRows([]string{"id"}).AddRow(expectCreatedEmployee.ID)
+
+	mock.ExpectQuery(query).WillReturnRows(rows)
+
+	actualCreatedEmployee, err := employeeRepository.Add(expectCreatedEmployee)
+	assert.NotNil(t, err)
+	assert.Error(t, err)
+	assert.Equal(t, expectCreatedEmployee, actualCreatedEmployee)
+}
+
+func TestAddUsernameIsNotReady_Failed(t *testing.T) {
+	dbMock, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal("error DB:", err.Error())
+	}
+	defer dbMock.Close()
+
+	expectCreatedEmployee := employeeDto.CreateEmployeeRequest{
+		ID:       expectEmployee.ID,
+		Name:     expectEmployee.Name,
+		Telp:     expectEmployee.Telp,
+		Username: expectEmployee.Username,
+		Password: expectEmployee.Password,
+	}
+
+	employeeRepository := NewEmployeeRepository(dbMock)
+
+	query := "SELECT COUNT(.+) FROM employee WHERE .+ = \\$1;"
+	rows := sqlmock.NewRows([]string{".+"}).AddRow(1)
+
+	mock.ExpectQuery(query).WillReturnRows(rows)
+
+	query = "INSERT INTO employee(.+) RETURNING .+;"
+	rows = sqlmock.NewRows([]string{"id"}).AddRow(expectCreatedEmployee.ID)
+
+	mock.ExpectQuery(query).WillReturnRows(rows)
+
+	actualCreatedEmployee, err := employeeRepository.Add(expectCreatedEmployee)
+	assert.NotNil(t, err)
+	assert.Error(t, err)
+	assert.Equal(t, expectCreatedEmployee, actualCreatedEmployee)
+}
+
+func TestAdd_Failed(t *testing.T) {
+	dbMock, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal("error DB:", err.Error())
+	}
+	defer dbMock.Close()
+
+	expectCreatedEmployee := employeeDto.CreateEmployeeRequest{
+		ID:       expectEmployee.ID,
+		Name:     expectEmployee.Name,
+		Telp:     expectEmployee.Telp,
+		Username: expectEmployee.Username,
+		Password: expectEmployee.Password,
+	}
+
+	employeeRepository := NewEmployeeRepository(dbMock)
+
+	query := "SELECT COUNT(.+) FROM employee WHERE .+ = \\$1;"
+	rows := sqlmock.NewRows([]string{".+"}).AddRow(0)
+
+	mock.ExpectQuery(query).WillReturnRows(rows)
+
+	query = "INSERT INTO employeesss(.+) RETURNING .+;"
+	rows = sqlmock.NewRows([]string{"id"}).AddRow(expectCreatedEmployee.ID)
+
+	mock.ExpectQuery(query).WillReturnRows(rows)
+
+	actualCreatedEmployee, err := employeeRepository.Add(expectCreatedEmployee)
+	assert.NotNil(t, err)
+	assert.Error(t, err)
+	assert.Equal(t, expectCreatedEmployee, actualCreatedEmployee)
+}
+
+func TestUpdate_Success(t *testing.T) {
+	dbMock, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal("error DB:", err.Error())
+	}
+	defer dbMock.Close()
+	employeeRepo := NewEmployeeRepository(dbMock)
+	expectEmployeeRequest := employeeDto.UpdateEmployeeRequest{
+		Name: expectEmployee.Name,
+		Telp: expectEmployee.Telp,
+		ID:   expectEmployee.ID,
+	}
+
+	query := "UPDATE employee"
+	mock.ExpectExec(query).WithArgs(expectEmployeeRequest.Name, expectEmployeeRequest.Telp, expectEmployeeRequest.ID).WillReturnResult(sqlmock.NewResult(0, 1))
+
+	query = "SELECT (.+) FROM employee .+"
+	rows := sqlmock.NewRows([]string{".+", ".+", ".+", ".+", ".+", ".+", ".+"}).AddRow(expectEmployee.ID, expectEmployee.Name, expectEmployee.Telp, expectEmployee.Username, expectEmployee.Password, expectEmployee.CreatedAt, expectEmployee.UpdatedAt)
+
+	mock.ExpectQuery(query).WillReturnRows(rows)
+
+	actualEmployeeRequest, err := employeeRepo.Update(expectEmployeeRequest)
+	assert.Nil(t, err)
+	assert.Equal(t, expectEmployee, actualEmployeeRequest)
+}
+
+func TestUpdate_FailedQuery(t *testing.T) {
+	dbMock, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal("error DB:", err.Error())
+	}
+	defer dbMock.Close()
+	employeeRepo := NewEmployeeRepository(dbMock)
+	expectEmployeeRequest := employeeDto.UpdateEmployeeRequest{
+		Name: expectEmployee.Name,
+		Telp: expectEmployee.Telp,
+		ID:   expectEmployee.ID,
+	}
+
+	query := "UPDATE employees"
+	mock.ExpectExec(query).WithArgs(expectEmployeeRequest.Name, expectEmployeeRequest.Telp, expectEmployeeRequest.ID).WillReturnResult(sqlmock.NewResult(0, 1))
+
+	query = "SELECT (.+) FROM employee .+"
+	rows := sqlmock.NewRows([]string{".+", ".+", ".+", ".+", ".+", ".+", ".+"}).AddRow(expectEmployee.ID, expectEmployee.Name, expectEmployee.Telp, expectEmployee.Username, expectEmployee.Password, expectEmployee.CreatedAt, expectEmployee.UpdatedAt)
+
+	mock.ExpectQuery(query).WillReturnRows(rows)
+
+	actualEmployeeRequest, err := employeeRepo.Update(expectEmployeeRequest)
+	assert.NotNil(t, err)
+	assert.Error(t, err)
+	assert.NotEqual(t, expectEmployee, actualEmployeeRequest)
+}
+
+func TestUpdate_FailedGetById(t *testing.T) {
+	dbMock, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal("error DB:", err.Error())
+	}
+	defer dbMock.Close()
+	employeeRepo := NewEmployeeRepository(dbMock)
+	expectEmployeeRequest := employeeDto.UpdateEmployeeRequest{
+		Name: expectEmployee.Name,
+		Telp: expectEmployee.Telp,
+		ID:   expectEmployee.ID,
+	}
+
+	query := "UPDATE employee"
+	mock.ExpectExec(query).WithArgs(expectEmployeeRequest.Name, expectEmployeeRequest.Telp, expectEmployeeRequest.ID).WillReturnResult(sqlmock.NewResult(0, 1))
+
+	query = "SELECT (.+) FROM employees .+"
+	rows := sqlmock.NewRows([]string{".+", ".+", ".+", ".+", ".+", ".+", ".+"}).AddRow(expectEmployee.ID, expectEmployee.Name, expectEmployee.Telp, expectEmployee.Username, expectEmployee.Password, expectEmployee.CreatedAt, expectEmployee.UpdatedAt)
+
+	mock.ExpectQuery(query).WillReturnRows(rows)
+
+	actualEmployeeRequest, err := employeeRepo.Update(expectEmployeeRequest)
+	assert.NotNil(t, err)
+	assert.Error(t, err)
+	assert.NotEqual(t, expectEmployee, actualEmployeeRequest)
+}
+
+func TestUpdatePassword_Success(t *testing.T) {
+	dbMock, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal("error DB:", err.Error())
+	}
+	defer dbMock.Close()
+
+	employeeRepo := NewEmployeeRepository(dbMock)
+
+	query := "UPDATE employee"
+	mock.ExpectExec(query).WithArgs(expectEmployee.Password, expectEmployee.ID).WillReturnResult(sqlmock.NewResult(1, 1))
+
+	err = employeeRepo.UpdatePassword(expectEmployee)
+	assert.Nil(t, err)
+}
+
+func TestDeleteSuccess_Success(t *testing.T) {
+	dbMock, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal("Error DB:", err.Error())
+	}
+	defer dbMock.Close()
+
+	employeeRepo := NewEmployeeRepository(dbMock)
+	expectResult := "Sucessfully delete employee"
+
+	query := "UPDATE employee"
+	mock.ExpectExec(query).WithArgs(expectEmployee.ID).WillReturnResult(sqlmock.NewResult(1, 1))
+
+	actualResult, err := employeeRepo.Delete(expectEmployee.ID)
+
+	assert.Nil(t, err)
+	assert.Equal(t, expectResult, actualResult)
+
+}
+
+func TestDeleteSuccess_Failed(t *testing.T) {
+	dbMock, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal("Error DB:", err.Error())
+	}
+	defer dbMock.Close()
+
+	employeeRepo := NewEmployeeRepository(dbMock)
+	expectResult := "Sucessfully delete employee"
+
+	query := "UPDATE employees"
+	mock.ExpectExec(query).WithArgs(expectEmployee.ID).WillReturnResult(sqlmock.NewResult(0, 1))
+
+	actualResult, err := employeeRepo.Delete(expectEmployee.ID)
+
+	assert.NotNil(t, err)
+	assert.Error(t, err)
+	assert.NotEqual(t, expectResult, actualResult)
+
+}
