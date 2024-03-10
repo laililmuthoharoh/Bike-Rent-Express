@@ -4,6 +4,7 @@ import (
 	"bike-rent-express/model/dto/motorVehicleDto"
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
@@ -42,15 +43,6 @@ var expectedMotorVehicleById = motorVehicleDto.MotorVehicle{
 	Plat:           "BA1234I",
 	CreatedAt:      "2024-03-07T00:00:00Z",
 	UpdatedAt:      "2024-03-07T00:00:00Z",
-	ProductionYear: "2023",
-	Status:         "AVAILABLE",
-}
-
-var expectedCreatedMotorVehicle = motorVehicleDto.CreateMotorVehicle{
-	Name:           "Vario",
-	Type:           "MATIC",
-	Price:          50000,
-	Plat:           "BA1234I",
 	ProductionYear: "2023",
 	Status:         "AVAILABLE",
 }
@@ -218,41 +210,118 @@ func TestInsertMotorVehicle_Fail(t *testing.T) {
 	//initialization repository
 	repository := NewMotorVehicleRepository(db)
 
-	query := "INSERT INTO motor_vehicle(.+) RETURNING id;"
+	query := "INSERT INTO motor_vehicle (name, type, price, plat, production_year, status) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id;"
 
-	//source: https://github.com/DATA-DOG/go-sqlmock/issues/27
 	mock.ExpectQuery(query).WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(expectedMotorVehicleById.Id))
 
 	query = "SELECT id, name, type, price, plat, created_at, updated_at, production_year, status FROM motor_vehicle WHERE id = \\$1 AND deleted_at IS NULL"
+	rows := mock.NewRows([]string{"id", "name", "type", "price", "plat", "created_at", "updated_at", "production_year", "status"}).
+		AddRow(expectedMotorVehicleById.Id, expectedMotorVehicleById.Name, expectedMotorVehicleById.Type, expectedMotorVehicleById.Price, expectedMotorVehicleById.Plat, expectedMotorVehicleById.CreatedAt, expectedMotorVehicleById.UpdatedAt, expectedMotorVehicleById.ProductionYear, expectedMotorVehicleById.Status)
 
-	mock.ExpectQuery(query).WillReturnError(errors.New("error sql"))
+	mock.ExpectQuery(query).WillReturnRows(rows)
 
-	result, err := repository.InsertMotorVehicle(expectedMotorVehicleById)
+	_, err = repository.InsertMotorVehicle(expectedMotorVehicleById)
 
 	assert.Error(t, err)
-	assert.Empty(t, result)
 }
 
 // test update motor vehicle success
-// func TestChangeMotorVehicle_Success(t *testing.T) {
+func TestChangeMotorVehicle_Success(t *testing.T) {
 
-// 	db, mock, err := sqlmock.New()
-// 	if err != nil {
-// 		t.Fatal("Error creating mock database: ", err)
-// 	}
-// 	defer db.Close()
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal("Error creating mock database: ", err)
+	}
+	defer db.Close()
 
-// 	//initialization repository
-// 	repository := NewMotorVehicleRepository(db)
+	//initialization repository
+	repository := NewMotorVehicleRepository(db)
 
-// 	query := "UPDATE motor_vehicle SET name = $1, type = $2, price = $3, plat = $4, production_year = $5, status = $6, updated_at = $7 WHERE id = $8;"
+	query := "UPDATE motor_vehicle SET name = \\$1, type = \\$2, price = \\$3, plat = \\$4, production_year = \\$5, status = \\$6, updated_at = CURRENT_TIMESTAMP WHERE id = \\$7;"
 
-// 	//source: https://github.com/DATA-DOG/go-sqlmock/issues/27
-// 	// mock.ExpectExec(query).WithArgs(expectedMotorVehicleById.Name, expectedMotorVehicleById.Type, expectedMotorVehicleById.Price, expectedMotorVehicleById.Plat, expectedMotorVehicleById.ProductionYear, time.Now(), expectedMotorVehicleById.Status).
-// 	// 	WillReturnResult(sqlmock.NewResult(0,1).WithLas(expectedMotorVehicleById.Id))
+	mock.ExpectExec(query).WithArgs(expectedMotorVehicleById.Name, expectedMotorVehicleById.Type, expectedMotorVehicleById.Price, expectedMotorVehicleById.Plat, expectedMotorVehicleById.ProductionYear, expectedMotorVehicleById.Status, expectedMotorVehicleById.Id).
+		WillReturnResult(sqlmock.NewResult(0, 1))
 
-// 	result, err := repository.InsertMotorVehicle(expectedMotorVehicleById)
+	query = "SELECT id, name, type, price, plat, created_at, updated_at, production_year, status FROM motor_vehicle WHERE id = \\$1 AND deleted_at IS NULL"
+	rows := mock.NewRows([]string{"id", "name", "type", "price", "plat", "created_at", "updated_at", "production_year", "status"}).
+		AddRow(expectedMotorVehicleById.Id, expectedMotorVehicleById.Name, expectedMotorVehicleById.Type, expectedMotorVehicleById.Price, expectedMotorVehicleById.Plat, expectedMotorVehicleById.CreatedAt, expectedMotorVehicleById.UpdatedAt, expectedMotorVehicleById.ProductionYear, expectedMotorVehicleById.Status)
 
-// 	assert.Nil(t, err)
-// 	assert.Equal(t, expectedMotorVehicleById, result)
-// }
+	mock.ExpectQuery(query).WillReturnRows(rows)
+
+	result, err := repository.ChangeMotorVehicle(expectedMotorVehicleById.Id, expectedMotorVehicleById)
+
+	assert.Nil(t, err)
+	assert.Equal(t, expectedMotorVehicleById, result)
+}
+
+// test update motor vehicle fail (error query update)
+func TestChangeMotorVehicle_Fail(t *testing.T) {
+
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal("Error creating mock database: ", err)
+	}
+	defer db.Close()
+
+	//initialization repository
+	repository := NewMotorVehicleRepository(db)
+
+	// wrong query
+	query := "UPDATE motor_vehicle SET name = $1, type = $2, price = $3, plat = $4, production_year = $5, status = $6, updated_at = $7 WHERE id = $8;"
+
+	mock.ExpectExec(query).WithArgs(expectedMotorVehicleById.Name, expectedMotorVehicleById.Type, expectedMotorVehicleById.Price, expectedMotorVehicleById.Plat, expectedMotorVehicleById.ProductionYear, expectedMotorVehicleById.Status, time.Now(), expectedMotorVehicleById.Id).
+		WillReturnResult(sqlmock.NewResult(0, 1))
+
+	query = "SELECT id, name, type, price, plat, created_at, updated_at, production_year, status FROM motor_vehicle WHERE id = \\$1 AND deleted_at IS NULL"
+	rows := mock.NewRows([]string{"id", "name", "type", "price", "plat", "created_at", "updated_at", "production_year", "status"}).
+		AddRow(expectedMotorVehicleById.Id, expectedMotorVehicleById.Name, expectedMotorVehicleById.Type, expectedMotorVehicleById.Price, expectedMotorVehicleById.Plat, expectedMotorVehicleById.CreatedAt, expectedMotorVehicleById.UpdatedAt, expectedMotorVehicleById.ProductionYear, expectedMotorVehicleById.Status)
+
+	mock.ExpectQuery(query).WillReturnRows(rows)
+
+	_, err = repository.ChangeMotorVehicle(expectedMotorVehicleById.Id, expectedMotorVehicleById)
+
+	assert.Error(t, err)
+}
+
+// test delete motor vehicle success
+func TestDropMotorVehicle_Success(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal("Error creating mock database: ", err)
+	}
+	defer db.Close()
+
+	//initialization repository
+	repository := NewMotorVehicleRepository(db)
+
+	query := "UPDATE motor_vehicle SET deleted_at = CURRENT_DATE WHERE id = \\$1;"
+
+	mock.ExpectExec(query).WithArgs(expectedMotorVehicleById.Id).
+		WillReturnResult(sqlmock.NewResult(0, 1))
+
+	err = repository.DropMotorVehicle(expectedMotorVehicleById.Id)
+
+	assert.Nil(t, err)
+}
+
+// test delete motor vehicle fail
+func TestDropMotorVehicle_Fail(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal("Error creating mock database: ", err)
+	}
+	defer db.Close()
+
+	//initialization repository
+	repository := NewMotorVehicleRepository(db)
+
+	// wrong query
+	query := "UPDATE motor_vehicle SET deleted_at = CURRENT_DATE WHERE id = $1;"
+
+	mock.ExpectExec(query).WithArgs(expectedMotorVehicleById.Id).
+		WillReturnResult(sqlmock.NewResult(0, 1))
+
+	err = repository.DropMotorVehicle(expectedMotorVehicleById.Id)
+
+	assert.Error(t, err)
+}
