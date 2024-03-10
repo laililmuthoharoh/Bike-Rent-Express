@@ -130,7 +130,7 @@ func (c *usersDelivery) LoginUsers(ctx *gin.Context) {
 		return
 	}
 
-	json.NewResponseSuccess(ctx, loginResponse, "login succes", "05", "02")
+	json.NewResponseSuccess(ctx, loginResponse, "login success", "05", "02")
 
 }
 
