@@ -4,7 +4,6 @@ import (
 	"bike-rent-express/model/dto/motorVehicleDto"
 	"bike-rent-express/src/motorVehicle"
 	"database/sql"
-	"fmt"
 	"time"
 )
 
@@ -64,9 +63,7 @@ func (mr *motorVehicleRepository) InsertMotorVehicle(motor motorVehicleDto.Motor
 
 func (mr *motorVehicleRepository) ChangeMotorVehicle(id string, motor motorVehicleDto.MotorVehicle) (motorVehicleDto.MotorVehicle, error) {
 
-	fmt.Println("id: ", id, "type:", motor)
 	now := time.Now()
-	// .Format("2006-01-02")
 
 	query := "UPDATE motor_vehicle SET name = $1, type = $2, price = $3, plat = $4, production_year = $5, status = $6, updated_at = $7 WHERE id = $8;"
 	_, err := mr.db.Exec(query, motor.Name, motor.Type, motor.Price, motor.Plat, motor.ProductionYear, motor.Status, now, id)
