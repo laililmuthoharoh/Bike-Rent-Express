@@ -36,6 +36,10 @@ func (t *transactionRepository) Add(transactionRequest transactionDto.AddTransac
 	}
 
 	difference := endDate.Sub(startDate).Hours() / 24
+	if difference < 1 {
+		tx.Rollback()
+		return transactionRequest, errors.New("end date is at least 1 day from the start date")
+	}
 
 	query := "SELECT price FROM motor_vehicle WHERE id = $1 AND status = 'AVAILABLE';"
 	priceMotor := 0

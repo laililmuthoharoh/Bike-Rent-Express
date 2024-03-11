@@ -37,7 +37,7 @@ func InitRoute(v1Group *gin.RouterGroup, db *sql.DB) {
 
 	transactionRepository := transactionRepository.NewTransactionRepository(db)
 	transactionUC := transactionUsecase.NewTransactionRepository(transactionRepository, usersRepo, employeeRepository, motorVehicleRepo)
-	transactionDelivery.NewTransactionUsecase(v1Group, transactionUC)
+	transactionDelivery.NewTransactionDelivery(v1Group, transactionUC)
 
 	motorReturnRepository := motorReturnRepository.NewMotorRepository(db)
 	motorReturnUC := motorReturnUsecase.NewMotorReturnUseCase(motorReturnRepository, transactionRepository, usersRepo)

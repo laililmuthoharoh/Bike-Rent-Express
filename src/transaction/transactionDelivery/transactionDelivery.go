@@ -6,7 +6,6 @@ import (
 	"bike-rent-express/pkg/middleware"
 	"bike-rent-express/pkg/utils"
 	"bike-rent-express/src/transaction"
-	"fmt"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,7 +14,7 @@ type transactionDelivery struct {
 	transactionUC transaction.TransactionUsecase
 }
 
-func NewTransactionUsecase(v1Group *gin.RouterGroup, transactionUC transaction.TransactionUsecase) {
+func NewTransactionDelivery(v1Group *gin.RouterGroup, transactionUC transaction.TransactionUsecase) {
 	handler := transactionDelivery{transactionUC}
 
 	transactionGroup := v1Group.Group("/users/transaction")
@@ -49,9 +48,7 @@ func (t *transactionDelivery) CreateTransaction(c *gin.Context) {
 func (t *transactionDelivery) GetTransactionById(c *gin.Context) {
 	id := c.Param("id")
 
-	fmt.Println(id)
 	transactionDetail, err := t.transactionUC.GetTransactionById(id)
-	fmt.Println(transactionDetail)
 	if err != nil {
 		if err.Error() == "1" {
 			json.NewResponseSuccess(c, nil, "Data not found", "02", "01")
