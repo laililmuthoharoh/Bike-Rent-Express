@@ -180,9 +180,10 @@ func (suite *MotorVehicleDeliveryTestSuite) TestCreateMotorVehicle_Success() {
 
 	suite.usecase.On("CreateMotorVehicle", expectedCreateMotorVehicle).Return(expectedMotorVehicleById, nil)
 
+	requestbody := []byte(`{"name":"Vario","type":"MATIC","price":50000,"plat":"BA1234I","production_year":"2023","status":"AVAILABLE"}`)
+
 	w := httptest.NewRecorder()
-	jsonData, _ := json.Marshal(expectedCreateMotorVehicle)
-	req, _ := http.NewRequest(http.MethodPost, "/api/v1/motor-vehicles/", bytes.NewBuffer(jsonData))
+	req, _ := http.NewRequest(http.MethodPost, "/api/v1/motor-vehicles/", bytes.NewBuffer(requestbody))
 
 	req.Header.Add("Authorization", token)
 	suite.router.ServeHTTP(w, req)
@@ -221,11 +222,12 @@ func (suite *MotorVehicleDeliveryTestSuite) TestCreateMotorVehicle_fail() {
 	expectedResposnse := `{"responseCode":"5000301","responseMessage":"internal server error","error":"error"}`
 	expectedError := errors.New("error")
 
+	requestbody := []byte(`{"name":"Vario","type":"MATIC","price":50000,"plat":"BA1234I","production_year":"2023","status":"AVAILABLE"}`)
+
 	suite.usecase.On("CreateMotorVehicle", expectedCreateMotorVehicle).Return(expectedMotorVehicleById, expectedError)
 
 	w := httptest.NewRecorder()
-	jsonData, _ := json.Marshal(expectedCreateMotorVehicle)
-	req, _ := http.NewRequest(http.MethodPost, "/api/v1/motor-vehicles/", bytes.NewBuffer(jsonData))
+	req, _ := http.NewRequest(http.MethodPost, "/api/v1/motor-vehicles/", bytes.NewBuffer(requestbody))
 
 	req.Header.Add("Authorization", token)
 	suite.router.ServeHTTP(w, req)
@@ -238,11 +240,12 @@ func (suite *MotorVehicleDeliveryTestSuite) TestUpdateMotorVehicle_Success() {
 
 	expectedResposnse := `{"responseCode":"2000401","responseMessage":"motor vehicle updated","data":{"id":"3a57713c-24d0-41f8-bfa8-f8f721dba9e4","name":"Vario","type":"MATIC","price":50000,"plat":"BA1234I","created_at":"2024-03-07T00:00:00Z","updated_at":"2024-03-07T00:00:00Z","production_year":"2023","status":"AVAILABLE"}}`
 
-	suite.usecase.On("UpdateMotorVehicle", expectedMotorVehicleById.Id, expectedUpdateMotorVehicle).Return(expectedMotorVehicleById, nil)
+	requestbody := []byte(`{"name":"Vario","type":"MATIC","price":50000,"plat":"BA1234I","production_year":"2023","status":"AVAILABLE"}`)
+
+	suite.usecase.On("UpdateMotorVehicle", mock.Anything, mock.Anything).Return(expectedMotorVehicleById, nil)
 
 	w := httptest.NewRecorder()
-	jsonData, _ := json.Marshal(expectedUpdateMotorVehicle)
-	req, _ := http.NewRequest(http.MethodPut, "/api/v1/motor-vehicles/"+expectedMotorVehicleById.Id, bytes.NewBuffer(jsonData))
+	req, _ := http.NewRequest(http.MethodPut, "/api/v1/motor-vehicles/"+expectedMotorVehicleById.Id, bytes.NewBuffer(requestbody))
 
 	req.Header.Add("Authorization", token)
 	suite.router.ServeHTTP(w, req)
@@ -263,7 +266,7 @@ func (suite *MotorVehicleDeliveryTestSuite) TestUpdateMotorVehicle_FailBadReques
 
 	expectedResposnse := `{"responseCode":"4000401","responseMessage":"Bad Request","error_description":[{"field":"Name","message":"field is required"}]}`
 
-	suite.usecase.On("UpdateMotorVehicle", expectedMotorVehicleById.Id, expectedCreateMotorVehicle).Return(expectedMotorVehicleById, nil)
+	suite.usecase.On("UpdateMotorVehicle", mock.Anything, mock.Anything).Return(expectedMotorVehicleById, nil)
 
 	w := httptest.NewRecorder()
 	jsonData, _ := json.Marshal(expectedUpdateMotorVehicle)
@@ -281,11 +284,12 @@ func (suite *MotorVehicleDeliveryTestSuite) TestUpdateMotorVehicle_fail() {
 	expectedResposnse := `{"responseCode":"5000401","responseMessage":"internal server error","error":"error"}`
 	expectedError := errors.New("error")
 
+	requestbody := []byte(`{"name":"Vario","type":"MATIC","price":50000,"plat":"BA1234I","production_year":"2023","status":"AVAILABLE"}`)
+
 	suite.usecase.On("UpdateMotorVehicle", expectedMotorVehicleById.Id, expectedUpdateMotorVehicle).Return(expectedMotorVehicleById, expectedError)
 
 	w := httptest.NewRecorder()
-	jsonData, _ := json.Marshal(expectedUpdateMotorVehicle)
-	req, _ := http.NewRequest(http.MethodPut, "/api/v1/motor-vehicles/"+expectedMotorVehicleById.Id, bytes.NewBuffer(jsonData))
+	req, _ := http.NewRequest(http.MethodPut, "/api/v1/motor-vehicles/"+expectedMotorVehicleById.Id, bytes.NewBuffer(requestbody))
 
 	req.Header.Add("Authorization", token)
 	suite.router.ServeHTTP(w, req)
