@@ -109,7 +109,7 @@ func (c *usersDelivery) RegisterUsers(ctx *gin.Context) {
 	}
 
 	// Respond with success
-	json.NewResponseSuccess(ctx, newUsers, "Account Created", "04", "02")
+	json.NewResponseCreated(ctx, newUsers, "Account Created", "04", "02")
 }
 
 func (c *usersDelivery) LoginUsers(ctx *gin.Context) {
@@ -130,7 +130,7 @@ func (c *usersDelivery) LoginUsers(ctx *gin.Context) {
 		return
 	}
 
-	json.NewResponseSuccess(ctx, loginResponse, "login succes", "05", "02")
+	json.NewResponseSuccess(ctx, loginResponse, "login success", "05", "02")
 
 }
 

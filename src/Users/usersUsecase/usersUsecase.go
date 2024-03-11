@@ -7,7 +7,6 @@ import (
 	"bike-rent-express/src/Users"
 	"database/sql"
 	"errors"
-	"fmt"
 	"strings"
 
 	"golang.org/x/crypto/bcrypt"
@@ -77,13 +76,10 @@ func (c *usersUC) LoginUsers(loginRequest model.LoginRequest) (dto.LoginResponse
 		}
 		return loginResponse, err
 	}
-
-	fmt.Println(user)
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginRequest.Password))
 	if err != nil {
 		return loginResponse, errors.New("1")
 	}
-
 	token, err := middleware.GenerateTokenJwt(user.Username, user.Role)
 	if err != nil {
 		return loginResponse, err
