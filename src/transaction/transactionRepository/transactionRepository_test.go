@@ -3,6 +3,7 @@ package transactionRepository
 import (
 	"bike-rent-express/model/dto/transactionDto"
 	"database/sql/driver"
+	"errors"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -65,32 +66,6 @@ func TestAddTransaction_Success(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, expectAddTransactionRequest, actualAddTransaction)
 }
-
-// func TestAddTransaction_FailedBegin(t *testing.T) {
-// 	dbMock, mock, err := sqlmock.New()
-// 	if err != nil {
-// 		t.Fatal("Error DB:", err.Error())
-// 	}
-// 	defer dbMock.Close()
-
-// 	expectAddTransactionRequest := transactionDto.AddTransactionRequest{
-// 		ID:             "123",
-// 		UserID:         "123",
-// 		MotorVehicleId: "123",
-// 		EmployeeId:     "123",
-// 		StartDate:      "13-08-2024",
-// 		EndDate:        "14-08-2024",
-// 	}
-
-// 	transactionRepository := NewTransactionRepository(dbMock)
-
-// 	mock.ExpectBegin().WillReturnError(sql.ErrNoRows)
-// 	mock.ExpectRollback()
-
-// 	_, err = transactionRepository.Add(expectAddTransactionRequest)
-// 	assert.NotNil(t, err)
-// 	assert.Error(t, err)
-// }
 
 func TestAddTransaction_FailedGetPriceMotorVehicle(t *testing.T) {
 	dbMock, mock, err := sqlmock.New()
@@ -155,6 +130,93 @@ func TestAddTransaction_FailedGetAmountBalance(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func TestAddTransaction_FailedSmallerPriceBalance(t *testing.T) {
+	dbMock, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal("Error DB:", err.Error())
+	}
+	defer dbMock.Close()
+
+	expectAddTransactionRequest := transactionDto.AddTransactionRequest{
+		ID:             "123",
+		UserID:         "123",
+		MotorVehicleId: "123",
+		EmployeeId:     "123",
+		StartDate:      "13-08-2024",
+		EndDate:        "14-08-2024",
+	}
+
+	transactionRepository := NewTransactionRepository(dbMock)
+
+	mock.ExpectBegin()
+
+	query := "SELECT (.+) FROM motor_vehicle WHERE .+"
+	rows := sqlmock.NewRows([]string{".+"}).AddRow(90000)
+	mock.ExpectQuery(query).WillReturnRows(rows)
+
+	query = "SELECT (.+) FROM balance WHERE .+"
+	rows = sqlmock.NewRows([]string{".+"}).AddRow(30000)
+	mock.ExpectQuery(query).WillReturnRows(rows)
+
+	mock.ExpectRollback()
+
+	_, err = transactionRepository.Add(expectAddTransactionRequest)
+	assert.NotNil(t, err)
+	assert.Error(t, err)
+}
+
+func TestAddTransaction_FailedConvertStartDate(t *testing.T) {
+	dbMock, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal("Error DB:", err.Error())
+	}
+	defer dbMock.Close()
+
+	expectAddTransactionRequest := transactionDto.AddTransactionRequest{
+		ID:             "123",
+		UserID:         "123",
+		MotorVehicleId: "123",
+		EmployeeId:     "123",
+		StartDate:      "asdasdas",
+		EndDate:        "14-08-2024",
+	}
+
+	transactionRepository := NewTransactionRepository(dbMock)
+
+	mock.ExpectBegin()
+	mock.ExpectRollback()
+
+	_, err = transactionRepository.Add(expectAddTransactionRequest)
+	assert.NotNil(t, err)
+	assert.Error(t, err)
+}
+
+func TestAddTransaction_FailedConvertEndDate(t *testing.T) {
+	dbMock, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal("Error DB:", err.Error())
+	}
+	defer dbMock.Close()
+
+	expectAddTransactionRequest := transactionDto.AddTransactionRequest{
+		ID:             "123",
+		UserID:         "123",
+		MotorVehicleId: "123",
+		EmployeeId:     "123",
+		StartDate:      "14-08-2024",
+		EndDate:        "adsasdasd",
+	}
+
+	transactionRepository := NewTransactionRepository(dbMock)
+
+	mock.ExpectBegin()
+	mock.ExpectRollback()
+
+	_, err = transactionRepository.Add(expectAddTransactionRequest)
+	assert.NotNil(t, err)
+	assert.Error(t, err)
+}
+
 func TestAddTransaction_FailedUpdateBalance(t *testing.T) {
 	dbMock, mock, err := sqlmock.New()
 	if err != nil {
@@ -184,7 +246,7 @@ func TestAddTransaction_FailedUpdateBalance(t *testing.T) {
 	mock.ExpectQuery(query).WillReturnRows(rows)
 
 	query = "UPDATE balance"
-	mock.ExpectExec(query).WithArgs(20000, expectAddTransactionRequest.UserID).WillReturnResult(sqlmock.NewResult(0, 0))
+	mock.ExpectExec(query).WithArgs(20000, expectAddTransactionRequest.UserID).WillReturnError(errors.New("error"))
 	mock.ExpectRollback()
 
 	_, err = transactionRepository.Add(expectAddTransactionRequest)
@@ -224,7 +286,7 @@ func TestAddTransaction_FailedUpdateMotorVehicle(t *testing.T) {
 	mock.ExpectExec(query).WithArgs(20000, expectAddTransactionRequest.UserID).WillReturnResult(sqlmock.NewResult(1, 1))
 
 	query = "UPDATE motor_vehicle"
-	mock.ExpectExec(query).WithArgs(expectAddTransactionRequest.MotorVehicleId).WillReturnResult(sqlmock.NewResult(0, 0))
+	mock.ExpectExec(query).WithArgs(expectAddTransactionRequest.MotorVehicleId).WillReturnError(errors.New("error"))
 	mock.ExpectRollback()
 
 	_, err = transactionRepository.Add(expectAddTransactionRequest)
