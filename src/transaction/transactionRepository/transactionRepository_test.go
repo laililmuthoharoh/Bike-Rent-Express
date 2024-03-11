@@ -217,6 +217,32 @@ func TestAddTransaction_FailedConvertEndDate(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func TestAddTransaction_FiledDifference(t *testing.T) {
+	dbMock, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal("Error DB:", err.Error())
+	}
+	defer dbMock.Close()
+
+	expectAddTransactionRequest := transactionDto.AddTransactionRequest{
+		ID:             "123",
+		UserID:         "123",
+		MotorVehicleId: "123",
+		EmployeeId:     "123",
+		StartDate:      "13-08-2024",
+		EndDate:        "10-08-2024",
+	}
+
+	transactionRepository := NewTransactionRepository(dbMock)
+
+	mock.ExpectBegin()
+	mock.ExpectRollback()
+
+	_, err = transactionRepository.Add(expectAddTransactionRequest)
+	assert.NotNil(t, err)
+	assert.Error(t, err)
+}
+
 func TestAddTransaction_FailedUpdateBalance(t *testing.T) {
 	dbMock, mock, err := sqlmock.New()
 	if err != nil {
