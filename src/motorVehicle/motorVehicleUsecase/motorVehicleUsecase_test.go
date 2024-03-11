@@ -207,6 +207,29 @@ func TestUpdateMotorVehicle_fail(t *testing.T) {
 	assert.EqualError(t, err, expectedError.Error())
 }
 
+func TestUpdateMotorVehicle_failGetMotorVehicleById(t *testing.T) {
+	mockRepo := new(mockMotorVehicleRepository)
+
+	expected := motorVehicleDto.UpdateMotorVehicle{
+		Name:           "Vario",
+		Type:           "MATIC",
+		Price:          50000,
+		Plat:           "BA1234I",
+		ProductionYear: "2023",
+		Status:         "AVAILABLE",
+	}
+	expectedError := errors.New("mock error")
+
+	mockRepo.On("RetrieveMotorVehicleById", expectedMotorVehicleById.Id).Return(expectedMotorVehicleById, expectedError)
+
+	usecase := NewMotorVehicleUsecase(mockRepo)
+
+	_, err := usecase.UpdateMotorVehicle(expectedMotorVehicleById.Id, expected)
+
+	mockRepo.AssertExpectations(t)
+	assert.EqualError(t, err, expectedError.Error())
+}
+
 func TestDeleteMotorVehicle_Success(t *testing.T) {
 	mockRepo := new(mockMotorVehicleRepository)
 
