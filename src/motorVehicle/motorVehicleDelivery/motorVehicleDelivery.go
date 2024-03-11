@@ -45,7 +45,7 @@ func (md motorVehicleDelivery) getMotorVehicleById(ctx *gin.Context) {
 
 	data, err := md.motorVehicleUC.GetMotorVehicleById(id)
 	if err != nil {
-		if errors.Is(sql.ErrNoRows, err) {
+		if err.Error() == "1" || errors.Is(sql.ErrNoRows, err) {
 			json.NewResponseSuccess(ctx, nil, "Data not found", "02", "01")
 			return
 		}

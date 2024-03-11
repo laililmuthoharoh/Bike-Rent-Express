@@ -1,4 +1,27 @@
 mode: set
+bike-rent-express/src/motorVehicle/motorVehicleDelivery/motorVehicleDelivery.go:19.105,23.2 3 1
+bike-rent-express/src/motorVehicle/motorVehicleDelivery/motorVehicleDelivery.go:23.2,29.3 5 1
+bike-rent-express/src/motorVehicle/motorVehicleDelivery/motorVehicleDelivery.go:32.69,35.16 2 1
+bike-rent-express/src/motorVehicle/motorVehicleDelivery/motorVehicleDelivery.go:35.16,38.3 2 1
+bike-rent-express/src/motorVehicle/motorVehicleDelivery/motorVehicleDelivery.go:40.2,40.60 1 1
+bike-rent-express/src/motorVehicle/motorVehicleDelivery/motorVehicleDelivery.go:43.70,47.16 3 1
+bike-rent-express/src/motorVehicle/motorVehicleDelivery/motorVehicleDelivery.go:47.16,48.58 1 1
+bike-rent-express/src/motorVehicle/motorVehicleDelivery/motorVehicleDelivery.go:48.58,51.4 2 1
+bike-rent-express/src/motorVehicle/motorVehicleDelivery/motorVehicleDelivery.go:52.3,53.9 2 1
+bike-rent-express/src/motorVehicle/motorVehicleDelivery/motorVehicleDelivery.go:56.2,56.74 1 1
+bike-rent-express/src/motorVehicle/motorVehicleDelivery/motorVehicleDelivery.go:59.69,63.47 3 1
+bike-rent-express/src/motorVehicle/motorVehicleDelivery/motorVehicleDelivery.go:63.47,66.3 2 1
+bike-rent-express/src/motorVehicle/motorVehicleDelivery/motorVehicleDelivery.go:68.2,69.16 2 1
+bike-rent-express/src/motorVehicle/motorVehicleDelivery/motorVehicleDelivery.go:69.16,72.3 2 1
+bike-rent-express/src/motorVehicle/motorVehicleDelivery/motorVehicleDelivery.go:74.2,74.73 1 1
+bike-rent-express/src/motorVehicle/motorVehicleDelivery/motorVehicleDelivery.go:78.69,84.47 4 1
+bike-rent-express/src/motorVehicle/motorVehicleDelivery/motorVehicleDelivery.go:84.47,87.3 2 1
+bike-rent-express/src/motorVehicle/motorVehicleDelivery/motorVehicleDelivery.go:89.2,90.16 2 1
+bike-rent-express/src/motorVehicle/motorVehicleDelivery/motorVehicleDelivery.go:90.16,93.3 2 1
+bike-rent-express/src/motorVehicle/motorVehicleDelivery/motorVehicleDelivery.go:95.2,95.74 1 1
+bike-rent-express/src/motorVehicle/motorVehicleDelivery/motorVehicleDelivery.go:98.69,102.16 3 1
+bike-rent-express/src/motorVehicle/motorVehicleDelivery/motorVehicleDelivery.go:102.16,105.3 2 1
+bike-rent-express/src/motorVehicle/motorVehicleDelivery/motorVehicleDelivery.go:107.2,107.84 1 1
 bike-rent-express/src/transaction/transactionRepository/transactionRepository.go:15.77,17.2 1 1
 bike-rent-express/src/transaction/transactionRepository/transactionRepository.go:19.140,21.16 2 1
 bike-rent-express/src/transaction/transactionRepository/transactionRepository.go:21.16,24.3 2 0
