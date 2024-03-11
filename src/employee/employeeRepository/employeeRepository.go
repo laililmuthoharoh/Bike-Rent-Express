@@ -5,7 +5,6 @@ import (
 	"bike-rent-express/src/employee"
 	"database/sql"
 	"errors"
-	"time"
 )
 
 type employeeRepository struct {
@@ -47,7 +46,7 @@ func (e *employeeRepository) GetByUsername(username string) (employeeDto.Employe
 }
 
 func (e *employeeRepository) UsernameIsReady(username string) (bool, error) {
-	query := "SELECT COUNT(username) FROM employee WHERE username = $1"
+	query := "SELECT COUNT(username) FROM employee WHERE username = $1;"
 
 	var result int
 	if err := e.db.QueryRow(query, username).Scan(&result); err != nil {
@@ -81,7 +80,7 @@ func (e *employeeRepository) Get() ([]employeeDto.Employee, error) {
 func (e *employeeRepository) GetById(id string) (employeeDto.Employee, error) {
 
 	var employee employeeDto.Employee
-	query := "SELECT id, name, telp, username, password,created_at, updated_at FROM employee WHERE id = $1 AND deleted_at IS NULL;"
+	query := "SELECT id, name, telp, username, password, created_at, updated_at FROM employee WHERE id = $1 AND deleted_at IS NULL;"
 	if err := e.db.QueryRow(query, id).Scan(&employee.ID, &employee.Name, &employee.Telp, &employee.Username, &employee.Password, &employee.CreatedAt, &employee.UpdatedAt); err != nil {
 		return employee, err
 	}
@@ -90,9 +89,8 @@ func (e *employeeRepository) GetById(id string) (employeeDto.Employee, error) {
 }
 
 func (e *employeeRepository) Update(employeeUpdateRequest employeeDto.UpdateEmployeeRequest) (employeeDto.Employee, error) {
-	query := "UPDATE employee SET name = $1, telp = $2, updated_at= $3 WHERE id = $4 AND deleted_at IS NULL;"
-	now := time.Now()
-	_, err := e.db.Exec(query, employeeUpdateRequest.Name, employeeUpdateRequest.Telp, now, employeeUpdateRequest.ID)
+	query := "UPDATE employee SET name = $1, telp = $2, updated_at= CURRENT_TIMESTAMP WHERE id = $3 AND deleted_at IS NULL;"
+	_, err := e.db.Exec(query, employeeUpdateRequest.Name, employeeUpdateRequest.Telp, employeeUpdateRequest.ID)
 	if err != nil {
 		return employeeDto.Employee{}, err
 	}
@@ -105,10 +103,9 @@ func (e *employeeRepository) Update(employeeUpdateRequest employeeDto.UpdateEmpl
 }
 
 func (e *employeeRepository) Delete(id string) (string, error) {
-	now := time.Now()
 
-	query := "UPDATE employee SET deleted_at = $1 WHERE id = $2 AND deleted_at IS NULL;"
-	_, err := e.db.Exec(query, now, id)
+	query := "UPDATE employee SET deleted_at = CURRENT_TIMESTAMP WHERE id = $1 AND deleted_at IS NULL;"
+	_, err := e.db.Exec(query, id)
 	if err != nil {
 		return "", err
 	}
