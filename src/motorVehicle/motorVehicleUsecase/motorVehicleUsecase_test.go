@@ -50,40 +50,6 @@ func (m *mockMotorVehicleRepository) DropMotorVehicle(id string) error {
 	return arg.Error(0)
 }
 
-// type MotorVehicleUsecaseTestSuite struct {
-// 	suite.Suite
-// 	repository *mockMotorVehicleRepository
-// 	usecase    motorVehicle.MotorVechileUsecase
-// }
-
-// func (suite *MotorVehicleUsecaseTestSuite) SetupTest() {
-// 	suite.repository = new(mockMotorVehicleRepository)
-// 	suite.usecase = NewMotorVehicleUsecase(suite.repository)
-// }
-
-// func (suite *MotorVehicleUsecaseTestSuite) TestGetAllMotorVehicle_Success() {
-// 	expected := []motorVehicleDto.MotorVehicle{expectedMotorVehicleById}
-
-// 	suite.repository.On("RetrieveAllMotorVehicle").Return(expected, nil)
-
-// 	result, err := suite.usecase.GetAllMotorVehicle()
-
-// 	// suite.repository.AssertExpectations(suite.T())
-// 	// assert.Nil(suite.T(), err)
-// 	// assert.Equal(suite.T(), expected, result)
-
-// 	// suite.Nil(err)
-// 	// suite.Equal(expected, result)
-// }
-
-// func (suite *MotorVehicleUsecaseTestSuite) TestGetAMotorVehicleById_Success() {
-// 	suite.repository.On("RetrieveMotorVehicleById", expectedMotorVehicleById.Id).Return(expectedMotorVehicleById, nil)
-
-// 	result, err := suite.usecase.GetMotorVehicleById(expectedMotorVehicleById.Id)
-// 	suite.Nil(err)
-// 	suite.Equal(expectedMotorVehicleById, result)
-// }
-
 func TestGetAllMotorVehicle_Success(t *testing.T) {
 	mockRepo := new(mockMotorVehicleRepository)
 
