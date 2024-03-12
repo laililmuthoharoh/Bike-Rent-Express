@@ -76,7 +76,9 @@ var expectedCreateMotorReturn = motorReturnDto.CreateMotorReturnRequest{
 	Description:    expectedMotorReturn.Descrption,
 }
 
-var token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAyNTIxNDIsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJhZG1pbjEyMjMiLCJpZCI6IiIsInJvbGUiOiJBRE1JTiJ9.w4HgU76uNybcG9QW0ajMSA-uzS0slZGucMnyrkrfiVl"
+var tokenAdmin = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAzMTk5NzQsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJhZG1pbjEzIiwicm9sZSI6IkFETUlOIn0.Kr-6qbAUKDBikHdJMUEZ90GG0DvfM_xUo7gxG25nAOI"
+
+var tokenEmployee = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAzMjAwNTIsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJkaW5vMTI0NTEiLCJyb2xlIjoiRU1QTE9ZRUUifQ.k-L7pBsS9w8uLkzfmo3aMcm9UhMfPuDGa_EgfWNdR_A"
 
 type mockMotorReturnUsecase struct {
 	mock.Mock
@@ -175,7 +177,7 @@ func (suite *MotorReturnDeliveryTestSuite) TestGetMotorReturnById_Succes() {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/api/v1/employee/"+expectTransaction.EmployeeId+"/motor-return/"+expectedMotorReturnResponse.ID, nil)
 
-	req.Header.Add("Authorization", token)
+	req.Header.Add("Authorization", tokenAdmin)
 	suite.router.ServeHTTP(w, req)
 
 	assert.Equal(suite.T(), 200, w.Code)
@@ -193,7 +195,7 @@ func (suite *MotorReturnDeliveryTestSuite) TestGetMotorReturnById_Fail() {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/api/v1/employee/"+expectTransaction.EmployeeId+"/motor-return/"+expectedMotorReturnResponse.ID, nil)
 
-	req.Header.Add("Authorization", token)
+	req.Header.Add("Authorization", tokenAdmin)
 	suite.router.ServeHTTP(w, req)
 
 	assert.Equal(suite.T(), 500, w.Code)
@@ -210,7 +212,7 @@ func (suite *MotorReturnDeliveryTestSuite) TestGetAllMotorReturn_Succes() {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/api/v1/users/motor-return", nil)
 
-	req.Header.Add("Authorization", token)
+	req.Header.Add("Authorization", tokenAdmin)
 	suite.router.ServeHTTP(w, req)
 
 	assert.Equal(suite.T(), 200, w.Code)
@@ -228,7 +230,7 @@ func (suite *MotorReturnDeliveryTestSuite) TestGetAllMotorReturn_Fail() {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/api/v1/users/motor-return", nil)
 
-	req.Header.Add("Authorization", token)
+	req.Header.Add("Authorization", tokenAdmin)
 	suite.router.ServeHTTP(w, req)
 
 	assert.Equal(suite.T(), 500, w.Code)
