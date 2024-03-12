@@ -1,7 +1,5 @@
 package dto
 
-import "database/sql"
-
 type ConfigData struct {
 	DbConfig  dbConfig
 	AppConfig appConfig
@@ -21,8 +19,4 @@ type dbConfig struct {
 
 type appConfig struct {
 	Port string
-}
-
-type Db struct {
-	*sql.DB
 }
