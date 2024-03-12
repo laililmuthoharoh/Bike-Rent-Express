@@ -78,8 +78,6 @@ var expectedCreateMotorReturn = motorReturnDto.CreateMotorReturnRequest{
 
 var tokenAdmin = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAzMTk5NzQsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJhZG1pbjEzIiwicm9sZSI6IkFETUlOIn0.Kr-6qbAUKDBikHdJMUEZ90GG0DvfM_xUo7gxG25nAOI"
 
-var tokenEmployee = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAzMjAwNTIsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJkaW5vMTI0NTEiLCJyb2xlIjoiRU1QTE9ZRUUifQ.k-L7pBsS9w8uLkzfmo3aMcm9UhMfPuDGa_EgfWNdR_A"
-
 type mockMotorReturnUsecase struct {
 	mock.Mock
 }
