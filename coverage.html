@@ -1,0 +1,1948 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>usersDelivery: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">bike-rent-express/src/Users/usersDelivery/usersDelivery.go (100.0%)</option>
+				
+				<option value="file1">bike-rent-express/src/Users/usersRepository/usersRepository.go (93.3%)</option>
+				
+				<option value="file2">bike-rent-express/src/Users/usersUsecase/usersUsecase.go (90.6%)</option>
+				
+				<option value="file3">bike-rent-express/src/employee/employeeDelivery/employeeDelivery.go (100.0%)</option>
+				
+				<option value="file4">bike-rent-express/src/employee/employeeRepository/employeeRepository.go (98.1%)</option>
+				
+				<option value="file5">bike-rent-express/src/employee/employeeUsecase/employeeUsecase.go (90.2%)</option>
+				
+				<option value="file6">bike-rent-express/src/motorReturn/motorReturnDelivery/motorReturnDelivery.go (100.0%)</option>
+				
+				<option value="file7">bike-rent-express/src/motorReturn/motorReturnRepository/motorReturnRepository.go (96.7%)</option>
+				
+				<option value="file8">bike-rent-express/src/motorReturn/motorReturnUsecase/motorReturnUsecase.go (100.0%)</option>
+				
+				<option value="file9">bike-rent-express/src/motorVehicle/motorVehicleDelivery/motorVehicleDelivery.go (100.0%)</option>
+				
+				<option value="file10">bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go (97.1%)</option>
+				
+				<option value="file11">bike-rent-express/src/motorVehicle/motorVehicleUsecase/motorVehicleUsecase.go (100.0%)</option>
+				
+				<option value="file12">bike-rent-express/src/transaction/transactionDelivery/transactionDelivery.go (100.0%)</option>
+				
+				<option value="file13">bike-rent-express/src/transaction/transactionRepository/transactionRepository.go (95.6%)</option>
+				
+				<option value="file14">bike-rent-express/src/transaction/transactionUsecase/transactionUsecase.go (100.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package usersDelivery
+
+import (
+        "bike-rent-express/model"
+        "bike-rent-express/model/dto"
+        "bike-rent-express/model/dto/json"
+        "bike-rent-express/pkg/middleware"
+        "bike-rent-express/pkg/utils"
+        "bike-rent-express/src/Users"
+        "database/sql"
+        "fmt"
+        "strings"
+
+        "github.com/gin-gonic/gin"
+)
+
+type usersDelivery struct {
+        usersUC Users.UsersUsecase
+}
+
+func NewUsersDelivery(v1Group *gin.RouterGroup, usersUC Users.UsersUsecase) <span class="cov8" title="1">{
+        handler := usersDelivery{
+                usersUC: usersUC,
+        }
+        usersGroup := v1Group.Group("/users")
+        </span><span class="cov8" title="1">{
+                usersGroup.GET("", middleware.JWTAuth("ADMIN"), handler.GetAllUsers)
+                usersGroup.PUT("/:id", middleware.JWTAuth("ADMIN", "USER"), handler.UpdateUsers)
+
+                usersGroup.GET("/:id", middleware.JWTAuth("ADMIN", "USER"), handler.getByID)
+                usersGroup.PUT("/:id/change-password", middleware.JWTAuth("ADMIN", "USER"), handler.ChangePassword)
+                usersGroup.PUT("/:id/top-up", middleware.JWTAuth("USER"), handler.TopUp)
+
+                usersGroup.POST("/register", handler.RegisterUsers)
+                usersGroup.POST("/login", handler.LoginUsers)
+
+        }</span>
+}
+
+func (h *usersDelivery) GetAllUsers(ctx *gin.Context) <span class="cov8" title="1">{
+        users, err := h.usersUC.GetAllUsers()
+        if err != nil </span><span class="cov8" title="1">{
+                // Handle error response
+                json.NewResponseError(ctx, err.Error(), "01", "01")
+                return
+        }</span>
+        <span class="cov8" title="1">json.NewResponseSuccess(ctx, users, "Success", "01", "01")</span>
+}
+
+func (h *usersDelivery) UpdateUsers(ctx *gin.Context) <span class="cov8" title="1">{
+        id := ctx.Param("id")
+
+        var newUsers dto.Users
+        newUsers.ID = id
+
+        ctx.ShouldBindJSON(&amp;newUsers)
+        if err := utils.Validated(newUsers); err != nil </span><span class="cov8" title="1">{
+                json.NewResponseBadRequest(ctx, err, "Bad Request", "02", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">if err := h.usersUC.UpdateUsers(newUsers); err != nil </span><span class="cov8" title="1">{
+                if strings.Contains(err.Error(), "invalid input syntax for type uuid") || err == sql.ErrNoRows </span><span class="cov8" title="1">{
+                        json.NewResponseSuccess(ctx, nil, "User not found", "02", "01")
+                        return
+                }</span>
+                <span class="cov8" title="1">json.NewResponseError(ctx, err.Error(), "02", "01")
+                return</span>
+
+        }
+
+        <span class="cov8" title="1">json.NewResponseSuccess(ctx, nil, "Account Updated", "02", "02")</span>
+}
+
+func (d *usersDelivery) getByID(ctx *gin.Context) <span class="cov8" title="1">{
+        id := ctx.Param("id")
+        fmt.Println(id)
+        usersItem, err := d.usersUC.GetByID(id)
+        if err != nil </span><span class="cov8" title="1">{
+                if err.Error() == "1" </span><span class="cov8" title="1">{
+                        json.NewResponseSuccess(ctx, nil, "User not found", "03", "01")
+                        return
+                }</span>
+                <span class="cov8" title="1">json.NewResponseError(ctx, err.Error(), "03", "01")
+                return</span>
+        }
+
+        <span class="cov8" title="1">json.NewResponseSuccess(ctx, usersItem, "Success", "03", "01")</span>
+}
+
+func (c *usersDelivery) RegisterUsers(ctx *gin.Context) <span class="cov8" title="1">{
+        var newUsers dto.RegisterUsers
+
+        ctx.ShouldBindJSON(&amp;newUsers)
+        if err := utils.Validated(newUsers); err != nil </span><span class="cov8" title="1">{
+                json.NewResponseBadRequest(ctx, err, "Bad Request", "04", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">if err := c.usersUC.RegisterUsers(newUsers); err != nil </span><span class="cov8" title="1">{
+                if err.Error() == "1" </span><span class="cov8" title="1">{
+                        json.NewResponseSuccess(ctx, nil, "username already in use", "04", "01")
+                        return
+                }</span>
+                <span class="cov8" title="1">json.NewResponseError(ctx, err.Error(), "04", "02")
+                fmt.Println(err)
+                return</span>
+
+        }
+
+        // Respond with success
+        <span class="cov8" title="1">json.NewResponseCreated(ctx, newUsers, "Account Created", "04", "02")</span>
+}
+
+func (c *usersDelivery) LoginUsers(ctx *gin.Context) <span class="cov8" title="1">{
+        var loginRequest model.LoginRequest
+        ctx.BindJSON(&amp;loginRequest)
+        if err := utils.Validated(loginRequest); err != nil </span><span class="cov8" title="1">{
+                json.NewResponseBadRequest(ctx, err, "bad request", "05", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">loginResponse, err := c.usersUC.LoginUsers(loginRequest)
+        if err != nil </span><span class="cov8" title="1">{
+                if err.Error() == "1" </span><span class="cov8" title="1">{
+                        json.NewResponseSuccess(ctx, nil, "Incorrect username or password", "05", "01")
+                        return
+                }</span>
+                <span class="cov8" title="1">json.NewResponseError(ctx, err.Error(), "05", "01")
+                return</span>
+        }
+
+        <span class="cov8" title="1">json.NewResponseSuccess(ctx, loginResponse, "login success", "05", "02")</span>
+
+}
+
+func (c *usersDelivery) TopUp(ctx *gin.Context) <span class="cov8" title="1">{
+        id := ctx.Param("id")
+        var topupRequest dto.TopUpRequest
+
+        ctx.BindJSON(&amp;topupRequest)
+        if err := utils.Validated(topupRequest); err != nil </span><span class="cov8" title="1">{
+                json.NewResponseBadRequest(ctx, err, "Bad Request", "06", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">topupRequest.UserID = id
+        err := c.usersUC.TopUp(topupRequest)
+        if err != nil </span><span class="cov8" title="1">{
+                json.NewResponseError(ctx, err.Error(), "06", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">json.NewResponseSuccess(ctx, nil, "Success Top Up", "06", "01")</span>
+
+}
+
+func (c *usersDelivery) ChangePassword(ctx *gin.Context) <span class="cov8" title="1">{
+        id := ctx.Param("id")
+        var changePasswordRequest dto.ChangePassword
+
+        ctx.BindJSON(&amp;changePasswordRequest)
+        if err := utils.Validated(changePasswordRequest); err != nil </span><span class="cov8" title="1">{
+                json.NewResponseBadRequest(ctx, err, "Bad Request", "07", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">changePasswordRequest.ID = id
+        err := c.usersUC.ChangePassword(changePasswordRequest)
+        if err != nil </span><span class="cov8" title="1">{
+                if err.Error() == "1" </span><span class="cov8" title="1">{
+                        json.NewResponseSuccess(ctx, nil, "Data not found", "07", "01")
+                        return
+                }</span>
+                <span class="cov8" title="1">if err.Error() == "2" </span><span class="cov8" title="1">{
+                        json.NewResponseSuccess(ctx, nil, "password does not match", "07", "02")
+                        return
+                }</span>
+                <span class="cov8" title="1">json.NewResponseError(ctx, err.Error(), "07", "02")
+                return</span>
+        }
+
+        <span class="cov8" title="1">json.NewResponseSuccess(ctx, nil, "Success change password", "07", "03")</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package usersRepository
+
+import (
+        "bike-rent-express/model/dto"
+        "bike-rent-express/src/Users"
+        "database/sql"
+)
+
+type usersRepository struct {
+        db *sql.DB
+}
+
+func NewUsersRepository(db *sql.DB) Users.UsersRepository <span class="cov8" title="1">{
+        return &amp;usersRepository{db}
+}</span>
+
+func (r *usersRepository) GetByID(uuid string) (dto.GetUsers, error) <span class="cov8" title="1">{
+        query := `SELECT id, name, username, password,address, role, can_rent,created_at, updated_at,telp FROM users WHERE id = $1`
+        var usersItem dto.GetUsers
+        if err := r.db.QueryRow(query, uuid).Scan(
+                &amp;usersItem.Uuid,
+                &amp;usersItem.Name,
+                &amp;usersItem.Username,
+                &amp;usersItem.Password,
+                &amp;usersItem.Address,
+                &amp;usersItem.Role,
+                &amp;usersItem.Can_rent,
+                &amp;usersItem.Created_at,
+                &amp;usersItem.Updated_at,
+                &amp;usersItem.Telp,
+        ); err != nil </span><span class="cov8" title="1">{
+                return usersItem, err
+        }</span>
+
+        <span class="cov8" title="1">return usersItem, nil</span>
+}
+
+func (r *usersRepository) GetAll() ([]dto.GetUsers, error) <span class="cov8" title="1">{
+        query := `SELECT id, name, username, address, role, can_rent, created_at, updated_at, telp FROM users WHERE role = 'USER'`
+        rows, err := r.db.Query(query)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">defer rows.Close()
+
+        var users []dto.GetUsers
+        for rows.Next() </span><span class="cov8" title="1">{
+                var user dto.GetUsers
+                if err := rows.Scan(
+                        &amp;user.Uuid,
+                        &amp;user.Name,
+                        &amp;user.Username,
+                        &amp;user.Address,
+                        &amp;user.Role,
+                        &amp;user.Can_rent,
+                        &amp;user.Created_at,
+                        &amp;user.Updated_at,
+                        &amp;user.Telp,
+                ); err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov8" title="1">users = append(users, user)</span>
+        }
+        <span class="cov8" title="1">if err := rows.Err(); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">return users, nil</span>
+}
+
+func (r *usersRepository) UpdateUsers(usersUpdate dto.Users) error <span class="cov8" title="1">{
+        query := `
+        UPDATE users
+        SET name = $1, 
+            address = $2, 
+            can_rent = $3, 
+            telp = $4,
+                        updated_at = CURRENT_TIMESTAMP
+        WHERE id = $5
+    `
+        result, err := r.db.Exec(query,
+                usersUpdate.Name,
+                usersUpdate.Address,
+                usersUpdate.CanRent,
+                usersUpdate.Telp,
+                usersUpdate.ID,
+        )
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">rowsAffected, _ := result.RowsAffected()
+        if rowsAffected == 0 </span><span class="cov8" title="1">{
+                return sql.ErrNoRows
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+
+func (c *usersRepository) RegisterUsers(newUsers dto.RegisterUsers) error <span class="cov8" title="1">{
+        tx, err := c.db.Begin()
+        if err != nil </span><span class="cov0" title="0">{
+                tx.Rollback()
+                return err
+        }</span>
+
+        <span class="cov8" title="1">canRent := newUsers.Role == "USER"
+
+        query := `INSERT INTO users (name, username, password, address, role, can_rent, telp) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id;`
+        if err := tx.QueryRow(query,
+                newUsers.Name,
+                newUsers.Username,
+                newUsers.Password,
+                newUsers.Address,
+                newUsers.Role,
+                canRent,
+                newUsers.Telp).Scan(&amp;newUsers.ID); err != nil </span><span class="cov8" title="1">{
+                tx.Rollback()
+                return err
+        }</span>
+
+        <span class="cov8" title="1">if newUsers.Role == "USER" </span><span class="cov8" title="1">{
+                query = "INSERT INTO balance (amount, user_id) VALUES(0, $1);"
+                _, err = tx.Exec(query, newUsers.ID)
+                if err != nil </span><span class="cov8" title="1">{
+                        tx.Rollback()
+                        return err
+                }</span>
+        }
+        <span class="cov8" title="1">tx.Commit()
+
+        return nil</span>
+}
+
+func (c *usersRepository) GetByUsername(username string) (dto.Users, error) <span class="cov8" title="1">{
+        var user dto.Users
+        query := `SELECT id, name, username, password, address, role, can_rent,updated_at,telp FROM users WHERE username = $1`
+        if err := c.db.QueryRow(query, username).Scan(&amp;user.ID, &amp;user.Name, &amp;user.Username, &amp;user.Password, &amp;user.Address, &amp;user.Role, &amp;user.CanRent, &amp;user.Updated_at, &amp;user.Telp); err != nil </span><span class="cov8" title="1">{
+                return user, err
+        }</span>
+        <span class="cov8" title="1">return user, nil</span>
+}
+
+func (c *usersRepository) UpdateBalance(topUpRequest dto.TopUpRequest) error <span class="cov8" title="1">{
+        query := "UPDATE balance SET amount =$1, updated_at = CURRENT_TIMESTAMP WHERE user_id = $2;"
+        _, err := c.db.Exec(query, topUpRequest.Amount, topUpRequest.UserID)
+        return err
+}</span>
+
+func (c *usersRepository) UpdatePassword(changePasswordRequest dto.ChangePassword) error <span class="cov8" title="1">{
+        query := "UPDATE users SET password = $1 WHERE id = $2"
+        _, err := c.db.Exec(query, changePasswordRequest.NewPassword, changePasswordRequest.ID)
+        return err
+}</span>
+
+func (c *usersRepository) UsernameIsReady(username string) (bool, error) <span class="cov8" title="1">{
+        query := "SELECT COUNT(username) FROM users WHERE username = $1;"
+        var result int
+
+        err := c.db.QueryRow(query, username).Scan(&amp;result)
+        return result == 0, err
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package usersUsecase
+
+import (
+        "bike-rent-express/model"
+        "bike-rent-express/model/dto"
+        "bike-rent-express/pkg/middleware"
+        "bike-rent-express/src/Users"
+        "database/sql"
+        "errors"
+        "strings"
+
+        "golang.org/x/crypto/bcrypt"
+)
+
+type usersUC struct {
+        usersRepo Users.UsersRepository
+}
+
+func (uc *usersUC) GetAllUsers() ([]dto.GetUsers, error) <span class="cov8" title="1">{
+        // Call the repository method to fetch all users
+        users, err := uc.usersRepo.GetAll()
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">return users, nil</span>
+}
+
+func (uc *usersUC) UpdateUsers(updateUsers dto.Users) error <span class="cov8" title="1">{
+
+        return uc.usersRepo.UpdateUsers(updateUsers)
+}</span>
+
+func (uc *usersUC) GetByID(id string) (dto.GetUsers, error) <span class="cov8" title="1">{
+        user, err := uc.usersRepo.GetByID(id)
+        if err != nil </span><span class="cov8" title="1">{
+                if strings.Contains(err.Error(), "invalid input syntax for type uuid") || err == sql.ErrNoRows </span><span class="cov8" title="1">{
+                        return user, errors.New("1")
+                }</span>
+                <span class="cov8" title="1">return user, err</span>
+        }
+
+        <span class="cov8" title="1">return user, nil</span>
+}
+
+func NewUsersUsecase(usersRepo Users.UsersRepository) Users.UsersUsecase <span class="cov8" title="1">{
+        return &amp;usersUC{usersRepo}
+}</span>
+
+func (c *usersUC) RegisterUsers(newUsers dto.RegisterUsers) error <span class="cov8" title="1">{
+        usernameReady, err := c.usersRepo.UsernameIsReady(newUsers.Username)
+
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">if !usernameReady </span><span class="cov8" title="1">{
+                return errors.New("1")
+        }</span>
+
+        <span class="cov8" title="1">encryptPassword, err := bcrypt.GenerateFromPassword([]byte(newUsers.Password), bcrypt.DefaultCost)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">newUsers.Password = string(encryptPassword)
+
+        return c.usersRepo.RegisterUsers(newUsers)</span>
+}
+
+func (c *usersUC) LoginUsers(loginRequest model.LoginRequest) (dto.LoginResponse, error) <span class="cov8" title="1">{
+        var loginResponse dto.LoginResponse
+        user, err := c.usersRepo.GetByUsername(loginRequest.Username)
+        if err != nil </span><span class="cov8" title="1">{
+                if strings.Contains(err.Error(), "invalid input syntax for type uuid") || err == sql.ErrNoRows </span><span class="cov8" title="1">{
+                        return loginResponse, errors.New("1")
+                }</span>
+                <span class="cov8" title="1">return loginResponse, err</span>
+        }
+        <span class="cov8" title="1">err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginRequest.Password))
+        if err != nil </span><span class="cov0" title="0">{
+                return loginResponse, errors.New("1")
+        }</span>
+        <span class="cov8" title="1">token, err := middleware.GenerateTokenJwt(user.Username, user.Role)
+        if err != nil </span><span class="cov0" title="0">{
+                return loginResponse, err
+        }</span>
+        <span class="cov8" title="1">loginResponse.User = user
+        loginResponse.AccesToken = token
+
+        return loginResponse, nil</span>
+}
+
+func (c *usersUC) TopUp(topUpRequest dto.TopUpRequest) error <span class="cov8" title="1">{
+        err := c.usersRepo.UpdateBalance(topUpRequest)
+        return err
+}</span>
+
+func (c *usersUC) ChangePassword(changePasswordRequest dto.ChangePassword) error <span class="cov8" title="1">{
+        user, err := c.usersRepo.GetByID(changePasswordRequest.ID)
+        if err != nil </span><span class="cov8" title="1">{
+                if strings.Contains(err.Error(), "invalid input syntax for type uuid") || err == sql.ErrNoRows </span><span class="cov8" title="1">{
+                        return errors.New("1")
+                }</span>
+                <span class="cov8" title="1">return err</span>
+        }
+        <span class="cov8" title="1">err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(changePasswordRequest.OldPassword))
+        if err != nil </span><span class="cov0" title="0">{
+                return errors.New("2")
+        }</span>
+        <span class="cov8" title="1">encryptPass, err := bcrypt.GenerateFromPassword([]byte(changePasswordRequest.NewPassword), bcrypt.DefaultCost)
+        if err != nil </span><span class="cov0" title="0">{
+                return errors.New("2")
+        }</span>
+
+        <span class="cov8" title="1">changePasswordRequest.NewPassword = string(encryptPass)
+
+        err = c.usersRepo.UpdatePassword(changePasswordRequest)
+        return err</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package employeeDelivery
+
+import (
+        employeeDto "bike-rent-express/model/dto/employee"
+        "bike-rent-express/model/dto/json"
+        "bike-rent-express/pkg/middleware"
+        "bike-rent-express/pkg/utils"
+        "bike-rent-express/src/employee"
+        "database/sql"
+        "errors"
+
+        "github.com/gin-gonic/gin"
+)
+
+type employeeDelivery struct {
+        employeeUC employee.EmployeeUsecase
+}
+
+func NewEmployeeDelivery(v1Group *gin.RouterGroup, employeeUC employee.EmployeeUsecase) <span class="cov8" title="1">{
+        handler := employeeDelivery{employeeUC}
+        employeeGroup := v1Group.Group("employee")
+        </span><span class="cov8" title="1">{
+                employeeGroup.POST("/register", handler.AddEmployee)
+                employeeGroup.POST("/login", handler.LoginEmployee)
+                employeeGroup.PUT("/:id/change-password", middleware.JWTAuth("ADMIN", "EMPLOYEE"), handler.ChangePassword)
+                employeeGroup.GET("/:id", middleware.JWTAuth("ADMIN", "EMPLOYEE"), handler.GetEmployeById)
+                employeeGroup.GET("", middleware.JWTAuth("ADMIN"), handler.GetEmployeeAll)
+                employeeGroup.PUT("/:id", middleware.JWTAuth("ADMIN", "EMPLOYEE"), handler.UpdateEmployeeById)
+                employeeGroup.DELETE("/:id", middleware.JWTAuth("ADMIN"), handler.DeleteEmployeeById)
+        }</span>
+}
+
+func (e *employeeDelivery) AddEmployee(c *gin.Context) <span class="cov8" title="1">{
+        var addEmployeeRequest employeeDto.CreateEmployeeRequest
+
+        c.BindJSON(&amp;addEmployeeRequest)
+        if err := utils.Validated(addEmployeeRequest); err != nil </span><span class="cov8" title="1">{
+                json.NewResponseBadRequest(c, err, "Bad Request", "01", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">resultEmployee, err := e.employeeUC.Register(addEmployeeRequest)
+        if err != nil </span><span class="cov8" title="1">{
+                if err.Error() == "1" </span><span class="cov8" title="1">{
+                        json.NewResponseSuccess(c, nil, "username already in use", "01", "01")
+                        return
+                }</span>
+                <span class="cov8" title="1">json.NewResponseError(c, err.Error(), "01", "01")
+                return</span>
+        }
+
+        <span class="cov8" title="1">json.NewResponseCreated(c, resultEmployee, "Employee Created", "01", "01")</span>
+}
+
+func (e *employeeDelivery) GetEmployeById(c *gin.Context) <span class="cov8" title="1">{
+        id := c.Param("id")
+
+        resultEmployee, err := e.employeeUC.GetById(id)
+        if err != nil </span><span class="cov8" title="1">{
+                if err.Error() == "1" || errors.Is(sql.ErrNoRows, err) </span><span class="cov8" title="1">{
+                        json.NewResponseSuccess(c, nil, "Data not found", "02", "01")
+                        return
+                }</span>
+                <span class="cov8" title="1">json.NewResponseError(c, err.Error(), "02", "01")
+                return</span>
+        }
+
+        <span class="cov8" title="1">json.NewResponseSuccess(c, resultEmployee, "", "02", "02")</span>
+}
+
+func (e *employeeDelivery) GetEmployeeAll(c *gin.Context) <span class="cov8" title="1">{
+        resultEmployee, err := e.employeeUC.Get()
+        if err != nil </span><span class="cov8" title="1">{
+                json.NewResponseError(c, err.Error(), "03", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">json.NewResponseSuccess(c, resultEmployee, "Success Get All Employee", "03", "01")</span>
+}
+
+func (e *employeeDelivery) UpdateEmployeeById(c *gin.Context) <span class="cov8" title="1">{
+        var employeUpdateRequest employeeDto.UpdateEmployeeRequest
+
+        id := c.Param("id")
+        employeUpdateRequest.ID = id
+
+        c.BindJSON(&amp;employeUpdateRequest)
+        if err := utils.Validated(employeUpdateRequest); err != nil </span><span class="cov8" title="1">{
+                json.NewResponseBadRequest(c, err, "Bad Request", "04", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">employee, err := e.employeeUC.Update(employeUpdateRequest)
+        if err != nil </span><span class="cov8" title="1">{
+                if err.Error() == "1" || errors.Is(sql.ErrNoRows, err) </span><span class="cov8" title="1">{
+                        json.NewResponseSuccess(c, nil, "Data not found", "04", "01")
+                        return
+                }</span>
+                <span class="cov8" title="1">json.NewResponseError(c, err.Error(), "04", "01")
+                return</span>
+        }
+
+        <span class="cov8" title="1">json.NewResponseSuccess(c, employee, "Success update employee", "04", "01")</span>
+}
+
+func (e *employeeDelivery) DeleteEmployeeById(c *gin.Context) <span class="cov8" title="1">{
+        id := c.Param("id")
+
+        msg, err := e.employeeUC.Delete(id)
+        if err != nil </span><span class="cov8" title="1">{
+                if err.Error() == "1" </span><span class="cov8" title="1">{
+                        json.NewResponseSuccess(c, nil, "Data not found", "05", "01")
+                        return
+                }</span>
+                <span class="cov8" title="1">json.NewResponseError(c, err.Error(), "05", "01")
+                return</span>
+        }
+
+        <span class="cov8" title="1">json.NewResponseSuccess(c, nil, msg, "05", "02")</span>
+}
+
+func (e *employeeDelivery) LoginEmployee(c *gin.Context) <span class="cov8" title="1">{
+        var loginRequest employeeDto.LoginRequest
+
+        c.BindJSON(&amp;loginRequest)
+
+        if err := utils.Validated(loginRequest); err != nil </span><span class="cov8" title="1">{
+                json.NewResponseBadRequest(c, err, "Bad Request", "06", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">loginResponse, err := e.employeeUC.Login(loginRequest)
+        if err != nil </span><span class="cov8" title="1">{
+                if err.Error() == "1" </span><span class="cov8" title="1">{
+                        json.NewResponseSuccess(c, nil, "Incorrect username or password", "06", "01")
+                        return
+                }</span> else<span class="cov8" title="1"> if err.Error() == "2" </span><span class="cov8" title="1">{
+                        json.NewResponseSuccess(c, nil, "Incorrect username or password", "06", "02")
+                        return
+                }</span>
+
+                <span class="cov8" title="1">json.NewResponseError(c, err.Error(), "06", "01")
+                return</span>
+        }
+
+        <span class="cov8" title="1">json.NewResponseSuccess(c, loginResponse, "Login successfully", "06", "03")</span>
+}
+
+func (e *employeeDelivery) ChangePassword(c *gin.Context) <span class="cov8" title="1">{
+        var changePasswordRequest employeeDto.ChangePasswordRequest
+
+        c.BindJSON(&amp;changePasswordRequest)
+        id := c.Param("id")
+
+        if err := utils.Validated(changePasswordRequest); err != nil </span><span class="cov8" title="1">{
+                json.NewResponseBadRequest(c, err, "Bad Request", "07", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">err := e.employeeUC.ChangePassword(id, changePasswordRequest)
+        if err != nil </span><span class="cov8" title="1">{
+                if err.Error() == "1" </span><span class="cov8" title="1">{
+                        json.NewResponseSuccess(c, nil, "Data not found", "07", "01")
+                        return
+                }</span>
+                <span class="cov8" title="1">if err.Error() == "2" </span><span class="cov8" title="1">{
+                        json.NewResponseSuccess(c, nil, "password does not match", "07", "02")
+                        return
+                }</span>
+                <span class="cov8" title="1">json.NewResponseError(c, err.Error(), "07", "01")
+                return</span>
+        }
+
+        <span class="cov8" title="1">json.NewResponseSuccess(c, nil, "Success updated password", "07", "03")</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package employeeRepository
+
+import (
+        employeeDto "bike-rent-express/model/dto/employee"
+        "bike-rent-express/src/employee"
+        "database/sql"
+        "errors"
+)
+
+type employeeRepository struct {
+        db *sql.DB
+}
+
+func NewEmployeeRepository(db *sql.DB) employee.EmployeeRepository <span class="cov8" title="1">{
+        return &amp;employeeRepository{db}
+}</span>
+
+func (e *employeeRepository) Add(employee employeeDto.CreateEmployeeRequest) (employeeDto.CreateEmployeeRequest, error) <span class="cov8" title="1">{
+        usernameReady, err := e.UsernameIsReady(employee.Username)
+        if err != nil </span><span class="cov8" title="1">{
+                return employee, err
+        }</span>
+
+        <span class="cov8" title="1">if !usernameReady </span><span class="cov8" title="1">{
+                return employee, errors.New("1")
+        }</span>
+
+        <span class="cov8" title="1">query := "INSERT INTO employee(name, telp, username, password) VALUES($1,$2,$3,$4) RETURNING id;"
+
+        if err := e.db.QueryRow(query, employee.Name, employee.Telp, employee.Username, employee.Password).Scan(&amp;employee.ID); err != nil </span><span class="cov8" title="1">{
+                return employee, err
+        }</span>
+
+        <span class="cov8" title="1">return employee, nil</span>
+}
+
+func (e *employeeRepository) GetByUsername(username string) (employeeDto.Employee, error) <span class="cov8" title="1">{
+        var employee employeeDto.Employee
+        query := "SELECT id, name, telp, username, password, created_at, updated_at FROM employee WHERE username = $1 AND deleted_at IS NULL;"
+
+        if err := e.db.QueryRow(query, username).Scan(&amp;employee.ID, &amp;employee.Name, &amp;employee.Telp, &amp;employee.Username, &amp;employee.Password, &amp;employee.CreatedAt, &amp;employee.UpdatedAt); err != nil </span><span class="cov8" title="1">{
+                return employee, err
+        }</span>
+
+        <span class="cov8" title="1">return employee, nil</span>
+}
+
+func (e *employeeRepository) UsernameIsReady(username string) (bool, error) <span class="cov8" title="1">{
+        query := "SELECT COUNT(username) FROM employee WHERE username = $1;"
+
+        var result int
+        if err := e.db.QueryRow(query, username).Scan(&amp;result); err != nil </span><span class="cov8" title="1">{
+                return false, err
+        }</span>
+
+        <span class="cov8" title="1">return result == 0, nil</span>
+}
+
+func (e *employeeRepository) Get() ([]employeeDto.Employee, error) <span class="cov8" title="1">{
+        query := "SELECT id, name, telp, username, created_at, updated_at FROM employee WHERE deleted_at IS NULL;"
+
+        var employee []employeeDto.Employee
+        row, err := e.db.Query(query)
+        if err != nil </span><span class="cov8" title="1">{
+                return employee, err
+        }</span>
+
+        <span class="cov8" title="1">for row.Next() </span><span class="cov8" title="1">{
+                var employe employeeDto.Employee
+                err := row.Scan(&amp;employe.ID, &amp;employe.Name, &amp;employe.Telp, &amp;employe.Username, &amp;employe.CreatedAt, &amp;employe.UpdatedAt)
+                if err != nil </span><span class="cov0" title="0">{
+                        return employee, err
+                }</span>
+                <span class="cov8" title="1">employee = append(employee, employe)</span>
+        }
+
+        <span class="cov8" title="1">return employee, nil</span>
+}
+
+func (e *employeeRepository) GetById(id string) (employeeDto.Employee, error) <span class="cov8" title="1">{
+
+        var employee employeeDto.Employee
+        query := "SELECT id, name, telp, username, password, created_at, updated_at FROM employee WHERE id = $1 AND deleted_at IS NULL;"
+        if err := e.db.QueryRow(query, id).Scan(&amp;employee.ID, &amp;employee.Name, &amp;employee.Telp, &amp;employee.Username, &amp;employee.Password, &amp;employee.CreatedAt, &amp;employee.UpdatedAt); err != nil </span><span class="cov8" title="1">{
+                return employee, err
+        }</span>
+
+        <span class="cov8" title="1">return employee, nil</span>
+}
+
+func (e *employeeRepository) Update(employeeUpdateRequest employeeDto.UpdateEmployeeRequest) (employeeDto.Employee, error) <span class="cov8" title="1">{
+        query := "UPDATE employee SET name = $1, telp = $2, updated_at= CURRENT_TIMESTAMP WHERE id = $3 AND deleted_at IS NULL;"
+        _, err := e.db.Exec(query, employeeUpdateRequest.Name, employeeUpdateRequest.Telp, employeeUpdateRequest.ID)
+        if err != nil </span><span class="cov8" title="1">{
+                return employeeDto.Employee{}, err
+        }</span>
+
+        <span class="cov8" title="1">employee, err := e.GetById(employeeUpdateRequest.ID)
+        if err != nil </span><span class="cov8" title="1">{
+                return employee, err
+        }</span>
+        <span class="cov8" title="1">return employee, nil</span>
+}
+
+func (e *employeeRepository) Delete(id string) (string, error) <span class="cov8" title="1">{
+
+        query := "UPDATE employee SET deleted_at = CURRENT_TIMESTAMP WHERE id = $1 AND deleted_at IS NULL;"
+        _, err := e.db.Exec(query, id)
+        if err != nil </span><span class="cov8" title="1">{
+                return "", err
+        }</span>
+
+        <span class="cov8" title="1">return "Sucessfully delete employee", nil</span>
+}
+
+func (e *employeeRepository) UpdatePassword(employee employeeDto.Employee) error <span class="cov8" title="1">{
+        query := "UPDATE employee SET password = $1 WHERE id = $2 AND deleted_at IS NULL"
+
+        _, err := e.db.Exec(query, employee.Password, employee.ID)
+        return err
+}</span>
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package employeeUsecase
+
+import (
+        employeeDto "bike-rent-express/model/dto/employee"
+        "bike-rent-express/pkg/middleware"
+        "bike-rent-express/src/employee"
+        "database/sql"
+        "errors"
+        "strings"
+
+        "golang.org/x/crypto/bcrypt"
+)
+
+type employeeUsecase struct {
+        employeeRepository employee.EmployeeRepository
+}
+
+func NewEmployeeUsecase(employeRepository employee.EmployeeRepository) employee.EmployeeUsecase <span class="cov8" title="1">{
+        return &amp;employeeUsecase{employeRepository}
+}</span>
+
+func (e *employeeUsecase) Register(employee employeeDto.CreateEmployeeRequest) (employeeDto.CreateEmployeeRequest, error) <span class="cov8" title="1">{
+        password, err := bcrypt.GenerateFromPassword([]byte(employee.Password), bcrypt.DefaultCost)
+
+        if err != nil </span><span class="cov0" title="0">{
+                return employee, err
+        }</span>
+
+        <span class="cov8" title="1">employee.Password = string(password)
+
+        returnEmployee, err := e.employeeRepository.Add(employee)
+        if err != nil </span><span class="cov8" title="1">{
+                return returnEmployee, err
+        }</span>
+        <span class="cov8" title="1">return returnEmployee, nil</span>
+}
+
+func (e *employeeUsecase) Get() ([]employeeDto.Employee, error) <span class="cov8" title="1">{
+        employee, err := e.employeeRepository.Get()
+
+        if err != nil </span><span class="cov8" title="1">{
+                return employee, err
+        }</span>
+
+        <span class="cov8" title="1">return employee, nil</span>
+}
+
+func (e *employeeUsecase) GetById(id string) (employeeDto.Employee, error) <span class="cov8" title="1">{
+        employee, err := e.employeeRepository.GetById(id)
+
+        if err != nil </span><span class="cov8" title="1">{
+                if strings.Contains(err.Error(), "invalid input syntax for type uuid") </span><span class="cov8" title="1">{
+                        return employee, errors.New("1")
+                }</span>
+                <span class="cov8" title="1">return employee, err</span>
+        }
+
+        <span class="cov8" title="1">return employee, nil</span>
+}
+
+func (e *employeeUsecase) Update(employeUpdateRequest employeeDto.UpdateEmployeeRequest) (employeeDto.Employee, error) <span class="cov8" title="1">{
+        employee, err := e.employeeRepository.Update(employeUpdateRequest)
+        if err != nil </span><span class="cov8" title="1">{
+                if strings.Contains(err.Error(), "invalid input syntax for type uuid") </span><span class="cov8" title="1">{
+                        return employee, errors.New("1")
+                }</span>
+                <span class="cov8" title="1">return employee, err</span>
+        }
+
+        <span class="cov8" title="1">return employee, err</span>
+}
+
+func (e *employeeUsecase) Delete(id string) (string, error) <span class="cov8" title="1">{
+        _, err := e.employeeRepository.GetById(id)
+        if err != nil </span><span class="cov8" title="1">{
+                if strings.Contains(err.Error(), "invalid input syntax for type uuid") || err == sql.ErrNoRows </span><span class="cov8" title="1">{
+                        return "", errors.New("1")
+                }</span>
+                <span class="cov8" title="1">return "", err</span>
+        }
+
+        <span class="cov8" title="1">resultDelete, err := e.employeeRepository.Delete(id)
+        if err != nil </span><span class="cov8" title="1">{
+                return resultDelete, err
+        }</span>
+
+        <span class="cov8" title="1">return resultDelete, nil</span>
+}
+
+func (e *employeeUsecase) Login(loginRequest employeeDto.LoginRequest) (employeeDto.LoginResponse, error) <span class="cov8" title="1">{
+        employee, err := e.employeeRepository.GetByUsername(loginRequest.Username)
+        if err != nil </span><span class="cov8" title="1">{
+                if err == sql.ErrNoRows || err.Error() == "invalid input syntax for type uuid" </span><span class="cov8" title="1">{
+                        return employeeDto.LoginResponse{}, errors.New("1")
+                }</span>
+                <span class="cov8" title="1">return employeeDto.LoginResponse{}, err</span>
+        }
+
+        <span class="cov8" title="1">err = bcrypt.CompareHashAndPassword([]byte(employee.Password), []byte(loginRequest.Password))
+        if err != nil </span><span class="cov0" title="0">{
+                return employeeDto.LoginResponse{}, errors.New("2")
+        }</span>
+
+        <span class="cov8" title="1">token, err := middleware.GenerateTokenJwt(employee.Username, "EMPLOYEE")
+        if err != nil </span><span class="cov0" title="0">{
+                return employeeDto.LoginResponse{}, err
+        }</span>
+
+        <span class="cov8" title="1">loginResponse := employeeDto.LoginResponse{
+                AccessToken: token,
+                Employee:    employee,
+        }
+
+        return loginResponse, nil</span>
+}
+
+func (e *employeeUsecase) ChangePassword(id string, changePasswordRequest employeeDto.ChangePasswordRequest) error <span class="cov8" title="1">{
+        employee, err := e.employeeRepository.GetById(id)
+        if err != nil </span><span class="cov8" title="1">{
+                if strings.Contains(err.Error(), "invalid input syntax for type uuid") || err == sql.ErrNoRows </span><span class="cov8" title="1">{
+                        return errors.New("1")
+                }</span>
+                <span class="cov0" title="0">return err</span>
+        }
+
+        <span class="cov8" title="1">err = bcrypt.CompareHashAndPassword([]byte(employee.Password), []byte(changePasswordRequest.PasswordOld))
+        if err != nil </span><span class="cov0" title="0">{
+                return errors.New("2")
+        }</span>
+
+        <span class="cov8" title="1">encryptPass, err := bcrypt.GenerateFromPassword([]byte(changePasswordRequest.NewPassword), bcrypt.DefaultCost)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">employee.Password = string(encryptPass)
+        err = e.employeeRepository.UpdatePassword(employee)
+
+        return err</span>
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package motorReturnDelivery
+
+import (
+        "bike-rent-express/model/dto/json"
+        "bike-rent-express/model/dto/motorReturnDto"
+        "bike-rent-express/pkg/middleware"
+        "bike-rent-express/pkg/utils"
+        "bike-rent-express/src/motorReturn"
+
+        "github.com/gin-gonic/gin"
+)
+
+type motorReturnDelivery struct {
+        motorReturnUC motorReturn.MotorReturnUsecase
+}
+
+func NewMotorReturnDelivey(v1Group *gin.RouterGroup, motorReturnUC motorReturn.MotorReturnUsecase) <span class="cov8" title="1">{
+        handler := motorReturnDelivery{motorReturnUC}
+
+        motorReturnGroup := v1Group.Group("employee/:id/motor-return")
+        </span><span class="cov8" title="1">{
+                motorReturnGroup.POST("", middleware.JWTAuth("EMPLOYEE"), handler.CreateMotorReturn)
+                motorReturnGroup.GET("/:motor-return-id", middleware.JWTAuth("EMPLOYEE", "ADMIN"), handler.GetMotorReturnById)
+        }</span>
+
+        <span class="cov8" title="1">v1Group.GET("/users/motor-return", middleware.JWTAuth("ADMIN", "EMPLOYEE"), handler.GetAllMotorReturn)</span>
+
+}
+
+func (m *motorReturnDelivery) CreateMotorReturn(c *gin.Context) <span class="cov8" title="1">{
+        var createMotorReturnRequest motorReturnDto.CreateMotorReturnRequest
+
+        c.BindJSON(&amp;createMotorReturnRequest)
+        if err := utils.Validated(createMotorReturnRequest); err != nil </span><span class="cov8" title="1">{
+                json.NewResponseBadRequest(c, err, "Bad Request", "01", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">motorReturnCreated, err := m.motorReturnUC.AddMotorReturn(createMotorReturnRequest)
+        if err != nil </span><span class="cov8" title="1">{
+                json.NewResponseError(c, err.Error(), "01", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">json.NewResponseCreated(c, motorReturnCreated, "Motor return created", "01", "01")</span>
+}
+
+func (m *motorReturnDelivery) GetMotorReturnById(c *gin.Context) <span class="cov8" title="1">{
+        id := c.Param("motor-return-id")
+        motorReturnDetail, err := m.motorReturnUC.GetMotorReturnById(id)
+        if err != nil </span><span class="cov8" title="1">{
+                json.NewResponseError(c, err.Error(), "02", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">json.NewResponseSuccess(c, motorReturnDetail, "Success get motor return by id", "02", "01")</span>
+}
+
+func (m *motorReturnDelivery) GetAllMotorReturn(c *gin.Context) <span class="cov8" title="1">{
+
+        motorsReturn, err := m.motorReturnUC.GetMotorReturnAll()
+        if err != nil </span><span class="cov8" title="1">{
+                json.NewResponseError(c, err.Error(), "03", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">json.NewResponseSuccess(c, motorsReturn, "Success get all motor return", "03", "01")</span>
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package motorReturnRepository
+
+import (
+        "bike-rent-express/model/dto/motorReturnDto"
+        "bike-rent-express/src/motorReturn"
+        "database/sql"
+        "errors"
+        "time"
+)
+
+type motorReturnRepository struct {
+        db *sql.DB
+}
+
+func NewMotorRepository(db *sql.DB) motorReturn.MotorReturnRepository <span class="cov8" title="1">{
+        return &amp;motorReturnRepository{db}
+}</span>
+
+func (m *motorReturnRepository) Add(createMotorReturnRequest motorReturnDto.CreateMotorReturnRequest) (motorReturnDto.CreateMotorReturnRequest, error) <span class="cov8" title="1">{
+        tx, err := m.db.Begin()
+        if err != nil </span><span class="cov0" title="0">{
+                tx.Rollback()
+                return createMotorReturnRequest, err
+        }</span>
+        <span class="cov8" title="1">var userId string
+        query := "SELECT user_id FROM transaction WHERE id = $1;"
+        if err := tx.QueryRow(query, createMotorReturnRequest.TransactionID).Scan(&amp;userId); err != nil </span><span class="cov8" title="1">{
+                tx.Rollback()
+                return createMotorReturnRequest, err
+        }</span>
+
+        <span class="cov8" title="1">var balanceUser int
+        query = "SELECT amount FROM balance WHERE user_id = $1;"
+
+        if err := tx.QueryRow(query, userId).Scan(&amp;balanceUser); err != nil </span><span class="cov8" title="1">{
+                tx.Rollback()
+                return createMotorReturnRequest, err
+        }</span>
+
+        <span class="cov8" title="1">if balanceUser &lt; createMotorReturnRequest.ExtraCharge </span><span class="cov8" title="1">{
+                tx.Rollback()
+                return createMotorReturnRequest, errors.New("1")
+        }</span>
+
+        <span class="cov8" title="1">balanceUser -= createMotorReturnRequest.ExtraCharge
+
+        query = "UPDATE balance SET amount = $1 WHERE user_id = $2;"
+        _, err = tx.Exec(query, balanceUser, userId)
+        if err != nil </span><span class="cov8" title="1">{
+                tx.Rollback()
+                return createMotorReturnRequest, err
+        }</span>
+
+        <span class="cov8" title="1">query = "UPDATE motor_vehicle SET status = 'AVAILABLE';"
+        _, err = tx.Exec(query)
+        if err != nil </span><span class="cov8" title="1">{
+                tx.Rollback()
+                return createMotorReturnRequest, err
+        }</span>
+
+        <span class="cov8" title="1">returnDate := time.Now()
+
+        query = "SELECT COUNT(transaction_id) FROM motor_return WHERE transaction_id = $1;"
+        var transactionExist int
+        if err := tx.QueryRow(query, createMotorReturnRequest.TransactionID).Scan(&amp;transactionExist); err != nil </span><span class="cov8" title="1">{
+                tx.Rollback()
+                return createMotorReturnRequest, err
+        }</span>
+
+        <span class="cov8" title="1">if transactionExist &gt; 0 </span><span class="cov8" title="1">{
+                tx.Rollback()
+                return createMotorReturnRequest, errors.New("motorcycle has been returned")
+        }</span>
+
+        <span class="cov8" title="1">query = "INSERT INTO motor_return(transaction_id, return_date, extra_charge, condition_motor, description) VALUES($1, $2, $3, $4, $5) RETURNING id;"
+
+        if err := tx.QueryRow(query, createMotorReturnRequest.TransactionID, returnDate, createMotorReturnRequest.ExtraCharge, createMotorReturnRequest.ConditionMotor, createMotorReturnRequest.Description).Scan(&amp;createMotorReturnRequest.ID); err != nil </span><span class="cov8" title="1">{
+                tx.Rollback()
+                return createMotorReturnRequest, err
+        }</span>
+        <span class="cov8" title="1">tx.Commit()
+
+        return createMotorReturnRequest, nil</span>
+}
+
+func (m *motorReturnRepository) GetById(id string) (motorReturnDto.MotorReturn, error) <span class="cov8" title="1">{
+        var motorReturn motorReturnDto.MotorReturn
+        query := "SELECT id, transaction_id, return_date, extra_charge, condition_motor, description, created_at, updated_at FROM motor_return WHERE id = $1;"
+
+        if err := m.db.QueryRow(query, id).Scan(&amp;motorReturn.ID, &amp;motorReturn.TrasactionID, &amp;motorReturn.ReturnDate, &amp;motorReturn.ExtraCharge, &amp;motorReturn.ConditionMotor, &amp;motorReturn.Descrption, &amp;motorReturn.CreatedAt, &amp;motorReturn.UpdatedAt); err != nil </span><span class="cov8" title="1">{
+                return motorReturn, err
+        }</span>
+
+        <span class="cov8" title="1">return motorReturn, nil</span>
+}
+
+func (m *motorReturnRepository) GetAll() ([]motorReturnDto.MotorReturn, error) <span class="cov8" title="1">{
+        var motorsReturn []motorReturnDto.MotorReturn
+
+        query := "SELECT id, transaction_id, return_date, extra_charge, condition_motor, description, created_at, updated_at FROM motor_return;"
+        rows, err := m.db.Query(query)
+        if err != nil </span><span class="cov8" title="1">{
+                return motorsReturn, err
+        }</span>
+
+        <span class="cov8" title="1">for rows.Next() </span><span class="cov8" title="1">{
+                var motorReturn motorReturnDto.MotorReturn
+                if err := rows.Scan(&amp;motorReturn.ID, &amp;motorReturn.TrasactionID, &amp;motorReturn.ReturnDate, &amp;motorReturn.ExtraCharge, &amp;motorReturn.ConditionMotor, &amp;motorReturn.Descrption, &amp;motorReturn.CreatedAt, &amp;motorReturn.UpdatedAt); err != nil </span><span class="cov8" title="1">{
+                        return motorsReturn, err
+                }</span>
+                <span class="cov8" title="1">motorsReturn = append(motorsReturn, motorReturn)</span>
+        }
+
+        <span class="cov8" title="1">return motorsReturn, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package motorReturnUsecase
+
+import (
+        "bike-rent-express/model/dto/motorReturnDto"
+        "bike-rent-express/src/Users"
+        "bike-rent-express/src/motorReturn"
+        "bike-rent-express/src/transaction"
+)
+
+type motorReturnUsecase struct {
+        motorReturnRepo motorReturn.MotorReturnRepository
+        transactionRepo transaction.TransactionRepository
+        userRepo        Users.UsersRepository
+}
+
+func NewMotorReturnUseCase(motorReturnRepo motorReturn.MotorReturnRepository, transactionRepo transaction.TransactionRepository, userRepo Users.UsersRepository) motorReturn.MotorReturnUsecase <span class="cov8" title="1">{
+        return &amp;motorReturnUsecase{motorReturnRepo, transactionRepo, userRepo}
+}</span>
+
+func (m *motorReturnUsecase) AddMotorReturn(createMotorReturnRequest motorReturnDto.CreateMotorReturnRequest) (motorReturnDto.CreateMotorReturnRequest, error) <span class="cov8" title="1">{
+        motorReturnCreated, err := m.motorReturnRepo.Add(createMotorReturnRequest)
+        if err != nil </span><span class="cov8" title="1">{
+                return motorReturnCreated, err
+        }</span>
+
+        <span class="cov8" title="1">return motorReturnCreated, nil</span>
+}
+func (m *motorReturnUsecase) GetMotorReturnById(id string) (motorReturnDto.MotorReturnResponse, error) <span class="cov8" title="1">{
+        var motorReturnDetail motorReturnDto.MotorReturnResponse
+
+        motorReturn, err := m.motorReturnRepo.GetById(id)
+        if err != nil </span><span class="cov8" title="1">{
+                return motorReturnDetail, err
+        }</span>
+
+        <span class="cov8" title="1">transaction, err := m.transactionRepo.GetById(motorReturn.TrasactionID)
+        if err != nil </span><span class="cov8" title="1">{
+                return motorReturnDetail, err
+        }</span>
+
+        <span class="cov8" title="1">user, err := m.userRepo.GetByID(transaction.UserID)
+        if err != nil </span><span class="cov8" title="1">{
+                return motorReturnDetail, err
+        }</span>
+
+        <span class="cov8" title="1">motorReturnDetail.ID = motorReturn.ID
+        motorReturnDetail.ReturnDate = motorReturn.ReturnDate
+        motorReturnDetail.ExtraCharge = motorReturn.ExtraCharge
+        motorReturnDetail.ConditionMotor = motorReturn.ConditionMotor
+        motorReturnDetail.Descrption = motorReturn.Descrption
+        motorReturnDetail.CreatedAt = motorReturn.CreatedAt
+        motorReturnDetail.UpdatedAt = motorReturn.UpdatedAt
+        motorReturnDetail.Customer = user
+
+        return motorReturnDetail, nil</span>
+}
+func (m *motorReturnUsecase) GetMotorReturnAll() ([]motorReturnDto.MotorReturnResponse, error) <span class="cov8" title="1">{
+        var motorsReturnDetail []motorReturnDto.MotorReturnResponse
+
+        motorsReturn, err := m.motorReturnRepo.GetAll()
+        if err != nil </span><span class="cov8" title="1">{
+                return motorsReturnDetail, err
+        }</span>
+
+        <span class="cov8" title="1">for _, motorReturn := range motorsReturn </span><span class="cov8" title="1">{
+                var motorReturnDetail motorReturnDto.MotorReturnResponse
+
+                motorReturn, err := m.motorReturnRepo.GetById(motorReturn.ID)
+                if err != nil </span><span class="cov8" title="1">{
+                        return motorsReturnDetail, err
+                }</span>
+
+                <span class="cov8" title="1">transaction, err := m.transactionRepo.GetById(motorReturn.TrasactionID)
+                if err != nil </span><span class="cov8" title="1">{
+                        return motorsReturnDetail, err
+                }</span>
+
+                <span class="cov8" title="1">user, err := m.userRepo.GetByID(transaction.UserID)
+                if err != nil </span><span class="cov8" title="1">{
+                        return motorsReturnDetail, err
+                }</span>
+                <span class="cov8" title="1">motorReturnDetail.ID = motorReturn.ID
+                motorReturnDetail.ReturnDate = motorReturn.ReturnDate
+                motorReturnDetail.ExtraCharge = motorReturn.ExtraCharge
+                motorReturnDetail.ConditionMotor = motorReturn.ConditionMotor
+                motorReturnDetail.Descrption = motorReturn.Descrption
+                motorReturnDetail.CreatedAt = motorReturn.CreatedAt
+                motorReturnDetail.UpdatedAt = motorReturn.UpdatedAt
+                motorReturnDetail.Customer = user
+
+                motorsReturnDetail = append(motorsReturnDetail, motorReturnDetail)</span>
+        }
+
+        <span class="cov8" title="1">return motorsReturnDetail, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package motorVehicleDelivery
+
+import (
+        "bike-rent-express/model/dto/json"
+        "bike-rent-express/model/dto/motorVehicleDto"
+        "bike-rent-express/pkg/middleware"
+        "bike-rent-express/pkg/utils"
+        "bike-rent-express/src/motorVehicle"
+        "database/sql"
+        "errors"
+
+        "github.com/gin-gonic/gin"
+)
+
+type motorVehicleDelivery struct {
+        motorVehicleUC motorVehicle.MotorVechileUsecase
+}
+
+func NewMotorVehicleDelivery(v1Group *gin.RouterGroup, motorVehicleUC motorVehicle.MotorVechileUsecase) <span class="cov8" title="1">{
+        handler := motorVehicleDelivery{
+                motorVehicleUC}
+        motorVehicleGroup := v1Group.Group("/motor-vehicles")
+        </span><span class="cov8" title="1">{
+                motorVehicleGroup.GET("/", middleware.JWTAuth("ADMIN", "USER"), handler.getAllMotorVehicle)
+                motorVehicleGroup.GET("/:id", middleware.JWTAuth("ADMIN", "USER"), handler.getMotorVehicleById)
+                motorVehicleGroup.POST("/", middleware.JWTAuth("ADMIN"), handler.createMotorVehicle)
+                motorVehicleGroup.PUT("/:id", middleware.JWTAuth("ADMIN"), handler.updateMotorVehicle)
+                motorVehicleGroup.DELETE("/:id", middleware.JWTAuth("ADMIN"), handler.deleteMotorVehicle)
+        }</span>
+}
+
+func (md motorVehicleDelivery) getAllMotorVehicle(ctx *gin.Context) <span class="cov8" title="1">{
+
+        motor, err := md.motorVehicleUC.GetAllMotorVehicle()
+        if err != nil </span><span class="cov8" title="1">{
+                json.NewResponseError(ctx, err.Error(), "01", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">json.NewResponseSuccess(ctx, motor, "success", "01", "01")</span>
+}
+
+func (md motorVehicleDelivery) getMotorVehicleById(ctx *gin.Context) <span class="cov8" title="1">{
+        id := ctx.Param("id")
+
+        data, err := md.motorVehicleUC.GetMotorVehicleById(id)
+        if err != nil </span><span class="cov8" title="1">{
+                if err.Error() == "1" || errors.Is(sql.ErrNoRows, err) </span><span class="cov8" title="1">{
+                        json.NewResponseSuccess(ctx, nil, "Data not found", "02", "01")
+                        return
+                }</span>
+                <span class="cov8" title="1">json.NewResponseError(ctx, err.Error(), "02", "01")
+                return</span>
+        }
+
+        <span class="cov8" title="1">json.NewResponseSuccess(ctx, data, "success get data by id", "02", "02")</span>
+}
+
+func (md motorVehicleDelivery) createMotorVehicle(ctx *gin.Context) <span class="cov8" title="1">{
+        var input motorVehicleDto.CreateMotorVehicle
+
+        ctx.ShouldBindJSON(&amp;input)
+        if err := utils.Validated(input); err != nil </span><span class="cov8" title="1">{
+                json.NewResponseBadRequest(ctx, err, "Bad Request", "03", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">data, err := md.motorVehicleUC.CreateMotorVehicle(input)
+        if err != nil </span><span class="cov8" title="1">{
+                json.NewResponseError(ctx, err.Error(), "03", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">json.NewResponseCreated(ctx, data, "motor vehicle created", "03", "01")</span>
+
+}
+
+func (md motorVehicleDelivery) updateMotorVehicle(ctx *gin.Context) <span class="cov8" title="1">{
+        var input motorVehicleDto.UpdateMotorVehicle
+
+        id := ctx.Param("id")
+
+        ctx.ShouldBindJSON(&amp;input)
+        if err := utils.Validated(input); err != nil </span><span class="cov8" title="1">{
+                json.NewResponseBadRequest(ctx, err, "Bad Request", "04", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">motor, err := md.motorVehicleUC.UpdateMotorVehicle(id, input)
+        if err != nil </span><span class="cov8" title="1">{
+                json.NewResponseError(ctx, err.Error(), "04", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">json.NewResponseSuccess(ctx, motor, "motor vehicle updated", "04", "01")</span>
+}
+
+func (md motorVehicleDelivery) deleteMotorVehicle(ctx *gin.Context) <span class="cov8" title="1">{
+        id := ctx.Param("id")
+
+        err := md.motorVehicleUC.DeleteMotorVehicle(id)
+        if err != nil </span><span class="cov8" title="1">{
+                json.NewResponseError(ctx, err.Error(), "05", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">json.NewResponseSuccess(ctx, nil, "Sucessfully deleted motor vehicle", "05", "01")</span>
+}
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package motorVehicleRepository
+
+import (
+        "bike-rent-express/model/dto/motorVehicleDto"
+        "bike-rent-express/src/motorVehicle"
+        "database/sql"
+)
+
+type motorVehicleRepository struct {
+        db *sql.DB
+}
+
+func NewMotorVehicleRepository(db *sql.DB) motorVehicle.MotorVechileRepository <span class="cov8" title="1">{
+        return &amp;motorVehicleRepository{db}
+}</span>
+
+// get all motor vehicle
+func (mr motorVehicleRepository) RetrieveAllMotorVehicle() ([]motorVehicleDto.MotorVehicle, error) <span class="cov8" title="1">{
+        query := "SELECT id, name, type, price, plat, created_at, updated_at, production_year, status FROM motor_vehicle WHERE deleted_at IS NULL;"
+        rows, err := mr.db.Query(query)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">defer rows.Close()
+
+        var motors []motorVehicleDto.MotorVehicle
+
+        for rows.Next() </span><span class="cov8" title="1">{
+                motor := motorVehicleDto.MotorVehicle{}
+                err := rows.Scan(&amp;motor.Id, &amp;motor.Name, &amp;motor.Type, &amp;motor.Price, &amp;motor.Plat, &amp;motor.CreatedAt, &amp;motor.UpdatedAt, &amp;motor.ProductionYear, &amp;motor.Status)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov8" title="1">motors = append(motors, motor)</span>
+        }
+        <span class="cov8" title="1">return motors, nil</span>
+}
+
+// get by id
+func (mr *motorVehicleRepository) RetrieveMotorVehicleById(id string) (motorVehicleDto.MotorVehicle, error) <span class="cov8" title="1">{
+
+        var motor motorVehicleDto.MotorVehicle
+        query := "SELECT id, name, type, price, plat, created_at, updated_at, production_year, status FROM motor_vehicle WHERE id = $1 AND deleted_at IS NULL"
+        if err := mr.db.QueryRow(query, id).Scan(&amp;motor.Id, &amp;motor.Name, &amp;motor.Type, &amp;motor.Price, &amp;motor.Plat, &amp;motor.CreatedAt, &amp;motor.UpdatedAt, &amp;motor.ProductionYear, &amp;motor.Status); err != nil </span><span class="cov8" title="1">{
+                return motor, err
+        }</span>
+
+        <span class="cov8" title="1">return motor, nil</span>
+}
+
+// insert
+func (mr *motorVehicleRepository) InsertMotorVehicle(motor motorVehicleDto.MotorVehicle) (motorVehicleDto.MotorVehicle, error) <span class="cov8" title="1">{
+
+        query := "INSERT INTO motor_vehicle (name, type, price, plat, production_year, status) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id;"
+        err := mr.db.QueryRow(query, motor.Name, motor.Type, motor.Price, motor.Plat, motor.ProductionYear, motor.Status).Scan(&amp;motor.Id)
+        if err != nil </span><span class="cov8" title="1">{
+                return motor, err
+        }</span>
+
+        <span class="cov8" title="1">return mr.RetrieveMotorVehicleById(motor.Id)</span>
+}
+
+func (mr *motorVehicleRepository) ChangeMotorVehicle(id string, motor motorVehicleDto.MotorVehicle) (motorVehicleDto.MotorVehicle, error) <span class="cov8" title="1">{
+
+        // now := time.Now().Truncate(time.Second)
+
+        query := "UPDATE motor_vehicle SET name = $1, type = $2, price = $3, plat = $4, production_year = $5, status = $6, updated_at = CURRENT_TIMESTAMP WHERE id = $7;"
+        _, err := mr.db.Exec(query, motor.Name, motor.Type, motor.Price, motor.Plat, motor.ProductionYear, motor.Status, id)
+        if err != nil </span><span class="cov8" title="1">{
+                return motor, err
+        }</span>
+        <span class="cov8" title="1">return mr.RetrieveMotorVehicleById(motor.Id)</span>
+}
+
+func (mr *motorVehicleRepository) DropMotorVehicle(id string) error <span class="cov8" title="1">{
+
+        query := "UPDATE motor_vehicle SET deleted_at = CURRENT_DATE WHERE id = $1;"
+        _, err := mr.db.Exec(query, id)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">return err</span>
+}
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package motorVehicleUsecase
+
+import (
+        "bike-rent-express/model/dto/motorVehicleDto"
+        "bike-rent-express/src/motorVehicle"
+)
+
+type motorVehicleUsecase struct {
+        motorVehicleRepo motorVehicle.MotorVechileRepository
+}
+
+func NewMotorVehicleUsecase(motorVehicleRepo motorVehicle.MotorVechileRepository) motorVehicle.MotorVechileUsecase <span class="cov8" title="1">{
+        return &amp;motorVehicleUsecase{motorVehicleRepo}
+}</span>
+
+// get all motors
+func (mu motorVehicleUsecase) GetAllMotorVehicle() ([]motorVehicleDto.MotorVehicle, error) <span class="cov8" title="1">{
+
+        motors, err := mu.motorVehicleRepo.RetrieveAllMotorVehicle()
+        if err != nil </span><span class="cov8" title="1">{
+                return motors, err
+        }</span>
+        <span class="cov8" title="1">return motors, nil</span>
+}
+
+// get by id
+func (mu motorVehicleUsecase) GetMotorVehicleById(id string) (motorVehicleDto.MotorVehicle, error) <span class="cov8" title="1">{
+        motor, err := mu.motorVehicleRepo.RetrieveMotorVehicleById(id)
+        if err != nil </span><span class="cov8" title="1">{
+                return motor, err
+        }</span>
+
+        <span class="cov8" title="1">return motor, nil</span>
+}
+
+func (mu motorVehicleUsecase) CreateMotorVehicle(motor motorVehicleDto.CreateMotorVehicle) (motorVehicleDto.MotorVehicle, error) <span class="cov8" title="1">{
+        newMotor, err := mu.motorVehicleRepo.InsertMotorVehicle(motorVehicleDto.MotorVehicle{
+                Name:           motor.Name,
+                Type:           motor.Type,
+                Price:          motor.Price,
+                Plat:           motor.Plat,
+                ProductionYear: motor.ProductionYear,
+                Status:         motor.Status,
+        })
+        if err != nil </span><span class="cov8" title="1">{
+                return newMotor, err
+        }</span>
+
+        <span class="cov8" title="1">return newMotor, nil</span>
+}
+
+func (mu motorVehicleUsecase) UpdateMotorVehicle(id string, input motorVehicleDto.UpdateMotorVehicle) (motorVehicleDto.MotorVehicle, error) <span class="cov8" title="1">{
+        motor, err := mu.motorVehicleRepo.RetrieveMotorVehicleById(id)
+        if err != nil </span><span class="cov8" title="1">{
+                return motor, err
+        }</span>
+
+        <span class="cov8" title="1">if input.Name != "" </span><span class="cov8" title="1">{
+                motor.Name = input.Name
+        }</span>
+        <span class="cov8" title="1">if input.Type != "" </span><span class="cov8" title="1">{
+                motor.Type = input.Type
+        }</span>
+        <span class="cov8" title="1">if input.Price != 0 </span><span class="cov8" title="1">{
+                motor.Price = input.Price
+        }</span>
+        <span class="cov8" title="1">if input.Plat != "" </span><span class="cov8" title="1">{
+                motor.Plat = input.Plat
+        }</span>
+        <span class="cov8" title="1">if input.ProductionYear != "" </span><span class="cov8" title="1">{
+                motor.ProductionYear = input.ProductionYear
+        }</span>
+        <span class="cov8" title="1">if input.Status != "" </span><span class="cov8" title="1">{
+                motor.Status = input.Status
+        }</span>
+
+        <span class="cov8" title="1">data, err := mu.motorVehicleRepo.ChangeMotorVehicle(id, motor)
+        if err != nil </span><span class="cov8" title="1">{
+                return data, err
+        }</span>
+        <span class="cov8" title="1">return data, nil</span>
+}
+
+func (mu motorVehicleUsecase) DeleteMotorVehicle(id string) error <span class="cov8" title="1">{
+        err := mu.motorVehicleRepo.DropMotorVehicle(id)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+
+}
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package transactionDelivery
+
+import (
+        "bike-rent-express/model/dto/json"
+        "bike-rent-express/model/dto/transactionDto"
+        "bike-rent-express/pkg/middleware"
+        "bike-rent-express/pkg/utils"
+        "bike-rent-express/src/transaction"
+
+        "github.com/gin-gonic/gin"
+)
+
+type transactionDelivery struct {
+        transactionUC transaction.TransactionUsecase
+}
+
+func NewTransactionDelivery(v1Group *gin.RouterGroup, transactionUC transaction.TransactionUsecase) <span class="cov8" title="1">{
+        handler := transactionDelivery{transactionUC}
+
+        transactionGroup := v1Group.Group("/users/transaction")
+        </span><span class="cov8" title="1">{
+                transactionGroup.POST("", middleware.JWTAuth("ADMIN", "USER"), handler.CreateTransaction)
+                transactionGroup.GET("/:id", middleware.JWTAuth("ADMIN", "USER"), handler.GetTransactionById)
+                transactionGroup.GET("", middleware.JWTAuth("ADMIN"), handler.GetTransactionAll)
+        }</span>
+}
+
+func (t *transactionDelivery) CreateTransaction(c *gin.Context) <span class="cov8" title="1">{
+        var transactionRequest transactionDto.AddTransactionRequest
+
+        c.BindJSON(&amp;transactionRequest)
+
+        if err := utils.Validated(transactionRequest); err != nil </span><span class="cov8" title="1">{
+                json.NewResponseBadRequest(c, err, "Bad Request", "01", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">resultTransaction, err := t.transactionUC.AddTransaction(transactionRequest)
+
+        if err != nil </span><span class="cov8" title="1">{
+                json.NewResponseError(c, err.Error(), "01", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">json.NewResponseCreated(c, resultTransaction, "Transaction Created", "01", "01")</span>
+}
+
+func (t *transactionDelivery) GetTransactionById(c *gin.Context) <span class="cov8" title="1">{
+        id := c.Param("id")
+
+        transactionDetail, err := t.transactionUC.GetTransactionById(id)
+        if err != nil </span><span class="cov8" title="1">{
+                if err.Error() == "1" </span><span class="cov8" title="1">{
+                        json.NewResponseSuccess(c, nil, "Data not found", "02", "01")
+                        return
+                }</span>
+                <span class="cov8" title="1">json.NewResponseError(c, err.Error(), "02", "01")
+                return</span>
+        }
+
+        <span class="cov8" title="1">json.NewResponseSuccess(c, transactionDetail, "Success get transaction by id", "02", "02")</span>
+}
+
+func (t *transactionDelivery) GetTransactionAll(c *gin.Context) <span class="cov8" title="1">{
+        transactionsDetail, err := t.transactionUC.GetTransactionAll()
+        if err != nil </span><span class="cov8" title="1">{
+                json.NewResponseError(c, err.Error(), "03", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">if len(transactionsDetail) == 0 </span><span class="cov8" title="1">{
+                json.NewResponseSuccess(c, nil, "Data empty", "02", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">json.NewResponseSuccess(c, transactionsDetail, "Success get all transaction", "02", "02")</span>
+}
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">package transactionRepository
+
+import (
+        "bike-rent-express/model/dto/transactionDto"
+        "bike-rent-express/src/transaction"
+        "database/sql"
+        "errors"
+        "time"
+)
+
+type transactionRepository struct {
+        db *sql.DB
+}
+
+func NewTransactionRepository(db *sql.DB) transaction.TransactionRepository <span class="cov8" title="1">{
+        return &amp;transactionRepository{db}
+}</span>
+
+func (t *transactionRepository) Add(transactionRequest transactionDto.AddTransactionRequest) (transactionDto.AddTransactionRequest, error) <span class="cov8" title="1">{
+        tx, err := t.db.Begin()
+        if err != nil </span><span class="cov0" title="0">{
+                tx.Rollback()
+                return transactionRequest, err
+        }</span>
+
+        <span class="cov8" title="1">startDate, err := time.Parse("02-01-2006", transactionRequest.StartDate)
+        if err != nil </span><span class="cov8" title="1">{
+                tx.Rollback()
+                return transactionRequest, err
+        }</span>
+
+        <span class="cov8" title="1">endDate, err := time.Parse("02-01-2006", transactionRequest.EndDate)
+        if err != nil </span><span class="cov8" title="1">{
+                tx.Rollback()
+                return transactionRequest, err
+        }</span>
+
+        <span class="cov8" title="1">difference := endDate.Sub(startDate).Hours() / 24
+        if difference &lt; 1 </span><span class="cov8" title="1">{
+                tx.Rollback()
+                return transactionRequest, errors.New("end date is at least 1 day from the start date")
+        }</span>
+
+        <span class="cov8" title="1">query := "SELECT price FROM motor_vehicle WHERE id = $1 AND status = 'AVAILABLE';"
+        priceMotor := 0
+
+        err = tx.QueryRow(query, transactionRequest.MotorVehicleId).Scan(&amp;priceMotor)
+        if err != nil </span><span class="cov8" title="1">{
+                tx.Rollback()
+                return transactionRequest, errors.New("motor not available")
+        }</span>
+        <span class="cov8" title="1">priceMotor *= int(difference)
+
+        query = "SELECT amount FROM balance WHERE user_id = $1;"
+        userBalance := 0
+
+        err = tx.QueryRow(query, transactionRequest.UserID).Scan(&amp;userBalance)
+        if err != nil </span><span class="cov8" title="1">{
+                tx.Rollback()
+                return transactionRequest, err
+        }</span>
+
+        <span class="cov8" title="1">if userBalance &lt; priceMotor </span><span class="cov8" title="1">{
+                tx.Rollback()
+                return transactionRequest, errors.New("balance is not enought")
+        }</span>
+
+        <span class="cov8" title="1">result := userBalance - priceMotor
+
+        query = "UPDATE balance SET amount = $1 WHERE user_id = $2;"
+        _, err = tx.Exec(query, result, transactionRequest.UserID)
+        if err != nil </span><span class="cov8" title="1">{
+                tx.Rollback()
+                return transactionRequest, err
+        }</span>
+
+        <span class="cov8" title="1">query = "UPDATE motor_vehicle SET status = 'NOT_AVAILABLE' WHERE id = $1"
+        _, err = tx.Exec(query, transactionRequest.MotorVehicleId)
+        if err != nil </span><span class="cov8" title="1">{
+                tx.Rollback()
+                return transactionRequest, err
+        }</span>
+
+        <span class="cov8" title="1">query = "INSERT INTO transaction(user_id, motor_vehicle_id, employee_id, start_date, end_date, price ) VALUES($1, $2, $3, $4, $5, $6) RETURNING id;"
+
+        err = tx.QueryRow(query, transactionRequest.UserID, transactionRequest.MotorVehicleId, transactionRequest.EmployeeId, startDate, endDate, priceMotor).Scan(&amp;transactionRequest.ID)
+        if err != nil </span><span class="cov8" title="1">{
+                tx.Rollback()
+                return transactionRequest, err
+        }</span>
+        <span class="cov8" title="1">tx.Commit()
+
+        return transactionRequest, nil</span>
+}
+
+func (t *transactionRepository) GetById(id string) (transactionDto.Transaction, error) <span class="cov8" title="1">{
+        var transaction transactionDto.Transaction
+        query := "SELECT id, user_id, motor_vehicle_id, start_date, end_date, price, created_at, updated_at, employee_id FROM transaction WHERE id = $1;"
+
+        if err := t.db.QueryRow(query, id).Scan(&amp;transaction.ID, &amp;transaction.UserID, &amp;transaction.MotorVehicleId, &amp;transaction.StartDate, &amp;transaction.EndDate, &amp;transaction.Price, &amp;transaction.CreatedAt, &amp;transaction.UpdatedAt, &amp;transaction.EmployeeId); err != nil </span><span class="cov8" title="1">{
+                return transaction, err
+        }</span>
+        <span class="cov8" title="1">return transaction, nil</span>
+}
+
+func (t *transactionRepository) GetAll() ([]transactionDto.Transaction, error) <span class="cov8" title="1">{
+        var transactions []transactionDto.Transaction
+
+        query := "SELECT id, user_id, motor_vehicle_id, start_date, end_date, price, created_at, updated_at, employee_id FROM transaction;"
+
+        row, err := t.db.Query(query)
+        if err != nil </span><span class="cov8" title="1">{
+                return transactions, err
+        }</span>
+        <span class="cov8" title="1">defer row.Close()
+
+        for row.Next() </span><span class="cov8" title="1">{
+                var transaction transactionDto.Transaction
+                if err := row.Scan(&amp;transaction.ID, &amp;transaction.UserID, &amp;transaction.MotorVehicleId, &amp;transaction.StartDate, &amp;transaction.EndDate, &amp;transaction.Price, &amp;transaction.CreatedAt, &amp;transaction.UpdatedAt, &amp;transaction.EmployeeId); err != nil </span><span class="cov0" title="0">{
+                        return transactions, err
+                }</span>
+                <span class="cov8" title="1">transactions = append(transactions, transaction)</span>
+        }
+
+        <span class="cov8" title="1">return transactions, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file14" style="display: none">package transactionUsecase
+
+import (
+        "bike-rent-express/model/dto/transactionDto"
+        "bike-rent-express/src/Users"
+        "bike-rent-express/src/employee"
+        "bike-rent-express/src/motorVehicle"
+        "bike-rent-express/src/transaction"
+        "database/sql"
+        "errors"
+        "strings"
+)
+
+type transactionUsecase struct {
+        transactionRepository transaction.TransactionRepository
+        userRepository        Users.UsersRepository
+        employeeRepository    employee.EmployeeRepository
+        vehicleRepository     motorVehicle.MotorVechileRepository
+}
+
+func NewTransactionRepository(transactionRepository transaction.TransactionRepository, userRepository Users.UsersRepository, employeeRepository employee.EmployeeRepository, motorVehicleRepository motorVehicle.MotorVechileRepository) transaction.TransactionUsecase <span class="cov8" title="1">{
+        return &amp;transactionUsecase{transactionRepository, userRepository, employeeRepository, motorVehicleRepository}
+}</span>
+
+func (t *transactionUsecase) AddTransaction(transactionRequest transactionDto.AddTransactionRequest) (transactionDto.Transaction, error) <span class="cov8" title="1">{
+        resultTransactionCreated, err := t.transactionRepository.Add(transactionRequest)
+        if err != nil </span><span class="cov8" title="1">{
+                return transactionDto.Transaction{}, err
+        }</span>
+
+        <span class="cov8" title="1">transaction, err := t.transactionRepository.GetById(resultTransactionCreated.ID)
+        if err != nil </span><span class="cov8" title="1">{
+                return transaction, err
+        }</span>
+
+        <span class="cov8" title="1">return transaction, nil</span>
+}
+
+func (t *transactionUsecase) GetTransactionById(id string) (transactionDto.ResponseTransaction, error) <span class="cov8" title="1">{
+        var transactionDetail transactionDto.ResponseTransaction
+
+        transaction, err := t.transactionRepository.GetById(id)
+        if err != nil </span><span class="cov8" title="1">{
+                if err == sql.ErrNoRows || strings.Contains(err.Error(), "invalid input syntax for type uuid") </span><span class="cov8" title="1">{
+                        return transactionDetail, errors.New("1")
+                }</span>
+                <span class="cov8" title="1">return transactionDetail, err</span>
+        }
+
+        <span class="cov8" title="1">motorVehicle, err := t.vehicleRepository.RetrieveMotorVehicleById(transaction.MotorVehicleId)
+        if err != nil </span><span class="cov8" title="1">{
+                return transactionDetail, err
+        }</span>
+
+        <span class="cov8" title="1">employee, err := t.employeeRepository.GetById(transaction.EmployeeId)
+        if err != nil </span><span class="cov8" title="1">{
+                return transactionDetail, err
+        }</span>
+
+        <span class="cov8" title="1">customer, err := t.userRepository.GetByID(transaction.UserID)
+        if err != nil </span><span class="cov8" title="1">{
+                return transactionDetail, err
+        }</span>
+
+        <span class="cov8" title="1">transactionDetail.ID = transaction.ID
+        transactionDetail.StartDate = transaction.StartDate
+        transactionDetail.EndDate = transaction.EndDate
+        transactionDetail.Price = transaction.Price
+        transactionDetail.MotorVehicle = motorVehicle
+        transactionDetail.Employee = employee
+        transactionDetail.Customer = customer
+        transactionDetail.CreatedAt = transaction.CreatedAt
+        transactionDetail.UpdatedAt = transaction.UpdatedAt
+
+        return transactionDetail, nil</span>
+}
+
+func (t *transactionUsecase) GetTransactionAll() ([]transactionDto.ResponseTransaction, error) <span class="cov8" title="1">{
+        var transactionsDetail []transactionDto.ResponseTransaction
+
+        transactions, err := t.transactionRepository.GetAll()
+        if err != nil </span><span class="cov8" title="1">{
+                return transactionsDetail, err
+        }</span>
+
+        <span class="cov8" title="1">for _, transaction := range transactions </span><span class="cov8" title="1">{
+                var transactionDetail transactionDto.ResponseTransaction
+
+                transaction, err := t.transactionRepository.GetById(transaction.ID)
+                if err != nil </span><span class="cov8" title="1">{
+                        return transactionsDetail, err
+                }</span>
+
+                <span class="cov8" title="1">motorVehicle, err := t.vehicleRepository.RetrieveMotorVehicleById(transaction.MotorVehicleId)
+                if err != nil </span><span class="cov8" title="1">{
+                        return transactionsDetail, err
+                }</span>
+
+                <span class="cov8" title="1">employee, err := t.employeeRepository.GetById(transaction.EmployeeId)
+                if err != nil </span><span class="cov8" title="1">{
+                        return transactionsDetail, err
+                }</span>
+
+                <span class="cov8" title="1">customer, err := t.userRepository.GetByID(transaction.UserID)
+                if err != nil </span><span class="cov8" title="1">{
+                        return transactionsDetail, err
+                }</span>
+
+                <span class="cov8" title="1">transactionDetail.ID = transaction.ID
+                transactionDetail.StartDate = transaction.StartDate
+                transactionDetail.EndDate = transaction.EndDate
+                transactionDetail.Price = transaction.Price
+                transactionDetail.MotorVehicle = motorVehicle
+                transactionDetail.Employee = employee
+                transactionDetail.Customer = customer
+                transactionDetail.CreatedAt = transaction.CreatedAt
+                transactionDetail.UpdatedAt = transaction.UpdatedAt
+
+                transactionsDetail = append(transactionsDetail, transactionDetail)</span>
+        }
+
+        <span class="cov8" title="1">return transactionsDetail, nil</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

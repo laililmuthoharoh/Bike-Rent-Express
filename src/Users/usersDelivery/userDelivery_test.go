@@ -30,7 +30,7 @@ var expectUsers = dto.GetUsers{
 	Telp:       "0813123",
 }
 
-var accessToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAxMzI1NTAsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJhZG1pbjMyMSIsInJvbGUiOiJBRE1JTiJ9.raoOyYiqs6BAhS93-9eFXbgEwcZ2XMQWv_uGSxzm2aw"
+var accessToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAzMjM0NjAsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJhZG1pbjEyMjMiLCJyb2xlIjoiQURNSU4ifQ.nC0gb9Vey1JXz2zQZgvg96NJIPm6CFSXHcA5OEWTD2I"
 
 type mockUserUC struct {
 	mock.Mock
@@ -490,7 +490,7 @@ func (suite *UsersDeliveryTestSuite) TestTopUp_Success() {
 	w := httptest.NewRecorder()
 	json, _ := json.Marshal(topUpRequest)
 	req, _ := http.NewRequest(http.MethodPut, "/api/v1/users/"+expectUsers.Uuid+"/top-up", bytes.NewBuffer(json))
-	req.Header.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAyMDY2NzksImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJ1c2VyciIsInJvbGUiOiJVU0VSIn0.n9_WnmQXq4FwoauIdy6m0MXVTvfbfOXwG8w7K2HwzzE")
+	req.Header.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAzMjg4NTQsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJ1c2VyMjEiLCJpZCI6IiIsInJvbGUiOiJVU0VSIn0.xT64rPCg2Ud9m_BSkXSOscYsQ3fT6-x6yNyttpfUNhI")
 
 	suite.router.ServeHTTP(w, req)
 	assert.Equal(suite.T(), 200, w.Code)
@@ -508,7 +508,7 @@ func (suite *UsersDeliveryTestSuite) TestTopUp_FailedBind() {
 	w := httptest.NewRecorder()
 	json, _ := json.Marshal(topUpRequest)
 	req, _ := http.NewRequest(http.MethodPut, "/api/v1/users/"+expectUsers.Uuid+"/top-up", bytes.NewBuffer(json))
-	req.Header.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAyMDY2NzksImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJ1c2VyciIsInJvbGUiOiJVU0VSIn0.n9_WnmQXq4FwoauIdy6m0MXVTvfbfOXwG8w7K2HwzzE")
+	req.Header.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAzMjg4NTQsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJ1c2VyMjEiLCJpZCI6IiIsInJvbGUiOiJVU0VSIn0.xT64rPCg2Ud9m_BSkXSOscYsQ3fT6-x6yNyttpfUNhI")
 
 	suite.router.ServeHTTP(w, req)
 	assert.Equal(suite.T(), 400, w.Code)
@@ -527,7 +527,7 @@ func (suite *UsersDeliveryTestSuite) TestTopUp_Failed() {
 	w := httptest.NewRecorder()
 	json, _ := json.Marshal(topUpRequest)
 	req, _ := http.NewRequest(http.MethodPut, "/api/v1/users/"+expectUsers.Uuid+"/top-up", bytes.NewBuffer(json))
-	req.Header.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAyMDY2NzksImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJ1c2VyciIsInJvbGUiOiJVU0VSIn0.n9_WnmQXq4FwoauIdy6m0MXVTvfbfOXwG8w7K2HwzzE")
+	req.Header.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAzMjg4NTQsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJ1c2VyMjEiLCJpZCI6IiIsInJvbGUiOiJVU0VSIn0.xT64rPCg2Ud9m_BSkXSOscYsQ3fT6-x6yNyttpfUNhI")
 
 	suite.router.ServeHTTP(w, req)
 	assert.Equal(suite.T(), 500, w.Code)

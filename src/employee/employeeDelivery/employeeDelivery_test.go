@@ -29,7 +29,7 @@ var expectEmployee = employeeDto.Employee{
 	UpdatedAt: "2024-03-07T00:00:00Z",
 }
 
-var accessToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAxMzI1NTAsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJhZG1pbjMyMSIsInJvbGUiOiJBRE1JTiJ9.raoOyYiqs6BAhS93-9eFXbgEwcZ2XMQWv_uGSxzm2aw"
+var accessToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAzMTk5NzQsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJhZG1pbjEzIiwicm9sZSI6IkFETUlOIn0.Kr-6qbAUKDBikHdJMUEZ90GG0DvfM_xUo7gxG25nAOI"
 
 func (m *mockEmployeeUsecase) Register(employee employeeDto.CreateEmployeeRequest) (employeeDto.CreateEmployeeRequest, error) {
 	args := m.Called(employee)

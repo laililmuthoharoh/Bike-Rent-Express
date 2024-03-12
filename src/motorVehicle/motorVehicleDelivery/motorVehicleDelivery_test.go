@@ -45,7 +45,7 @@ var expectedCreateMotorVehicle = motorVehicleDto.CreateMotorVehicle{
 	Status:         "AVAILABLE",
 }
 
-var token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAxOTg4MzIsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJhZG1pbjEzIiwicm9sZSI6IkFETUlOIn0.nvIsadw4uz88C0uvjV9ofiiR-thIBXN-CWG2vBl3MXg"
+var token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAzMTk5NzQsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJhZG1pbjEzIiwicm9sZSI6IkFETUlOIn0.Kr-6qbAUKDBikHdJMUEZ90GG0DvfM_xUo7gxG25nAOI"
 
 type mockMotorVehicleUsecase struct {
 	mock.Mock

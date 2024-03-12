@@ -44,7 +44,7 @@ func JWTAuth(roles ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if !strings.Contains(authHeader, "Bearer") {
-			json.NewResponseBadRequest(c, []json.ValidationField{}, "Invalid token", "01", "01")
+			json.NewResponseUnauthorized(c, "Invalid token", "01", "01")
 			c.Abort()
 			return
 		}
@@ -56,13 +56,13 @@ func JWTAuth(roles ...string) gin.HandlerFunc {
 		})
 
 		if err != nil {
-			json.NewResponseBadRequest(c, []json.ValidationField{}, "Invalid token", "01", "01")
+			json.NewResponseError(c, "Invalid token", "01", "01")
 			c.Abort()
 			return
 		}
 
 		if !token.Valid {
-			json.NewResponseBadRequest(c, []json.ValidationField{}, "Forbidden", "03", "03")
+			json.NewResponseForbidden(c, "Forbidden", "03", "03")
 			c.Abort()
 			return
 		}
@@ -79,7 +79,7 @@ func JWTAuth(roles ...string) gin.HandlerFunc {
 		}
 
 		if !validRole {
-			json.NewResponseBadRequest(c, []json.ValidationField{}, "Forbidden", "03", "03")
+			json.NewResponseForbidden(c, "Forbidden", "03", "03")
 			c.Abort()
 			return
 		}
