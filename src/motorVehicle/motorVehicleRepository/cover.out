@@ -1,0 +1,21 @@
+mode: set
+bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:13.80,15.2 1 1
+bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:18.100,21.16 3 1
+bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:21.16,23.3 1 1
+bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:24.2,28.18 3 1
+bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:28.18,31.17 3 1
+bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:31.17,33.4 1 0
+bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:34.3,34.33 1 1
+bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:36.2,36.20 1 1
+bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:40.109,44.193 3 1
+bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:44.193,46.3 1 1
+bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:48.2,48.19 1 1
+bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:52.128,56.16 3 1
+bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:56.16,58.3 1 1
+bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:60.2,60.46 1 1
+bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:63.139,69.16 3 1
+bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:69.16,71.3 1 1
+bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:72.2,72.46 1 1
+bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:75.69,79.16 3 1
+bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:79.16,81.3 1 1
+bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go:83.2,83.12 1 1

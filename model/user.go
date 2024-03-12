@@ -6,6 +6,7 @@ type (
 	JWTClaim struct {
 		jwt.StandardClaims
 		Username string `json:"username"`
+		ID       string `json:"id"`
 		Roles    string `json:"role"`
 	}
 
