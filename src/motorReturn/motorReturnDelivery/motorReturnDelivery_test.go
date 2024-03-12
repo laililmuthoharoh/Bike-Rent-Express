@@ -5,7 +5,9 @@ import (
 	"bike-rent-express/model/dto/motorReturnDto"
 	"bike-rent-express/model/dto/transactionDto"
 	"bytes"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -74,7 +76,9 @@ var expectedCreateMotorReturn = motorReturnDto.CreateMotorReturnRequest{
 	Description:    expectedMotorReturn.Descrption,
 }
 
-var token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAyNTIxNDIsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJhZG1pbjEyMjMiLCJpZCI6IiIsInJvbGUiOiJBRE1JTiJ9.w4HgU76uNybcG9QW0ajMSA-uzS0slZGucMnyrkrfiVl"
+var tokenAdmin = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAzMTk5NzQsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJhZG1pbjEzIiwicm9sZSI6IkFETUlOIn0.Kr-6qbAUKDBikHdJMUEZ90GG0DvfM_xUo7gxG25nAOI"
+
+var tokenEmployee = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAzMjAwNTIsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJkaW5vMTI0NTEiLCJyb2xlIjoiRU1QTE9ZRUUifQ.k-L7pBsS9w8uLkzfmo3aMcm9UhMfPuDGa_EgfWNdR_A"
 
 type mockMotorReturnUsecase struct {
 	mock.Mock
@@ -112,19 +116,65 @@ func (suite *MotorReturnDeliveryTestSuite) SetupTest() {
 // create success
 func (suite *MotorReturnDeliveryTestSuite) TestCreateMotorReturn_Success() {
 
-	expectedResposnse := `{"responseCode":"2010101","responseMessage":"Motor return created","data:{"transaction_id":"907698c8-ae04-47b2-a7b9-68c46690c3f8","extra_charge":25000,"condition_motor":"Ban depan bocor","description":"bocor di jalan"}}`
+	expectedResposnse := `{"responseCode":"2010101","responseMessage":"Motor return created","data":{"id":"907698c8-ae04-47b2-a7b9-68c46690c3f8","transaction_id":"621dfcb6-06df-4420-b98e-3ec04def9547","extra_charge":25000,"condition_motor":"Ban depan bocor","description":"bocor di jalan"}}`
 
 	suite.usecase.On("AddMotorReturn", expectedCreateMotorReturn).Return(expectedCreateMotorReturn, nil)
 
-	requestbody := []byte(`{"transaction_id":"907698c8-ae04-47b2-a7b9-68c46690c3f8","extra_charge":25000,"condition_motor":"Ban depan bocor","description":"bocor di jalan"}`)
-	// jsonData, _ := json.Marshal(expectedCreateMotorReturn)
+	jsonData, _ := json.Marshal(expectedCreateMotorReturn)
+
+	tokenEmployee := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAzMjAwNTIsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJkaW5vMTI0NTEiLCJyb2xlIjoiRU1QTE9ZRUUifQ.k-L7pBsS9w8uLkzfmo3aMcm9UhMfPuDGa_EgfWNdR_A"
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/api/v1/employee/"+expectTransaction.EmployeeId+"/motor-return", bytes.NewBuffer(requestbody))
-	req.Header.Add("Authorization", token)
+	req, _ := http.NewRequest(http.MethodPost, "/api/v1/employee/"+expectTransaction.EmployeeId+"/motor-return", bytes.NewBuffer(jsonData))
+	req.Header.Add("Authorization", tokenEmployee)
 
 	suite.router.ServeHTTP(w, req)
 	assert.Equal(suite.T(), 201, w.Code)
+	assert.Equal(suite.T(), expectedResposnse, w.Body.String())
+}
+
+// fail create
+func (suite *MotorReturnDeliveryTestSuite) TestCreateMotorReturn_Fail() {
+
+	expectedResposnse := `{"responseCode":"5000101","responseMessage":"internal server error","error":"error"}`
+	expectedError := errors.New("error")
+
+	suite.usecase.On("AddMotorReturn", expectedCreateMotorReturn).Return(expectedCreateMotorReturn, expectedError)
+
+	jsonData, _ := json.Marshal(expectedCreateMotorReturn)
+
+	tokenEmployee := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAzMjAwNTIsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJkaW5vMTI0NTEiLCJyb2xlIjoiRU1QTE9ZRUUifQ.k-L7pBsS9w8uLkzfmo3aMcm9UhMfPuDGa_EgfWNdR_A"
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/api/v1/employee/"+expectTransaction.EmployeeId+"/motor-return", bytes.NewBuffer(jsonData))
+	req.Header.Add("Authorization", tokenEmployee)
+
+	suite.router.ServeHTTP(w, req)
+	assert.Equal(suite.T(), 500, w.Code)
+	assert.Equal(suite.T(), expectedResposnse, w.Body.String())
+}
+
+// fail create
+func (suite *MotorReturnDeliveryTestSuite) TestCreateMotorReturn_FailBadRequest() {
+
+	expectedFailCreateMotorReturn := motorReturnDto.CreateMotorReturnRequest{
+		ExtraCharge:    expectedMotorReturn.ExtraCharge,
+		ConditionMotor: expectedMotorReturn.ConditionMotor,
+		Description:    expectedMotorReturn.Descrption,
+	}
+	expectedResposnse := `{"responseCode":"4000101","responseMessage":"Bad Request","error_description":[{"field":"TransactionID","message":"field is required"}]}`
+
+	suite.usecase.On("AddMotorReturn", mock.Anything).Return(expectedCreateMotorReturn, nil)
+
+	jsonData, _ := json.Marshal(expectedFailCreateMotorReturn)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/api/v1/employee/"+expectTransaction.EmployeeId+"/motor-return", bytes.NewBuffer(jsonData))
+	fmt.Println("reqqqqqqqq:", req)
+	req.Header.Add("Authorization", tokenEmployee)
+
+	suite.router.ServeHTTP(w, req)
+	assert.Equal(suite.T(), 400, w.Code)
 	assert.Equal(suite.T(), expectedResposnse, w.Body.String())
 }
 
@@ -138,7 +188,7 @@ func (suite *MotorReturnDeliveryTestSuite) TestGetMotorReturnById_Succes() {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/api/v1/employee/"+expectTransaction.EmployeeId+"/motor-return/"+expectedMotorReturnResponse.ID, nil)
 
-	req.Header.Add("Authorization", token)
+	req.Header.Add("Authorization", tokenAdmin)
 	suite.router.ServeHTTP(w, req)
 
 	assert.Equal(suite.T(), 200, w.Code)
@@ -156,7 +206,7 @@ func (suite *MotorReturnDeliveryTestSuite) TestGetMotorReturnById_Fail() {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/api/v1/employee/"+expectTransaction.EmployeeId+"/motor-return/"+expectedMotorReturnResponse.ID, nil)
 
-	req.Header.Add("Authorization", token)
+	req.Header.Add("Authorization", tokenAdmin)
 	suite.router.ServeHTTP(w, req)
 
 	assert.Equal(suite.T(), 500, w.Code)
@@ -173,7 +223,7 @@ func (suite *MotorReturnDeliveryTestSuite) TestGetAllMotorReturn_Succes() {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/api/v1/users/motor-return", nil)
 
-	req.Header.Add("Authorization", token)
+	req.Header.Add("Authorization", tokenAdmin)
 	suite.router.ServeHTTP(w, req)
 
 	assert.Equal(suite.T(), 200, w.Code)
@@ -191,7 +241,7 @@ func (suite *MotorReturnDeliveryTestSuite) TestGetAllMotorReturn_Fail() {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/api/v1/users/motor-return", nil)
 
-	req.Header.Add("Authorization", token)
+	req.Header.Add("Authorization", tokenAdmin)
 	suite.router.ServeHTTP(w, req)
 
 	assert.Equal(suite.T(), 500, w.Code)
