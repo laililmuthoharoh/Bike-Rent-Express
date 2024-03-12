@@ -19,9 +19,9 @@ func NewMotorRepository(db *sql.DB) motorReturn.MotorReturnRepository {
 func (m *motorReturnRepository) Add(createMotorReturnRequest motorReturnDto.CreateMotorReturnRequest) (motorReturnDto.CreateMotorReturnRequest, error) {
 	tx, err := m.db.Begin()
 	if err != nil {
+		tx.Rollback()
 		return createMotorReturnRequest, err
 	}
-
 	var userId string
 	query := "SELECT user_id FROM transaction WHERE id = $1;"
 	if err := tx.QueryRow(query, createMotorReturnRequest.TransactionID).Scan(&userId); err != nil {
@@ -59,6 +59,18 @@ func (m *motorReturnRepository) Add(createMotorReturnRequest motorReturnDto.Crea
 	}
 
 	returnDate := time.Now()
+
+	query = "SELECT COUNT(transaction_id) FROM motor_return WHERE transaction_id = $1;"
+	var transactionExist int
+	if err := tx.QueryRow(query, createMotorReturnRequest.TransactionID).Scan(&transactionExist); err != nil {
+		tx.Rollback()
+		return createMotorReturnRequest, err
+	}
+
+	if transactionExist > 0 {
+		tx.Rollback()
+		return createMotorReturnRequest, errors.New("motorcycle has been returned")
+	}
 
 	query = "INSERT INTO motor_return(transaction_id, return_date, extra_charge, condition_motor, description) VALUES($1, $2, $3, $4, $5) RETURNING id;"
 
