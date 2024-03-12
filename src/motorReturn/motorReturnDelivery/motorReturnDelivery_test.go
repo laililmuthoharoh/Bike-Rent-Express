@@ -5,7 +5,9 @@ import (
 	"bike-rent-express/model/dto/motorReturnDto"
 	"bike-rent-express/model/dto/transactionDto"
 	"bytes"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -112,19 +114,54 @@ func (suite *MotorReturnDeliveryTestSuite) SetupTest() {
 // create success
 func (suite *MotorReturnDeliveryTestSuite) TestCreateMotorReturn_Success() {
 
-	expectedResposnse := `{"responseCode":"2010101","responseMessage":"Motor return created","data:{"transaction_id":"907698c8-ae04-47b2-a7b9-68c46690c3f8","extra_charge":25000,"condition_motor":"Ban depan bocor","description":"bocor di jalan"}}`
+	expectedResposnse := `{"responseCode":"2010101","responseMessage":"Motor return created","data":{"id":"907698c8-ae04-47b2-a7b9-68c46690c3f8","transaction_id":"621dfcb6-06df-4420-b98e-3ec04def9547","extra_charge":25000,"condition_motor":"Ban depan bocor","description":"bocor di jalan"}}`
 
 	suite.usecase.On("AddMotorReturn", expectedCreateMotorReturn).Return(expectedCreateMotorReturn, nil)
 
-	requestbody := []byte(`{"transaction_id":"907698c8-ae04-47b2-a7b9-68c46690c3f8","extra_charge":25000,"condition_motor":"Ban depan bocor","description":"bocor di jalan"}`)
-	// jsonData, _ := json.Marshal(expectedCreateMotorReturn)
+	jsonData, _ := json.Marshal(expectedCreateMotorReturn)
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/api/v1/employee/"+expectTransaction.EmployeeId+"/motor-return", bytes.NewBuffer(requestbody))
-	req.Header.Add("Authorization", token)
+	req, _ := http.NewRequest(http.MethodPost, "/api/v1/employee/"+expectTransaction.EmployeeId+"/motor-return", bytes.NewBuffer(jsonData))
+	accessTokenEmployee := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAzMjE2ODksImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJkaW5vMTI0NTEiLCJyb2xlIjoiRU1QTE9ZRUUifQ.lGqvAnJ2q7E34ZnA2IXpYY5EfMNI1pjxDf4ZKhnh_oA"
+	req.Header.Add("Authorization", accessTokenEmployee)
 
 	suite.router.ServeHTTP(w, req)
 	assert.Equal(suite.T(), 201, w.Code)
+	assert.Equal(suite.T(), expectedResposnse, w.Body.String())
+}
+
+func (suite *MotorReturnDeliveryTestSuite) TestCreateMotorReturn_FailedBind() {
+
+	expectedResposnse := `{"responseCode":"4000101","responseMessage":"Bad Request","error_description":[{"field":"TransactionID","message":"field is required"},{"field":"ExtraCharge","message":"field is required"},{"field":"ConditionMotor","message":"field is required"},{"field":"Description","message":"field is required"}]}`
+
+	suite.usecase.On("AddMotorReturn", expectedCreateMotorReturn).Return(expectedCreateMotorReturn, nil)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/api/v1/employee/"+expectTransaction.EmployeeId+"/motor-return", nil)
+	accessTokenEmployee := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAzMjE2ODksImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJkaW5vMTI0NTEiLCJyb2xlIjoiRU1QTE9ZRUUifQ.lGqvAnJ2q7E34ZnA2IXpYY5EfMNI1pjxDf4ZKhnh_oA"
+	req.Header.Add("Authorization", accessTokenEmployee)
+
+	suite.router.ServeHTTP(w, req)
+	assert.Equal(suite.T(), 400, w.Code)
+	assert.Equal(suite.T(), expectedResposnse, w.Body.String())
+}
+
+func (suite *MotorReturnDeliveryTestSuite) TestCreateMotorReturn_Failed() {
+
+	expectedResposnse := `{"responseCode":"5000101","responseMessage":"internal server error","error":"error"}`
+
+	suite.usecase.On("AddMotorReturn", expectedCreateMotorReturn).Return(expectedCreateMotorReturn, errors.New("error"))
+
+	jsonData, _ := json.Marshal(expectedCreateMotorReturn)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/api/v1/employee/"+expectTransaction.EmployeeId+"/motor-return", bytes.NewBuffer(jsonData))
+	accessTokenEmployee := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAzMjE2ODksImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJkaW5vMTI0NTEiLCJyb2xlIjoiRU1QTE9ZRUUifQ.lGqvAnJ2q7E34ZnA2IXpYY5EfMNI1pjxDf4ZKhnh_oA"
+	req.Header.Add("Authorization", accessTokenEmployee)
+
+	suite.router.ServeHTTP(w, req)
+	assert.Equal(suite.T(), 500, w.Code)
+	fmt.Println(w.Body.String())
 	assert.Equal(suite.T(), expectedResposnse, w.Body.String())
 }
 
