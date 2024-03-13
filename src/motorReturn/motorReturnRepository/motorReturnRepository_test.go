@@ -52,6 +52,9 @@ func TestAdd_Success(t *testing.T) {
 	query = "UPDATE balance SET amount = \\$1 WHERE user_id = \\$2;"
 	mock.ExpectExec(query).WithArgs(5000, "907698c8-ae04-47b2-a7b9-68c46690c3f8").WillReturnResult(sqlmock.NewResult(0, 1))
 
+	query = "UPDATE users"
+	mock.ExpectExec(query).WithArgs("907698c8-ae04-47b2-a7b9-68c46690c3f8").WillReturnResult(sqlmock.NewResult(0, 1))
+
 	query = "UPDATE motor_vehicle SET status = 'AVAILABLE';"
 	mock.ExpectExec(query).WillReturnResult(sqlmock.NewResult(0, 1))
 
@@ -176,6 +179,38 @@ func TestAdd_FailToUpdateBalance(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func TestAdd_FailToUpdateStatusUser(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal("Error creating mock database: ", err)
+	}
+	defer db.Close()
+
+	//initialization repository
+	repository := NewMotorRepository(db)
+
+	mock.ExpectBegin()
+
+	query := "SELECT user_id FROM transaction WHERE id = \\$1;"
+	rows := sqlmock.NewRows([]string{"user_id"}).AddRow("907698c8-ae04-47b2-a7b9-68c46690c3f8")
+	mock.ExpectQuery(query).WillReturnRows(rows)
+
+	query = "SELECT amount FROM balance WHERE user_id = \\$1;"
+	rows = sqlmock.NewRows([]string{"amount"}).AddRow(30000)
+	mock.ExpectQuery(query).WillReturnRows(rows)
+
+	query = "UPDATE balance SET amount = \\$1 WHERE user_id = \\$2;"
+	mock.ExpectExec(query).WithArgs(5000, "907698c8-ae04-47b2-a7b9-68c46690c3f8").WillReturnResult(sqlmock.NewResult(0, 1))
+
+	query = "UPDATE users"
+	mock.ExpectExec(query).WillReturnError(errors.New("error sql"))
+
+	mock.ExpectRollback()
+
+	_, err = repository.Add(expectedCreateMotorReturn)
+	assert.Error(t, err)
+}
+
 // test fail to update Motor Vehicle
 func TestAdd_FailToUpdateMotorVehicle(t *testing.T) {
 	db, mock, err := sqlmock.New()
@@ -199,6 +234,9 @@ func TestAdd_FailToUpdateMotorVehicle(t *testing.T) {
 
 	query = "UPDATE balance SET amount = \\$1 WHERE user_id = \\$2;"
 	mock.ExpectExec(query).WithArgs(5000, "907698c8-ae04-47b2-a7b9-68c46690c3f8").WillReturnResult(sqlmock.NewResult(0, 1))
+
+	query = "UPDATE users"
+	mock.ExpectExec(query).WithArgs("907698c8-ae04-47b2-a7b9-68c46690c3f8").WillReturnResult(sqlmock.NewResult(0, 1))
 
 	query = "UPDATE motor_vehicle SET status = 'AVAILABLE';"
 	mock.ExpectExec(query).WillReturnError(errors.New("error sql"))

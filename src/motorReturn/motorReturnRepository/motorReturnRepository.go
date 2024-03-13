@@ -51,6 +51,13 @@ func (m *motorReturnRepository) Add(createMotorReturnRequest motorReturnDto.Crea
 		return createMotorReturnRequest, err
 	}
 
+	query = "UPDATE users SET can_rent = true WHERE id = $1p"
+	_, err = tx.Exec(query, userId)
+	if err != nil {
+		tx.Rollback()
+		return createMotorReturnRequest, err
+	}
+
 	query = "UPDATE motor_vehicle SET status = 'AVAILABLE';"
 	_, err = tx.Exec(query)
 	if err != nil {
