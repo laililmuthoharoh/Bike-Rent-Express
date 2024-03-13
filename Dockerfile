@@ -19,4 +19,4 @@ WORKDIR /app
 
 COPY --from=build /app/bike-rent-express /app/bike-rent-express
 
-ENTRYPOINT ["/app/bike-rent-express"]
+CMD ["/app/bike-rent-express"]
