@@ -16,13 +16,11 @@ services:
       - POSTGRES_PASSWORD=password123
       - POSTGRES_DATABASE=db-bike-rent-express
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - bike-rent-express-volume:/var/lib/postgresql/data
     networks:
       - bike_rent_express_net
 volumes:
-  pgdata:
-    external: true
-    name: bike-rent-express-volume
+  bike-rent-express-volume:
 networks:
   bike_rent_express_net:
-    driver: brige
+    driver: bridge
