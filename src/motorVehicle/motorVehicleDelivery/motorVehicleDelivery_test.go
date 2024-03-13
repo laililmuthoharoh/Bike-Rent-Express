@@ -93,9 +93,24 @@ func (suite *MotorVehicleDeliveryTestSuite) SetupTest() {
 
 func (suite *MotorVehicleDeliveryTestSuite) TestGetAllMotorVehicle_Success() {
 	expected := []motorVehicleDto.MotorVehicle{expectedMotorVehicleById}
-	expectedResposnse := `{"responseCode":"2000101","responseMessage":"success","data":[{"id":"3a57713c-24d0-41f8-bfa8-f8f721dba9e4","name":"Vario","type":"MATIC","price":50000,"plat":"BA1234I","created_at":"2024-03-07T00:00:00Z","updated_at":"2024-03-07T00:00:00Z","production_year":"2023","status":"AVAILABLE"}]}`
+	expectedResposnse := `{"responseCode":"2000102","responseMessage":"success","data":[{"id":"3a57713c-24d0-41f8-bfa8-f8f721dba9e4","name":"Vario","type":"MATIC","price":50000,"plat":"BA1234I","created_at":"2024-03-07T00:00:00Z","updated_at":"2024-03-07T00:00:00Z","production_year":"2023","status":"AVAILABLE"}]}`
 
 	suite.usecase.On("GetAllMotorVehicle").Return(expected, nil)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodGet, "/api/v1/motor-vehicles/", nil)
+
+	req.Header.Add("Authorization", token)
+	suite.router.ServeHTTP(w, req)
+
+	assert.Equal(suite.T(), 200, w.Code)
+	assert.Equal(suite.T(), expectedResposnse, w.Body.String())
+}
+
+func (suite *MotorVehicleDeliveryTestSuite) TestGetAllMotorVehicle_FailedDataEmpty() {
+	expectedResposnse := `{"responseCode":"2000101","responseMessage":"Empty data"}`
+
+	suite.usecase.On("GetAllMotorVehicle").Return([]motorVehicleDto.MotorVehicle{}, nil)
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/api/v1/motor-vehicles/", nil)
