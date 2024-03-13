@@ -203,9 +203,25 @@ func (suite *MotorReturnDeliveryTestSuite) TestGetMotorReturnById_Fail() {
 // get all success
 func (suite *MotorReturnDeliveryTestSuite) TestGetAllMotorReturn_Succes() {
 
-	expectedResposnse := `{"responseCode":"2000301","responseMessage":"Success get all motor return","data":[{"id":"907698c8-ae04-47b2-a7b9-68c46690c3f8","return_date":"2024-03-07T00:00:00Z","extra_charge":25000,"condition_motor":"Ban depan bocor","description":"bocor di jalan","customer":{"id":"f4884dfc-7ef3-4d84-b77e-4fb930069da5","nama":"billkin","username":"billkin","alamat":"Bekasi","role":"USER","cant_rent":true,"created_at":"2024-03-07T23:39:42.63419Z","updated_at":"2024-03-07T23:39:42.63419Z","telepon":"08123456789"},"created_at":"2024-03-07T23:39:42.63419Z","updatad_at":"2024-03-07T23:39:42.63419Z"}]}`
+	expectedResposnse := `{"responseCode":"2000302","responseMessage":"Success get all motor return","data":[{"id":"907698c8-ae04-47b2-a7b9-68c46690c3f8","return_date":"2024-03-07T00:00:00Z","extra_charge":25000,"condition_motor":"Ban depan bocor","description":"bocor di jalan","customer":{"id":"f4884dfc-7ef3-4d84-b77e-4fb930069da5","nama":"billkin","username":"billkin","alamat":"Bekasi","role":"USER","cant_rent":true,"created_at":"2024-03-07T23:39:42.63419Z","updated_at":"2024-03-07T23:39:42.63419Z","telepon":"08123456789"},"created_at":"2024-03-07T23:39:42.63419Z","updatad_at":"2024-03-07T23:39:42.63419Z"}]}`
 
 	suite.usecase.On("GetMotorReturnAll").Return(expectedAllMotorReturnResponse, nil)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodGet, "/api/v1/users/motor-return", nil)
+
+	req.Header.Add("Authorization", tokenAdmin)
+	suite.router.ServeHTTP(w, req)
+
+	assert.Equal(suite.T(), 200, w.Code)
+	assert.Equal(suite.T(), expectedResposnse, w.Body.String())
+}
+
+func (suite *MotorReturnDeliveryTestSuite) TestGetAllMotorReturn_FailEmptyData() {
+
+	expectedResposnse := `{"responseCode":"2000301","responseMessage":"Empty data"}`
+
+	suite.usecase.On("GetMotorReturnAll").Return([]motorReturnDto.MotorReturnResponse{}, nil)
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/api/v1/users/motor-return", nil)
