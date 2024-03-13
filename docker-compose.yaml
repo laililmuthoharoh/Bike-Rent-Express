@@ -3,7 +3,7 @@ services:
   bike-rent-express:
     build: .
     env_file:
-      - /home/ubuntu/bike-rent-express/.env
+      - /.env
     ports:
       - "8080:8080"
     networks:
