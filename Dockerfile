@@ -7,6 +7,7 @@ WORKDIR /app
 COPY . .
 
 COPY .env .
+RUN chmod 777 .env 
 
 RUN go mod download
 
