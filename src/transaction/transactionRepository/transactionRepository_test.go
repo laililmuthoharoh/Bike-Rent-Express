@@ -56,6 +56,9 @@ func TestAddTransaction_Success(t *testing.T) {
 	query = "UPDATE motor_vehicle"
 	mock.ExpectExec(query).WithArgs(expectAddTransactionRequest.MotorVehicleId).WillReturnResult(sqlmock.NewResult(1, 1))
 
+	query = "UPDATE users"
+	mock.ExpectExec(query).WithArgs(expectAddTransactionRequest.UserID).WillReturnResult(sqlmock.NewResult(1, 1))
+
 	query = "INSERT INTO transaction(.+) RETURNING .+;"
 	rows = sqlmock.NewRows([]string{".+"}).AddRow(expectAddTransactionRequest.ID)
 	mock.ExpectQuery(query).WillReturnRows(rows)
@@ -320,6 +323,49 @@ func TestAddTransaction_FailedUpdateMotorVehicle(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func TestAddTransaction_FailedUpdateUserCanRent(t *testing.T) {
+	dbMock, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal("Error DB:", err.Error())
+	}
+	defer dbMock.Close()
+
+	expectAddTransactionRequest := transactionDto.AddTransactionRequest{
+		ID:             "123",
+		UserID:         "123",
+		MotorVehicleId: "123",
+		EmployeeId:     "123",
+		StartDate:      "13-08-2024",
+		EndDate:        "14-08-2024",
+	}
+
+	transactionRepository := NewTransactionRepository(dbMock)
+
+	mock.ExpectBegin()
+
+	query := "SELECT (.+) FROM motor_vehicle WHERE .+"
+	rows := sqlmock.NewRows([]string{".+"}).AddRow(10000)
+	mock.ExpectQuery(query).WillReturnRows(rows)
+
+	query = "SELECT (.+) FROM balance WHERE .+"
+	rows = sqlmock.NewRows([]string{".+"}).AddRow(30000)
+	mock.ExpectQuery(query).WillReturnRows(rows)
+
+	query = "UPDATE balance"
+	mock.ExpectExec(query).WithArgs(20000, expectAddTransactionRequest.UserID).WillReturnResult(sqlmock.NewResult(1, 1))
+
+	query = "UPDATE motor_vehicle"
+	mock.ExpectExec(query).WithArgs(expectAddTransactionRequest.MotorVehicleId).WillReturnResult(sqlmock.NewResult(1, 1))
+
+	query = "UPDATE users"
+	mock.ExpectExec(query).WithArgs(expectAddTransactionRequest.UserID).WillReturnError(errors.New("error"))
+	mock.ExpectRollback()
+
+	_, err = transactionRepository.Add(expectAddTransactionRequest)
+	assert.NotNil(t, err)
+	assert.Error(t, err)
+}
+
 func TestAddTransaction_Failed(t *testing.T) {
 	dbMock, mock, err := sqlmock.New()
 	if err != nil {
@@ -353,6 +399,9 @@ func TestAddTransaction_Failed(t *testing.T) {
 
 	query = "UPDATE motor_vehicle"
 	mock.ExpectExec(query).WithArgs(expectAddTransactionRequest.MotorVehicleId).WillReturnResult(sqlmock.NewResult(1, 1))
+
+	query = "UPDATE users"
+	mock.ExpectExec(query).WithArgs(expectAddTransactionRequest.UserID).WillReturnResult(sqlmock.NewResult(1, 1))
 
 	query = "INSERT INTO transaction(.+) RETURNING .+;"
 	mock.ExpectQuery(query)

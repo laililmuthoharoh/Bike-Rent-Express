@@ -81,6 +81,13 @@ func (t *transactionRepository) Add(transactionRequest transactionDto.AddTransac
 		return transactionRequest, err
 	}
 
+	query = "UPDATE users SET can_rent = false WHERE id = $1"
+	_, err = tx.Exec(query, transactionRequest.UserID)
+	if err != nil {
+		tx.Rollback()
+		return transactionRequest, err
+	}
+
 	query = "INSERT INTO transaction(user_id, motor_vehicle_id, employee_id, start_date, end_date, price ) VALUES($1, $2, $3, $4, $5, $6) RETURNING id;"
 
 	err = tx.QueryRow(query, transactionRequest.UserID, transactionRequest.MotorVehicleId, transactionRequest.EmployeeId, startDate, endDate, priceMotor).Scan(&transactionRequest.ID)
