@@ -74,7 +74,7 @@ func (mr *motorVehicleRepository) ChangeMotorVehicle(id string, motor motorVehic
 
 func (mr *motorVehicleRepository) DropMotorVehicle(id string) error {
 
-	query := "UPDATE motor_vehicle SET deleted_at = CURRENT_DATE WHERE id = $1;"
+	query := "UPDATE motor_vehicle SET deleted_at = CURRENT_DATE WHERE id = $1 AND status = 'AVAILABLE';"
 	_, err := mr.db.Exec(query, id)
 	if err != nil {
 		return err
