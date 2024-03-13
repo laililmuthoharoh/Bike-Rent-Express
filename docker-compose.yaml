@@ -14,7 +14,7 @@ services:
     image: postgres:alpine
     environment:
       - POSTGRES_PASSWORD=password123
-      - POSTGRES_DATABASE=db-bike-rent-express
+      - POSTGRES_DATABASE=db_bike_rent_express
     volumes:
       - bike-rent-express-volume:/var/lib/postgresql/data
     networks:
