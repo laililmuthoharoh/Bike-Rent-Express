@@ -55,33 +55,33 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">bike-rent-express/src/Users/usersDelivery/usersDelivery.go (100.0%)</option>
+				<option value="file0">bike-rent-express/src/Users/usersDelivery/usersDelivery.go (90.1%)</option>
 				
-				<option value="file1">bike-rent-express/src/Users/usersRepository/usersRepository.go (93.3%)</option>
+				<option value="file1">bike-rent-express/src/Users/usersRepository/usersRepository.go (87.5%)</option>
 				
-				<option value="file2">bike-rent-express/src/Users/usersUsecase/usersUsecase.go (90.6%)</option>
+				<option value="file2">bike-rent-express/src/Users/usersUsecase/usersUsecase.go (79.7%)</option>
 				
 				<option value="file3">bike-rent-express/src/employee/employeeDelivery/employeeDelivery.go (100.0%)</option>
 				
 				<option value="file4">bike-rent-express/src/employee/employeeRepository/employeeRepository.go (98.1%)</option>
 				
-				<option value="file5">bike-rent-express/src/employee/employeeUsecase/employeeUsecase.go (90.2%)</option>
+				<option value="file5">bike-rent-express/src/employee/employeeUsecase/employeeUsecase.go (91.8%)</option>
 				
 				<option value="file6">bike-rent-express/src/motorReturn/motorReturnDelivery/motorReturnDelivery.go (100.0%)</option>
 				
-				<option value="file7">bike-rent-express/src/motorReturn/motorReturnRepository/motorReturnRepository.go (96.7%)</option>
+				<option value="file7">bike-rent-express/src/motorReturn/motorReturnRepository/motorReturnRepository.go (87.7%)</option>
 				
-				<option value="file8">bike-rent-express/src/motorReturn/motorReturnUsecase/motorReturnUsecase.go (100.0%)</option>
+				<option value="file8">bike-rent-express/src/motorReturn/motorReturnUsecase/motorReturnUsecase.go (98.0%)</option>
 				
-				<option value="file9">bike-rent-express/src/motorVehicle/motorVehicleDelivery/motorVehicleDelivery.go (100.0%)</option>
+				<option value="file9">bike-rent-express/src/motorVehicle/motorVehicleDelivery/motorVehicleDelivery.go (87.5%)</option>
 				
-				<option value="file10">bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go (97.1%)</option>
+				<option value="file10">bike-rent-express/src/motorVehicle/motorVehicleRepository/motorVehicleRepository.go (82.5%)</option>
 				
-				<option value="file11">bike-rent-express/src/motorVehicle/motorVehicleUsecase/motorVehicleUsecase.go (100.0%)</option>
+				<option value="file11">bike-rent-express/src/motorVehicle/motorVehicleUsecase/motorVehicleUsecase.go (81.5%)</option>
 				
-				<option value="file12">bike-rent-express/src/transaction/transactionDelivery/transactionDelivery.go (100.0%)</option>
+				<option value="file12">bike-rent-express/src/transaction/transactionDelivery/transactionDelivery.go (89.7%)</option>
 				
-				<option value="file13">bike-rent-express/src/transaction/transactionRepository/transactionRepository.go (95.6%)</option>
+				<option value="file13">bike-rent-express/src/transaction/transactionRepository/transactionRepository.go (95.9%)</option>
 				
 				<option value="file14">bike-rent-express/src/transaction/transactionUsecase/transactionUsecase.go (100.0%)</option>
 				
@@ -129,6 +129,7 @@ func NewUsersDelivery(v1Group *gin.RouterGroup, usersUC Users.UsersUsecase) <spa
                 usersGroup.GET("/:id", middleware.JWTAuth("ADMIN", "USER"), handler.getByID)
                 usersGroup.PUT("/:id/change-password", middleware.JWTAuth("ADMIN", "USER"), handler.ChangePassword)
                 usersGroup.PUT("/:id/top-up", middleware.JWTAuth("USER"), handler.TopUp)
+                usersGroup.GET("/:id/balance", middleware.JWTAuth("USER"), handler.GetBalance)
 
                 usersGroup.POST("/register", handler.RegisterUsers)
                 usersGroup.POST("/login", handler.LoginUsers)
@@ -143,7 +144,13 @@ func (h *usersDelivery) GetAllUsers(ctx *gin.Context) <span class="cov8" title="
                 json.NewResponseError(ctx, err.Error(), "01", "01")
                 return
         }</span>
-        <span class="cov8" title="1">json.NewResponseSuccess(ctx, users, "Success", "01", "01")</span>
+
+        <span class="cov8" title="1">if len(users) == 0 </span><span class="cov8" title="1">{
+                json.NewResponseSuccess(ctx, nil, "Data empty", "01", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">json.NewResponseSuccess(ctx, users, "Success", "01", "02")</span>
 }
 
 func (h *usersDelivery) UpdateUsers(ctx *gin.Context) <span class="cov8" title="1">{
@@ -198,7 +205,7 @@ func (c *usersDelivery) RegisterUsers(ctx *gin.Context) <span class="cov8" title
 
         <span class="cov8" title="1">if err := c.usersUC.RegisterUsers(newUsers); err != nil </span><span class="cov8" title="1">{
                 if err.Error() == "1" </span><span class="cov8" title="1">{
-                        json.NewResponseSuccess(ctx, nil, "username already in use", "04", "01")
+                        json.NewResponseBadRequest(ctx, nil, "username already in use", "04", "01")
                         return
                 }</span>
                 <span class="cov8" title="1">json.NewResponseError(ctx, err.Error(), "04", "02")
@@ -246,11 +253,15 @@ func (c *usersDelivery) TopUp(ctx *gin.Context) <span class="cov8" title="1">{
         <span class="cov8" title="1">topupRequest.UserID = id
         err := c.usersUC.TopUp(topupRequest)
         if err != nil </span><span class="cov8" title="1">{
-                json.NewResponseError(ctx, err.Error(), "06", "01")
-                return
-        }</span>
+                if err.Error() == "1" </span><span class="cov0" title="0">{
+                        json.NewResponseSuccess(ctx, nil, "Data not found", "06", "01")
+                        return
+                }</span>
+                <span class="cov8" title="1">json.NewResponseError(ctx, err.Error(), "06", "01")
+                return</span>
+        }
 
-        <span class="cov8" title="1">json.NewResponseSuccess(ctx, nil, "Success Top Up", "06", "01")</span>
+        <span class="cov8" title="1">json.NewResponseSuccess(ctx, nil, "Success Top Up", "06", "02")</span>
 
 }
 
@@ -280,6 +291,22 @@ func (c *usersDelivery) ChangePassword(ctx *gin.Context) <span class="cov8" titl
         }
 
         <span class="cov8" title="1">json.NewResponseSuccess(ctx, nil, "Success change password", "07", "03")</span>
+}
+
+func (c *usersDelivery) GetBalance(ctx *gin.Context) <span class="cov0" title="0">{
+        id := ctx.Param("id")
+        balance, err := c.usersUC.GetBalanceCustomer(id)
+        if err != nil </span><span class="cov0" title="0">{
+                if err.Error() == "1" </span><span class="cov0" title="0">{
+                        json.NewResponseSuccess(ctx, nil, "Balance not found", "08", "01")
+                        return
+                }</span>
+                <span class="cov0" title="0">json.NewResponseError(ctx, err.Error(), "08", "01")
+                return</span>
+        }
+
+        <span class="cov0" title="0">json.NewResponseSuccess(ctx, balance, "Success get balance", "08", "02")</span>
+
 }
 </pre>
 		
@@ -445,6 +472,14 @@ func (c *usersRepository) UsernameIsReady(username string) (bool, error) <span c
         err := c.db.QueryRow(query, username).Scan(&amp;result)
         return result == 0, err
 }</span>
+
+func (c *usersRepository) GetBalance(id string) (dto.Balance, error) <span class="cov0" title="0">{
+        var balance dto.Balance
+        query := "SELECT id, amount, created_at, updated_at FROM balance WHERE user_id = $1"
+
+        err := c.db.QueryRow(query, id).Scan(&amp;balance.ID, &amp;balance.Amount, &amp;balance.CreatedAt, &amp;balance.UpdatedAt)
+        return balance, err
+}</span>
 </pre>
 		
 		<pre class="file" id="file2" style="display: none">package usersUsecase
@@ -540,9 +575,17 @@ func (c *usersUC) LoginUsers(loginRequest model.LoginRequest) (dto.LoginResponse
 }
 
 func (c *usersUC) TopUp(topUpRequest dto.TopUpRequest) error <span class="cov8" title="1">{
-        err := c.usersRepo.UpdateBalance(topUpRequest)
-        return err
-}</span>
+        balance, err := c.usersRepo.GetBalance(topUpRequest.UserID)
+        if err != nil </span><span class="cov0" title="0">{
+                if err == sql.ErrNoRows || strings.Contains(err.Error(), "invalid input syntax for type uuid") </span><span class="cov0" title="0">{
+                        return errors.New("1")
+                }</span>
+                <span class="cov0" title="0">return err</span>
+        }
+        <span class="cov8" title="1">topUpRequest.Amount += balance.Amount
+        err = c.usersRepo.UpdateBalance(topUpRequest)
+        return err</span>
+}
 
 func (c *usersUC) ChangePassword(changePasswordRequest dto.ChangePassword) error <span class="cov8" title="1">{
         user, err := c.usersRepo.GetByID(changePasswordRequest.ID)
@@ -565,6 +608,16 @@ func (c *usersUC) ChangePassword(changePasswordRequest dto.ChangePassword) error
 
         err = c.usersRepo.UpdatePassword(changePasswordRequest)
         return err</span>
+}
+
+func (c *usersUC) GetBalanceCustomer(id string) (dto.Balance, error) <span class="cov0" title="0">{
+        balance, err := c.usersRepo.GetBalance(id)
+        if err != nil </span><span class="cov0" title="0">{
+                if strings.Contains(err.Error(), "invalid input syntax for type uuid") || err == sql.ErrNoRows </span><span class="cov0" title="0">{
+                        return balance, errors.New("1")
+                }</span>
+        }
+        <span class="cov0" title="0">return balance, err</span>
 }
 </pre>
 		
@@ -612,7 +665,7 @@ func (e *employeeDelivery) AddEmployee(c *gin.Context) <span class="cov8" title=
         <span class="cov8" title="1">resultEmployee, err := e.employeeUC.Register(addEmployeeRequest)
         if err != nil </span><span class="cov8" title="1">{
                 if err.Error() == "1" </span><span class="cov8" title="1">{
-                        json.NewResponseSuccess(c, nil, "username already in use", "01", "01")
+                        json.NewResponseBadRequest(c, nil, "username already in use", "01", "02")
                         return
                 }</span>
                 <span class="cov8" title="1">json.NewResponseError(c, err.Error(), "01", "01")
@@ -645,7 +698,12 @@ func (e *employeeDelivery) GetEmployeeAll(c *gin.Context) <span class="cov8" tit
                 return
         }</span>
 
-        <span class="cov8" title="1">json.NewResponseSuccess(c, resultEmployee, "Success Get All Employee", "03", "01")</span>
+        <span class="cov8" title="1">if len(resultEmployee) == 0 </span><span class="cov8" title="1">{
+                json.NewResponseSuccess(c, nil, "Data empty", "03", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">json.NewResponseSuccess(c, resultEmployee, "Success Get All Employee", "03", "02")</span>
 }
 
 func (e *employeeDelivery) UpdateEmployeeById(c *gin.Context) <span class="cov8" title="1">{
@@ -663,7 +721,7 @@ func (e *employeeDelivery) UpdateEmployeeById(c *gin.Context) <span class="cov8"
         <span class="cov8" title="1">employee, err := e.employeeUC.Update(employeUpdateRequest)
         if err != nil </span><span class="cov8" title="1">{
                 if err.Error() == "1" || errors.Is(sql.ErrNoRows, err) </span><span class="cov8" title="1">{
-                        json.NewResponseSuccess(c, nil, "Data not found", "04", "01")
+                        json.NewResponseBadRequest(c, nil, "Data not found", "04", "02")
                         return
                 }</span>
                 <span class="cov8" title="1">json.NewResponseError(c, err.Error(), "04", "01")
@@ -679,7 +737,7 @@ func (e *employeeDelivery) DeleteEmployeeById(c *gin.Context) <span class="cov8"
         msg, err := e.employeeUC.Delete(id)
         if err != nil </span><span class="cov8" title="1">{
                 if err.Error() == "1" </span><span class="cov8" title="1">{
-                        json.NewResponseSuccess(c, nil, "Data not found", "05", "01")
+                        json.NewResponseBadRequest(c, nil, "Data not found", "05", "01")
                         return
                 }</span>
                 <span class="cov8" title="1">json.NewResponseError(c, err.Error(), "05", "01")
@@ -730,18 +788,18 @@ func (e *employeeDelivery) ChangePassword(c *gin.Context) <span class="cov8" tit
         <span class="cov8" title="1">err := e.employeeUC.ChangePassword(id, changePasswordRequest)
         if err != nil </span><span class="cov8" title="1">{
                 if err.Error() == "1" </span><span class="cov8" title="1">{
-                        json.NewResponseSuccess(c, nil, "Data not found", "07", "01")
+                        json.NewResponseBadRequest(c, nil, "Data not found", "07", "01")
                         return
                 }</span>
                 <span class="cov8" title="1">if err.Error() == "2" </span><span class="cov8" title="1">{
-                        json.NewResponseSuccess(c, nil, "password does not match", "07", "02")
+                        json.NewResponseBadRequest(c, nil, "password does not match", "07", "02")
                         return
                 }</span>
                 <span class="cov8" title="1">json.NewResponseError(c, err.Error(), "07", "01")
                 return</span>
         }
 
-        <span class="cov8" title="1">json.NewResponseSuccess(c, nil, "Success updated password", "07", "03")</span>
+        <span class="cov8" title="1">json.NewResponseSuccess(c, nil, "Success updated password", "07", "01")</span>
 }
 </pre>
 		
@@ -990,7 +1048,7 @@ func (e *employeeUsecase) ChangePassword(id string, changePasswordRequest employ
                 if strings.Contains(err.Error(), "invalid input syntax for type uuid") || err == sql.ErrNoRows </span><span class="cov8" title="1">{
                         return errors.New("1")
                 }</span>
-                <span class="cov0" title="0">return err</span>
+                <span class="cov8" title="1">return err</span>
         }
 
         <span class="cov8" title="1">err = bcrypt.CompareHashAndPassword([]byte(employee.Password), []byte(changePasswordRequest.PasswordOld))
@@ -1050,9 +1108,21 @@ func (m *motorReturnDelivery) CreateMotorReturn(c *gin.Context) <span class="cov
 
         <span class="cov8" title="1">motorReturnCreated, err := m.motorReturnUC.AddMotorReturn(createMotorReturnRequest)
         if err != nil </span><span class="cov8" title="1">{
-                json.NewResponseError(c, err.Error(), "01", "01")
-                return
-        }</span>
+                if err.Error() == "1" </span><span class="cov8" title="1">{
+                        json.NewResponseBadRequest(c, nil, "Not enough balance", "01", "01")
+                        return
+                }</span>
+                <span class="cov8" title="1">if err.Error() == "2" </span><span class="cov8" title="1">{
+                        json.NewResponseBadRequest(c, nil, "motorcycle has been returned", "01", "02")
+                        return
+                }</span>
+                <span class="cov8" title="1">if err.Error() == "3" </span><span class="cov8" title="1">{
+                        json.NewResponseBadRequest(c, nil, "Data not found", "01", "02")
+                        return
+                }</span>
+                <span class="cov8" title="1">json.NewResponseError(c, err.Error(), "01", "01")
+                return</span>
+        }
 
         <span class="cov8" title="1">json.NewResponseCreated(c, motorReturnCreated, "Motor return created", "01", "01")</span>
 }
@@ -1076,7 +1146,12 @@ func (m *motorReturnDelivery) GetAllMotorReturn(c *gin.Context) <span class="cov
                 return
         }</span>
 
-        <span class="cov8" title="1">json.NewResponseSuccess(c, motorsReturn, "Success get all motor return", "03", "01")</span>
+        <span class="cov8" title="1">if len(motorsReturn) == 0 </span><span class="cov8" title="1">{
+                json.NewResponseSuccess(c, nil, "Empty data", "03", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">json.NewResponseSuccess(c, motorsReturn, "Success get all motor return", "03", "02")</span>
 }
 </pre>
 		
@@ -1133,6 +1208,13 @@ func (m *motorReturnRepository) Add(createMotorReturnRequest motorReturnDto.Crea
                 return createMotorReturnRequest, err
         }</span>
 
+        <span class="cov8" title="1">query = "UPDATE users SET can_rent = true WHERE id = $1"
+        _, err = tx.Exec(query, userId)
+        if err != nil </span><span class="cov8" title="1">{
+                tx.Rollback()
+                return createMotorReturnRequest, err
+        }</span>
+
         <span class="cov8" title="1">query = "UPDATE motor_vehicle SET status = 'AVAILABLE';"
         _, err = tx.Exec(query)
         if err != nil </span><span class="cov8" title="1">{
@@ -1144,19 +1226,19 @@ func (m *motorReturnRepository) Add(createMotorReturnRequest motorReturnDto.Crea
 
         query = "SELECT COUNT(transaction_id) FROM motor_return WHERE transaction_id = $1;"
         var transactionExist int
-        if err := tx.QueryRow(query, createMotorReturnRequest.TransactionID).Scan(&amp;transactionExist); err != nil </span><span class="cov8" title="1">{
+        if err := tx.QueryRow(query, createMotorReturnRequest.TransactionID).Scan(&amp;transactionExist); err != nil </span><span class="cov0" title="0">{
                 tx.Rollback()
                 return createMotorReturnRequest, err
         }</span>
 
-        <span class="cov8" title="1">if transactionExist &gt; 0 </span><span class="cov8" title="1">{
+        <span class="cov8" title="1">if transactionExist &gt; 0 </span><span class="cov0" title="0">{
                 tx.Rollback()
-                return createMotorReturnRequest, errors.New("motorcycle has been returned")
+                return createMotorReturnRequest, errors.New("2")
         }</span>
 
         <span class="cov8" title="1">query = "INSERT INTO motor_return(transaction_id, return_date, extra_charge, condition_motor, description) VALUES($1, $2, $3, $4, $5) RETURNING id;"
 
-        if err := tx.QueryRow(query, createMotorReturnRequest.TransactionID, returnDate, createMotorReturnRequest.ExtraCharge, createMotorReturnRequest.ConditionMotor, createMotorReturnRequest.Description).Scan(&amp;createMotorReturnRequest.ID); err != nil </span><span class="cov8" title="1">{
+        if err := tx.QueryRow(query, createMotorReturnRequest.TransactionID, returnDate, createMotorReturnRequest.ExtraCharge, createMotorReturnRequest.ConditionMotor, createMotorReturnRequest.Description).Scan(&amp;createMotorReturnRequest.ID); err != nil </span><span class="cov0" title="0">{
                 tx.Rollback()
                 return createMotorReturnRequest, err
         }</span>
@@ -1204,6 +1286,9 @@ import (
         "bike-rent-express/src/Users"
         "bike-rent-express/src/motorReturn"
         "bike-rent-express/src/transaction"
+        "database/sql"
+        "errors"
+        "strings"
 )
 
 type motorReturnUsecase struct {
@@ -1219,8 +1304,11 @@ func NewMotorReturnUseCase(motorReturnRepo motorReturn.MotorReturnRepository, tr
 func (m *motorReturnUsecase) AddMotorReturn(createMotorReturnRequest motorReturnDto.CreateMotorReturnRequest) (motorReturnDto.CreateMotorReturnRequest, error) <span class="cov8" title="1">{
         motorReturnCreated, err := m.motorReturnRepo.Add(createMotorReturnRequest)
         if err != nil </span><span class="cov8" title="1">{
-                return motorReturnCreated, err
-        }</span>
+                if strings.Contains(err.Error(), "invalid input syntax for type uuid") || err == sql.ErrNoRows </span><span class="cov0" title="0">{
+                        return motorReturnCreated, errors.New("3")
+                }</span>
+                <span class="cov8" title="1">return motorReturnCreated, err</span>
+        }
 
         <span class="cov8" title="1">return motorReturnCreated, nil</span>
 }
@@ -1333,7 +1421,12 @@ func (md motorVehicleDelivery) getAllMotorVehicle(ctx *gin.Context) <span class=
                 return
         }</span>
 
-        <span class="cov8" title="1">json.NewResponseSuccess(ctx, motor, "success", "01", "01")</span>
+        <span class="cov8" title="1">if len(motor) == 0 </span><span class="cov8" title="1">{
+                json.NewResponseSuccess(ctx, nil, "Empty data", "01", "01")
+                return
+        }</span>
+
+        <span class="cov8" title="1">json.NewResponseSuccess(ctx, motor, "success", "01", "02")</span>
 }
 
 func (md motorVehicleDelivery) getMotorVehicleById(ctx *gin.Context) <span class="cov8" title="1">{
@@ -1363,9 +1456,13 @@ func (md motorVehicleDelivery) createMotorVehicle(ctx *gin.Context) <span class=
 
         <span class="cov8" title="1">data, err := md.motorVehicleUC.CreateMotorVehicle(input)
         if err != nil </span><span class="cov8" title="1">{
-                json.NewResponseError(ctx, err.Error(), "03", "01")
-                return
-        }</span>
+                if err.Error() == "1" </span><span class="cov0" title="0">{
+                        json.NewResponseBadRequest(ctx, nil, "the license plate is already registered to another vehicle", "03", "01")
+                        return
+                }</span>
+                <span class="cov8" title="1">json.NewResponseError(ctx, err.Error(), "03", "01")
+                return</span>
+        }
 
         <span class="cov8" title="1">json.NewResponseCreated(ctx, data, "motor vehicle created", "03", "01")</span>
 
@@ -1384,9 +1481,13 @@ func (md motorVehicleDelivery) updateMotorVehicle(ctx *gin.Context) <span class=
 
         <span class="cov8" title="1">motor, err := md.motorVehicleUC.UpdateMotorVehicle(id, input)
         if err != nil </span><span class="cov8" title="1">{
-                json.NewResponseError(ctx, err.Error(), "04", "01")
-                return
-        }</span>
+                if err.Error() == "1" </span><span class="cov0" title="0">{
+                        json.NewResponseBadRequest(ctx, nil, "the license plate is already registered to another vehicle", "03", "01")
+                        return
+                }</span>
+                <span class="cov8" title="1">json.NewResponseError(ctx, err.Error(), "04", "01")
+                return</span>
+        }
 
         <span class="cov8" title="1">json.NewResponseSuccess(ctx, motor, "motor vehicle updated", "04", "01")</span>
 }
@@ -1396,9 +1497,17 @@ func (md motorVehicleDelivery) deleteMotorVehicle(ctx *gin.Context) <span class=
 
         err := md.motorVehicleUC.DeleteMotorVehicle(id)
         if err != nil </span><span class="cov8" title="1">{
-                json.NewResponseError(ctx, err.Error(), "05", "01")
-                return
-        }</span>
+                if err == sql.ErrNoRows </span><span class="cov0" title="0">{
+                        json.NewResponseBadRequest(ctx, nil, "Data not found", "05", "01")
+                        return
+                }</span>
+                <span class="cov8" title="1">if err.Error() == "1" </span><span class="cov0" title="0">{
+                        json.NewResponseBadRequest(ctx, nil, "the motor cannot be deleted because the motor still has a not available status.", "05", "02")
+                        return
+                }</span>
+                <span class="cov8" title="1">json.NewResponseError(ctx, err.Error(), "05", "01")
+                return</span>
+        }
 
         <span class="cov8" title="1">json.NewResponseSuccess(ctx, nil, "Sucessfully deleted motor vehicle", "05", "01")</span>
 }
@@ -1488,6 +1597,18 @@ func (mr *motorVehicleRepository) DropMotorVehicle(id string) error <span class=
 
         <span class="cov8" title="1">return err</span>
 }
+
+func (mr *motorVehicleRepository) CheckPlatMotor(plat string) (bool, error) <span class="cov0" title="0">{
+        query := "SELECT COUNT(plat) FROM motor_vehicle WHERE plat = $1"
+        var count int
+        err := mr.db.QueryRow(query, plat).Scan(&amp;count)
+
+        if count &gt; 0 </span><span class="cov0" title="0">{
+                return false, err
+        }</span> else<span class="cov0" title="0"> {
+                return true, err
+        }</span>
+}
 </pre>
 		
 		<pre class="file" id="file11" style="display: none">package motorVehicleUsecase
@@ -1495,6 +1616,8 @@ func (mr *motorVehicleRepository) DropMotorVehicle(id string) error <span class=
 import (
         "bike-rent-express/model/dto/motorVehicleDto"
         "bike-rent-express/src/motorVehicle"
+        "errors"
+        "strings"
 )
 
 type motorVehicleUsecase struct {
@@ -1519,14 +1642,26 @@ func (mu motorVehicleUsecase) GetAllMotorVehicle() ([]motorVehicleDto.MotorVehic
 func (mu motorVehicleUsecase) GetMotorVehicleById(id string) (motorVehicleDto.MotorVehicle, error) <span class="cov8" title="1">{
         motor, err := mu.motorVehicleRepo.RetrieveMotorVehicleById(id)
         if err != nil </span><span class="cov8" title="1">{
-                return motor, err
-        }</span>
+                if strings.Contains(err.Error(), "invalid input syntax for type uuid") </span><span class="cov0" title="0">{
+                        return motor, errors.New("1")
+                }</span>
+                <span class="cov8" title="1">return motor, err</span>
+        }
 
         <span class="cov8" title="1">return motor, nil</span>
 }
 
 func (mu motorVehicleUsecase) CreateMotorVehicle(motor motorVehicleDto.CreateMotorVehicle) (motorVehicleDto.MotorVehicle, error) <span class="cov8" title="1">{
-        newMotor, err := mu.motorVehicleRepo.InsertMotorVehicle(motorVehicleDto.MotorVehicle{
+        ready, err := mu.motorVehicleRepo.CheckPlatMotor(motor.Plat)
+        if err != nil </span><span class="cov0" title="0">{
+                return motorVehicleDto.MotorVehicle{}, err
+        }</span>
+
+        <span class="cov8" title="1">if !ready </span><span class="cov0" title="0">{
+                return motorVehicleDto.MotorVehicle{}, errors.New("1")
+        }</span>
+
+        <span class="cov8" title="1">newMotor, err := mu.motorVehicleRepo.InsertMotorVehicle(motorVehicleDto.MotorVehicle{
                 Name:           motor.Name,
                 Type:           motor.Type,
                 Price:          motor.Price,
@@ -1534,6 +1669,7 @@ func (mu motorVehicleUsecase) CreateMotorVehicle(motor motorVehicleDto.CreateMot
                 ProductionYear: motor.ProductionYear,
                 Status:         motor.Status,
         })
+
         if err != nil </span><span class="cov8" title="1">{
                 return newMotor, err
         }</span>
@@ -1546,6 +1682,18 @@ func (mu motorVehicleUsecase) UpdateMotorVehicle(id string, input motorVehicleDt
         if err != nil </span><span class="cov8" title="1">{
                 return motor, err
         }</span>
+
+        <span class="cov8" title="1">if input.Plat != motor.Plat </span><span class="cov0" title="0">{
+                ready, err := mu.motorVehicleRepo.CheckPlatMotor(input.Plat)
+                if err != nil </span><span class="cov0" title="0">{
+                        return motorVehicleDto.MotorVehicle{}, err
+                }</span>
+
+                <span class="cov0" title="0">if !ready </span><span class="cov0" title="0">{
+                        return motorVehicleDto.MotorVehicle{}, errors.New("1")
+                }</span>
+
+        }
 
         <span class="cov8" title="1">if input.Name != "" </span><span class="cov8" title="1">{
                 motor.Name = input.Name
@@ -1574,7 +1722,14 @@ func (mu motorVehicleUsecase) UpdateMotorVehicle(id string, input motorVehicleDt
 }
 
 func (mu motorVehicleUsecase) DeleteMotorVehicle(id string) error <span class="cov8" title="1">{
-        err := mu.motorVehicleRepo.DropMotorVehicle(id)
+        motor, err := mu.motorVehicleRepo.RetrieveMotorVehicleById(id)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if motor.Status == "NOT_AVAILABLE" </span><span class="cov0" title="0">{
+                return errors.New("1")
+        }</span>
+        <span class="cov8" title="1">err = mu.motorVehicleRepo.DropMotorVehicle(id)
         if err != nil </span><span class="cov8" title="1">{
                 return err
         }</span>
@@ -1624,9 +1779,19 @@ func (t *transactionDelivery) CreateTransaction(c *gin.Context) <span class="cov
         <span class="cov8" title="1">resultTransaction, err := t.transactionUC.AddTransaction(transactionRequest)
 
         if err != nil </span><span class="cov8" title="1">{
-                json.NewResponseError(c, err.Error(), "01", "01")
-                return
-        }</span>
+                if err.Error() == "1" </span><span class="cov0" title="0">{
+                        json.NewResponseBadRequest(c, nil, "motor not available", "01", "01")
+                        return
+                }</span>
+
+                <span class="cov8" title="1">if err.Error() == "2" </span><span class="cov0" title="0">{
+                        json.NewResponseBadRequest(c, nil, "balance is not enought", "01", "02")
+                        return
+                }</span>
+
+                <span class="cov8" title="1">json.NewResponseError(c, err.Error(), "01", "01")
+                return</span>
+        }
 
         <span class="cov8" title="1">json.NewResponseCreated(c, resultTransaction, "Transaction Created", "01", "01")</span>
 }
@@ -1712,7 +1877,7 @@ func (t *transactionRepository) Add(transactionRequest transactionDto.AddTransac
         err = tx.QueryRow(query, transactionRequest.MotorVehicleId).Scan(&amp;priceMotor)
         if err != nil </span><span class="cov8" title="1">{
                 tx.Rollback()
-                return transactionRequest, errors.New("motor not available")
+                return transactionRequest, errors.New("1")
         }</span>
         <span class="cov8" title="1">priceMotor *= int(difference)
 
@@ -1727,7 +1892,7 @@ func (t *transactionRepository) Add(transactionRequest transactionDto.AddTransac
 
         <span class="cov8" title="1">if userBalance &lt; priceMotor </span><span class="cov8" title="1">{
                 tx.Rollback()
-                return transactionRequest, errors.New("balance is not enought")
+                return transactionRequest, errors.New("2")
         }</span>
 
         <span class="cov8" title="1">result := userBalance - priceMotor
@@ -1741,6 +1906,13 @@ func (t *transactionRepository) Add(transactionRequest transactionDto.AddTransac
 
         <span class="cov8" title="1">query = "UPDATE motor_vehicle SET status = 'NOT_AVAILABLE' WHERE id = $1"
         _, err = tx.Exec(query, transactionRequest.MotorVehicleId)
+        if err != nil </span><span class="cov8" title="1">{
+                tx.Rollback()
+                return transactionRequest, err
+        }</span>
+
+        <span class="cov8" title="1">query = "UPDATE users SET can_rent = false WHERE id = $1"
+        _, err = tx.Exec(query, transactionRequest.UserID)
         if err != nil </span><span class="cov8" title="1">{
                 tx.Rollback()
                 return transactionRequest, err
