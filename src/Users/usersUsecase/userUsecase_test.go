@@ -293,7 +293,15 @@ func (suite *UserUCTestSuite) TestTopUpSuccess() {
 		UserID: expectUsers.Uuid,
 	}
 
+	balance := dto.Balance{
+		ID:        "1",
+		Amount:    0,
+		CreatedAt: "1",
+		UpdatedAt: "1",
+	}
+
 	suite.mockUserRepository.On("UpdateBalance", topUpRequest).Return(nil)
+	suite.mockUserRepository.On("GetBalance", topUpRequest.UserID).Return(balance, nil)
 	err := suite.userUC.TopUp(topUpRequest)
 
 	assert.Nil(suite.T(), err)

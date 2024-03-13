@@ -325,3 +325,23 @@ func TestDropMotorVehicle_Fail(t *testing.T) {
 
 	assert.Error(t, err)
 }
+
+// func TestCheckPlatMotor_Success(t *testing.T) {
+// 	db, mock, err := sqlmock.New()
+// 	if err != nil {
+// 		t.Fatal("Error creating mock database: ", err)
+// 	}
+// 	defer db.Close()
+
+// 	repository := NewMotorVehicleRepository(db)
+
+// 	query := "SELECT COUNT(.+) FROM motor_vehicle WHERE plat = \\$1;"
+// 	rows := sqlmock.NewRows([]string{".+"}).AddRow(0)
+
+// 	mock.ExpectQuery(query).WillReturnRows(rows)
+
+// 	ready, err := repository.CheckPlatMotor("B2313")
+
+// 	assert.Nil(t, err)
+// 	assert.Equal(t, true, ready)
+// }

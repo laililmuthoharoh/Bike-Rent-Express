@@ -283,7 +283,7 @@ func (suite *EmployeeDeliverySuite) TestUpdateEmployee_FailedBind() {
 }
 
 func (suite *EmployeeDeliverySuite) TestUpdateEmployee_FailedDataNotFound() {
-	expectResponse := `{"responseCode":"2000401","responseMessage":"Data not found"}`
+	expectResponse := `{"responseCode":"4000402","responseMessage":"Data not found"}`
 	updateEmployeeRequest := employeeDto.UpdateEmployeeRequest{
 		ID:   expectEmployee.ID,
 		Name: expectEmployee.Name,
@@ -298,7 +298,7 @@ func (suite *EmployeeDeliverySuite) TestUpdateEmployee_FailedDataNotFound() {
 	req.Header.Add("Authorization", accessToken)
 
 	suite.router.ServeHTTP(w, req)
-	assert.Equal(suite.T(), 200, w.Code)
+	assert.Equal(suite.T(), 400, w.Code)
 	assert.Equal(suite.T(), expectResponse, w.Body.String())
 }
 
@@ -336,7 +336,7 @@ func (suite *EmployeeDeliverySuite) TestDeleteEmployee_Success() {
 }
 
 func (suite *EmployeeDeliverySuite) TestDeleteEmployee_FailedDataNotFound() {
-	expectResponse := `{"responseCode":"2000501","responseMessage":"Data not found"}`
+	expectResponse := `{"responseCode":"4000501","responseMessage":"Data not found"}`
 	suite.mockEmployeeUC.On("Delete", expectEmployee.ID).Return("Sucessfully delete employee", errors.New("1"))
 
 	w := httptest.NewRecorder()
@@ -344,7 +344,7 @@ func (suite *EmployeeDeliverySuite) TestDeleteEmployee_FailedDataNotFound() {
 	req.Header.Add("Authorization", accessToken)
 
 	suite.router.ServeHTTP(w, req)
-	assert.Equal(suite.T(), 200, w.Code)
+	assert.Equal(suite.T(), 400, w.Code)
 	assert.Equal(suite.T(), expectResponse, w.Body.String())
 }
 
@@ -476,7 +476,7 @@ func (suite *EmployeeDeliverySuite) TestLoginEmployee_Failed() {
 }
 
 func (suite *EmployeeDeliverySuite) TestChangePassword_Success() {
-	expectResponse := `{"responseCode":"2000703","responseMessage":"Success updated password"}`
+	expectResponse := `{"responseCode":"2000701","responseMessage":"Success updated password"}`
 	changePasswordRequest := employeeDto.ChangePasswordRequest{
 		PasswordOld: expectEmployee.Password,
 		NewPassword: "test",
@@ -515,7 +515,7 @@ func (suite *EmployeeDeliverySuite) TestChangePassword_FailedBind() {
 }
 
 func (suite *EmployeeDeliverySuite) TestChangePassword_FailedDataNotFound1() {
-	expectResponse := `{"responseCode":"2000701","responseMessage":"Data not found"}`
+	expectResponse := `{"responseCode":"4000701","responseMessage":"Data not found"}`
 	changePasswordRequest := employeeDto.ChangePasswordRequest{
 		PasswordOld: expectEmployee.Password,
 		NewPassword: "test",
@@ -535,7 +535,7 @@ func (suite *EmployeeDeliverySuite) TestChangePassword_FailedDataNotFound1() {
 }
 
 func (suite *EmployeeDeliverySuite) TestChangePassword_FailedDataNotFound2() {
-	expectResponse := `{"responseCode":"2000702","responseMessage":"password does not match"}`
+	expectResponse := `{"responseCode":"4000702","responseMessage":"password does not match"}`
 	changePasswordRequest := employeeDto.ChangePasswordRequest{
 		PasswordOld: expectEmployee.Password,
 		NewPassword: "test",
@@ -549,7 +549,8 @@ func (suite *EmployeeDeliverySuite) TestChangePassword_FailedDataNotFound2() {
 	req.Header.Add("Authorization", accessToken)
 
 	suite.router.ServeHTTP(w, req)
-	assert.Equal(suite.T(), 200, w.Code)
+	assert.Equal(suite.T(), 400, w.Code)
+	fmt.Println(w.Body.String())
 	assert.Equal(suite.T(), expectResponse, w.Body.String())
 }
 

@@ -7,6 +7,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -30,7 +31,7 @@ var expectUsers = dto.GetUsers{
 	Telp:       "0813123",
 }
 
-var accessToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAzMjM0NjAsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJhZG1pbjEyMjMiLCJyb2xlIjoiQURNSU4ifQ.nC0gb9Vey1JXz2zQZgvg96NJIPm6CFSXHcA5OEWTD2I"
+var accessToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTA0MTI0MTgsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJhZG1pbiIsImlkIjoiIiwicm9sZSI6IkFETUlOIn0.VL7b2UjsczLaEyLNJFYhpbUCSlbfG4tAMGpEPXi9JOk"
 
 type mockUserUC struct {
 	mock.Mock
@@ -321,7 +322,7 @@ func (suite *UsersDeliveryTestSuite) TestRegisterUser_FailedBind() {
 }
 
 func (suite *UsersDeliveryTestSuite) TestRegisterUser_FailedUsername() {
-	expectResponse := `{"responseCode":"2000401","responseMessage":"username already in use"}`
+	expectResponse := `{"responseCode":"4000401","responseMessage":"username already in use"}`
 	newUser := dto.RegisterUsers{
 		Name:     expectUsers.Name,
 		Username: expectUsers.Username,
@@ -339,7 +340,8 @@ func (suite *UsersDeliveryTestSuite) TestRegisterUser_FailedUsername() {
 	req.Header.Add("Authorization", accessToken)
 
 	suite.router.ServeHTTP(w, req)
-	assert.Equal(suite.T(), 200, w.Code)
+	assert.Equal(suite.T(), 400, w.Code)
+	fmt.Println(w.Body.String())
 	assert.Equal(suite.T(), expectResponse, w.Body.String())
 }
 
@@ -497,7 +499,7 @@ func (suite *UsersDeliveryTestSuite) TestLoginUser_Failed() {
 }
 
 func (suite *UsersDeliveryTestSuite) TestTopUp_Success() {
-	expectResponse := `{"responseCode":"2000601","responseMessage":"Success Top Up"}`
+	expectResponse := `{"responseCode":"2000602","responseMessage":"Success Top Up"}`
 	topUpRequest := dto.TopUpRequest{
 		Amount: 1,
 		UserID: expectUsers.Uuid,
@@ -508,7 +510,7 @@ func (suite *UsersDeliveryTestSuite) TestTopUp_Success() {
 	w := httptest.NewRecorder()
 	json, _ := json.Marshal(topUpRequest)
 	req, _ := http.NewRequest(http.MethodPut, "/api/v1/users/"+expectUsers.Uuid+"/top-up", bytes.NewBuffer(json))
-	req.Header.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAzMjg4NTQsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJ1c2VyMjEiLCJpZCI6IiIsInJvbGUiOiJVU0VSIn0.xT64rPCg2Ud9m_BSkXSOscYsQ3fT6-x6yNyttpfUNhI")
+	req.Header.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTA0MTY1NjAsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJ1c2VyIiwiaWQiOiIiLCJyb2xlIjoiVVNFUiJ9.wrFodYDqhBM_CtHQxK7gXLpy3BjI82eYeUuQUBFemyI")
 
 	suite.router.ServeHTTP(w, req)
 	assert.Equal(suite.T(), 200, w.Code)
@@ -526,10 +528,11 @@ func (suite *UsersDeliveryTestSuite) TestTopUp_FailedBind() {
 	w := httptest.NewRecorder()
 	json, _ := json.Marshal(topUpRequest)
 	req, _ := http.NewRequest(http.MethodPut, "/api/v1/users/"+expectUsers.Uuid+"/top-up", bytes.NewBuffer(json))
-	req.Header.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAzMjg4NTQsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJ1c2VyMjEiLCJpZCI6IiIsInJvbGUiOiJVU0VSIn0.xT64rPCg2Ud9m_BSkXSOscYsQ3fT6-x6yNyttpfUNhI")
+	req.Header.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTA0MTY1NjAsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJ1c2VyIiwiaWQiOiIiLCJyb2xlIjoiVVNFUiJ9.wrFodYDqhBM_CtHQxK7gXLpy3BjI82eYeUuQUBFemyI")
 
 	suite.router.ServeHTTP(w, req)
 	assert.Equal(suite.T(), 400, w.Code)
+	fmt.Println(w.Body.String())
 	assert.Equal(suite.T(), expectResponse, w.Body.String())
 }
 
@@ -545,7 +548,7 @@ func (suite *UsersDeliveryTestSuite) TestTopUp_Failed() {
 	w := httptest.NewRecorder()
 	json, _ := json.Marshal(topUpRequest)
 	req, _ := http.NewRequest(http.MethodPut, "/api/v1/users/"+expectUsers.Uuid+"/top-up", bytes.NewBuffer(json))
-	req.Header.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAzMjg4NTQsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJ1c2VyMjEiLCJpZCI6IiIsInJvbGUiOiJVU0VSIn0.xT64rPCg2Ud9m_BSkXSOscYsQ3fT6-x6yNyttpfUNhI")
+	req.Header.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTA0MTY1NjAsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJ1c2VyIiwiaWQiOiIiLCJyb2xlIjoiVVNFUiJ9.wrFodYDqhBM_CtHQxK7gXLpy3BjI82eYeUuQUBFemyI")
 
 	suite.router.ServeHTTP(w, req)
 	assert.Equal(suite.T(), 500, w.Code)

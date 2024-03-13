@@ -18,7 +18,7 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-var accessToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAyNTIxNDIsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJhZG1pbjEyMjMiLCJpZCI6IiIsInJvbGUiOiJBRE1JTiJ9.w4HgU76uNybcG9QW0ajMSA-uzS0slZGucMnyrkrfiVk"
+var accessToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTA0MTI0MTgsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJhZG1pbiIsImlkIjoiIiwicm9sZSI6IkFETUlOIn0.VL7b2UjsczLaEyLNJFYhpbUCSlbfG4tAMGpEPXi9JOk"
 
 type mockTransactionUC struct {
 	mock.Mock

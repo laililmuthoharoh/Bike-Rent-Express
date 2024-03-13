@@ -76,7 +76,7 @@ var expectedCreateMotorReturn = motorReturnDto.CreateMotorReturnRequest{
 	Description:    expectedMotorReturn.Descrption,
 }
 
-var tokenAdmin = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAzMTk5NzQsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJhZG1pbjEzIiwicm9sZSI6IkFETUlOIn0.Kr-6qbAUKDBikHdJMUEZ90GG0DvfM_xUo7gxG25nAOI"
+var tokenAdmin = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTA0MTI0MTgsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJhZG1pbiIsImlkIjoiIiwicm9sZSI6IkFETUlOIn0.VL7b2UjsczLaEyLNJFYhpbUCSlbfG4tAMGpEPXi9JOk"
 
 type mockMotorReturnUsecase struct {
 	mock.Mock
@@ -122,7 +122,7 @@ func (suite *MotorReturnDeliveryTestSuite) TestCreateMotorReturn_Success() {
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/api/v1/employee/"+expectTransaction.EmployeeId+"/motor-return", bytes.NewBuffer(jsonData))
-	accessTokenEmployee := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAzMjE2ODksImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJkaW5vMTI0NTEiLCJyb2xlIjoiRU1QTE9ZRUUifQ.lGqvAnJ2q7E34ZnA2IXpYY5EfMNI1pjxDf4ZKhnh_oA"
+	accessTokenEmployee := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTA0MDgwODcsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJkaW5vIiwiaWQiOiIiLCJyb2xlIjoiRU1QTE9ZRUUifQ.n-iBKsZpt2GRFU_aR6ph6kIeZm63uB-skQo6YWQoa-k"
 	req.Header.Add("Authorization", accessTokenEmployee)
 
 	suite.router.ServeHTTP(w, req)
@@ -138,7 +138,61 @@ func (suite *MotorReturnDeliveryTestSuite) TestCreateMotorReturn_FailedBind() {
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/api/v1/employee/"+expectTransaction.EmployeeId+"/motor-return", nil)
-	accessTokenEmployee := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAzMjE2ODksImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJkaW5vMTI0NTEiLCJyb2xlIjoiRU1QTE9ZRUUifQ.lGqvAnJ2q7E34ZnA2IXpYY5EfMNI1pjxDf4ZKhnh_oA"
+	accessTokenEmployee := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTA0MDgwODcsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJkaW5vIiwiaWQiOiIiLCJyb2xlIjoiRU1QTE9ZRUUifQ.n-iBKsZpt2GRFU_aR6ph6kIeZm63uB-skQo6YWQoa-k"
+	req.Header.Add("Authorization", accessTokenEmployee)
+
+	suite.router.ServeHTTP(w, req)
+	assert.Equal(suite.T(), 400, w.Code)
+	fmt.Println(w.Body.String())
+	assert.Equal(suite.T(), expectedResposnse, w.Body.String())
+}
+func (suite *MotorReturnDeliveryTestSuite) TestCreateMotorReturn_FailedNotEnoughBalance() {
+
+	expectedResposnse := `{"responseCode":"4000101","responseMessage":"Not enough balance"}`
+
+	suite.usecase.On("AddMotorReturn", expectedCreateMotorReturn).Return(expectedCreateMotorReturn, errors.New("1"))
+
+	jsonData, _ := json.Marshal(expectedCreateMotorReturn)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/api/v1/employee/"+expectTransaction.EmployeeId+"/motor-return", bytes.NewBuffer(jsonData))
+	accessTokenEmployee := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTA0MDgwODcsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJkaW5vIiwiaWQiOiIiLCJyb2xlIjoiRU1QTE9ZRUUifQ.n-iBKsZpt2GRFU_aR6ph6kIeZm63uB-skQo6YWQoa-k"
+	req.Header.Add("Authorization", accessTokenEmployee)
+
+	suite.router.ServeHTTP(w, req)
+	assert.Equal(suite.T(), 400, w.Code)
+	assert.Equal(suite.T(), expectedResposnse, w.Body.String())
+}
+
+func (suite *MotorReturnDeliveryTestSuite) TestCreateMotorReturn_FailedMotorcucleHasBeenReturned() {
+
+	expectedResposnse := `{"responseCode":"4000102","responseMessage":"motorcycle has been returned"}`
+
+	suite.usecase.On("AddMotorReturn", expectedCreateMotorReturn).Return(expectedCreateMotorReturn, errors.New("2"))
+
+	jsonData, _ := json.Marshal(expectedCreateMotorReturn)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/api/v1/employee/"+expectTransaction.EmployeeId+"/motor-return", bytes.NewBuffer(jsonData))
+	accessTokenEmployee := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTA0MDgwODcsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJkaW5vIiwiaWQiOiIiLCJyb2xlIjoiRU1QTE9ZRUUifQ.n-iBKsZpt2GRFU_aR6ph6kIeZm63uB-skQo6YWQoa-k"
+	req.Header.Add("Authorization", accessTokenEmployee)
+
+	suite.router.ServeHTTP(w, req)
+	assert.Equal(suite.T(), 400, w.Code)
+	assert.Equal(suite.T(), expectedResposnse, w.Body.String())
+}
+
+func (suite *MotorReturnDeliveryTestSuite) TestCreateMotorReturn_FailedDataNotFound() {
+
+	expectedResposnse := `{"responseCode":"4000102","responseMessage":"Data not found"}`
+
+	suite.usecase.On("AddMotorReturn", expectedCreateMotorReturn).Return(expectedCreateMotorReturn, errors.New("3"))
+
+	jsonData, _ := json.Marshal(expectedCreateMotorReturn)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/api/v1/employee/"+expectTransaction.EmployeeId+"/motor-return", bytes.NewBuffer(jsonData))
+	accessTokenEmployee := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTA0MDgwODcsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJkaW5vIiwiaWQiOiIiLCJyb2xlIjoiRU1QTE9ZRUUifQ.n-iBKsZpt2GRFU_aR6ph6kIeZm63uB-skQo6YWQoa-k"
 	req.Header.Add("Authorization", accessTokenEmployee)
 
 	suite.router.ServeHTTP(w, req)
@@ -156,7 +210,7 @@ func (suite *MotorReturnDeliveryTestSuite) TestCreateMotorReturn_Failed() {
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/api/v1/employee/"+expectTransaction.EmployeeId+"/motor-return", bytes.NewBuffer(jsonData))
-	accessTokenEmployee := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAzMjE2ODksImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJkaW5vMTI0NTEiLCJyb2xlIjoiRU1QTE9ZRUUifQ.lGqvAnJ2q7E34ZnA2IXpYY5EfMNI1pjxDf4ZKhnh_oA"
+	accessTokenEmployee := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTA0MDgwODcsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJkaW5vIiwiaWQiOiIiLCJyb2xlIjoiRU1QTE9ZRUUifQ.n-iBKsZpt2GRFU_aR6ph6kIeZm63uB-skQo6YWQoa-k"
 	req.Header.Add("Authorization", accessTokenEmployee)
 
 	suite.router.ServeHTTP(w, req)

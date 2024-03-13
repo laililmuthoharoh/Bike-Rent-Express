@@ -129,6 +129,7 @@ func TestCreateMotorVehicle_Success(t *testing.T) {
 	}
 
 	mockRepo.On("InsertMotorVehicle", expectedMotorVehicleById).Return(expectedMotorVehicleById, nil)
+	mockRepo.On("CheckPlatMotor", expected.Plat).Return(true, nil)
 
 	usecase := NewMotorVehicleUsecase(mockRepo)
 
@@ -152,6 +153,7 @@ func TestCreateMotorVehicle_Fail(t *testing.T) {
 	}
 	expectedError := errors.New("mock error")
 
+	mockRepo.On("CheckPlatMotor", expected.Plat).Return(true, nil)
 	mockRepo.On("InsertMotorVehicle", expectedMotorVehicleById).Return(expectedMotorVehicleById, expectedError)
 
 	usecase := NewMotorVehicleUsecase(mockRepo)
@@ -239,6 +241,7 @@ func TestDeleteMotorVehicle_Success(t *testing.T) {
 	mockRepo := new(mockMotorVehicleRepository)
 
 	mockRepo.On("DropMotorVehicle", expectedMotorVehicleById.Id).Return(nil)
+	mockRepo.On("RetrieveMotorVehicleById", expectedMotorVehicleById.Id).Return(expectedMotorVehicleById, nil)
 
 	usecase := NewMotorVehicleUsecase(mockRepo)
 
@@ -254,6 +257,7 @@ func TestDeleteMotorVehicle_Fail(t *testing.T) {
 	expectedError := errors.New("mock error")
 
 	mockRepo.On("DropMotorVehicle", expectedMotorVehicleById.Id).Return(expectedError)
+	mockRepo.On("RetrieveMotorVehicleById", expectedMotorVehicleById.Id).Return(expectedMotorVehicleById, nil)
 
 	usecase := NewMotorVehicleUsecase(mockRepo)
 
