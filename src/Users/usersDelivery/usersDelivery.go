@@ -106,7 +106,7 @@ func (c *usersDelivery) RegisterUsers(ctx *gin.Context) {
 
 	if err := c.usersUC.RegisterUsers(newUsers); err != nil {
 		if err.Error() == "1" {
-			json.NewResponseSuccess(ctx, nil, "username already in use", "04", "01")
+			json.NewResponseBadRequest(ctx, nil, "username already in use", "04", "01")
 			return
 		}
 		json.NewResponseError(ctx, err.Error(), "04", "02")
@@ -154,11 +154,15 @@ func (c *usersDelivery) TopUp(ctx *gin.Context) {
 	topupRequest.UserID = id
 	err := c.usersUC.TopUp(topupRequest)
 	if err != nil {
+		if err.Error() == "1" {
+			json.NewResponseSuccess(ctx, nil, "Data not found", "06", "01")
+			return
+		}
 		json.NewResponseError(ctx, err.Error(), "06", "01")
 		return
 	}
 
-	json.NewResponseSuccess(ctx, nil, "Success Top Up", "06", "01")
+	json.NewResponseSuccess(ctx, nil, "Success Top Up", "06", "02")
 
 }
 

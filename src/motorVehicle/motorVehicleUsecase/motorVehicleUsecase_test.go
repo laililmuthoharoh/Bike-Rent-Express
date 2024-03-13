@@ -50,6 +50,11 @@ func (m *mockMotorVehicleRepository) DropMotorVehicle(id string) error {
 	return arg.Error(0)
 }
 
+func (m *mockMotorVehicleRepository) CheckPlatMotor(plat string) (bool, error) {
+	args := m.Called(plat)
+	return args.Bool(0), args.Error(1)
+}
+
 func TestGetAllMotorVehicle_Success(t *testing.T) {
 	mockRepo := new(mockMotorVehicleRepository)
 

@@ -74,11 +74,23 @@ func (mr *motorVehicleRepository) ChangeMotorVehicle(id string, motor motorVehic
 
 func (mr *motorVehicleRepository) DropMotorVehicle(id string) error {
 
-	query := "UPDATE motor_vehicle SET deleted_at = CURRENT_DATE WHERE id = $1 AND status = 'AVAILABLE';"
+	query := "UPDATE motor_vehicle SET deleted_at = CURRENT_DATE WHERE id = $1;"
 	_, err := mr.db.Exec(query, id)
 	if err != nil {
 		return err
 	}
 
 	return err
+}
+
+func (mr *motorVehicleRepository) CheckPlatMotor(plat string) (bool, error) {
+	query := "SELECT COUNT(plat) FROM motor_vehicle WHERE plat = $1"
+	var count int
+	err := mr.db.QueryRow(query, plat).Scan(&count)
+
+	if count > 0 {
+		return false, err
+	} else {
+		return true, err
+	}
 }

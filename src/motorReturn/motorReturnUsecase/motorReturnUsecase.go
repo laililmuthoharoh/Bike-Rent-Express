@@ -5,6 +5,9 @@ import (
 	"bike-rent-express/src/Users"
 	"bike-rent-express/src/motorReturn"
 	"bike-rent-express/src/transaction"
+	"database/sql"
+	"errors"
+	"strings"
 )
 
 type motorReturnUsecase struct {
@@ -20,6 +23,9 @@ func NewMotorReturnUseCase(motorReturnRepo motorReturn.MotorReturnRepository, tr
 func (m *motorReturnUsecase) AddMotorReturn(createMotorReturnRequest motorReturnDto.CreateMotorReturnRequest) (motorReturnDto.CreateMotorReturnRequest, error) {
 	motorReturnCreated, err := m.motorReturnRepo.Add(createMotorReturnRequest)
 	if err != nil {
+		if strings.Contains(err.Error(), "invalid input syntax for type uuid") || err == sql.ErrNoRows {
+			return motorReturnCreated, errors.New("3")
+		}
 		return motorReturnCreated, err
 	}
 

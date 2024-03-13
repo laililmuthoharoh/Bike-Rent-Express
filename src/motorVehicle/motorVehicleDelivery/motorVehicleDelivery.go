@@ -72,6 +72,10 @@ func (md motorVehicleDelivery) createMotorVehicle(ctx *gin.Context) {
 
 	data, err := md.motorVehicleUC.CreateMotorVehicle(input)
 	if err != nil {
+		if err.Error() == "1" {
+			json.NewResponseBadRequest(ctx, nil, "the license plate is already registered to another vehicle", "03", "01")
+			return
+		}
 		json.NewResponseError(ctx, err.Error(), "03", "01")
 		return
 	}
@@ -93,6 +97,10 @@ func (md motorVehicleDelivery) updateMotorVehicle(ctx *gin.Context) {
 
 	motor, err := md.motorVehicleUC.UpdateMotorVehicle(id, input)
 	if err != nil {
+		if err.Error() == "1" {
+			json.NewResponseBadRequest(ctx, nil, "the license plate is already registered to another vehicle", "03", "01")
+			return
+		}
 		json.NewResponseError(ctx, err.Error(), "04", "01")
 		return
 	}
@@ -105,6 +113,14 @@ func (md motorVehicleDelivery) deleteMotorVehicle(ctx *gin.Context) {
 
 	err := md.motorVehicleUC.DeleteMotorVehicle(id)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			json.NewResponseBadRequest(ctx, nil, "Data not found", "05", "01")
+			return
+		}
+		if err.Error() == "1" {
+			json.NewResponseBadRequest(ctx, nil, "the motor cannot be deleted because the motor still has a not available status.", "05", "02")
+			return
+		}
 		json.NewResponseError(ctx, err.Error(), "05", "01")
 		return
 	}

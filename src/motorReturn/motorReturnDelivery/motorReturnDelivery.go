@@ -46,6 +46,10 @@ func (m *motorReturnDelivery) CreateMotorReturn(c *gin.Context) {
 			json.NewResponseBadRequest(c, nil, "motorcycle has been returned", "01", "02")
 			return
 		}
+		if err.Error() == "3" {
+			json.NewResponseBadRequest(c, nil, "Data not found", "01", "02")
+			return
+		}
 		json.NewResponseError(c, err.Error(), "01", "01")
 		return
 	}
