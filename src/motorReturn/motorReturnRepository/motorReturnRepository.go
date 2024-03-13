@@ -51,7 +51,7 @@ func (m *motorReturnRepository) Add(createMotorReturnRequest motorReturnDto.Crea
 		return createMotorReturnRequest, err
 	}
 
-	query = "UPDATE users SET can_rent = true WHERE id = $p"
+	query = "UPDATE users SET can_rent = true WHERE id = $1"
 	_, err = tx.Exec(query, userId)
 	if err != nil {
 		tx.Rollback()
