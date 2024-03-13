@@ -64,5 +64,10 @@ func (m *motorReturnDelivery) GetAllMotorReturn(c *gin.Context) {
 		return
 	}
 
-	json.NewResponseSuccess(c, motorsReturn, "Success get all motor return", "03", "01")
+	if len(motorsReturn) == 0 {
+		json.NewResponseSuccess(c, nil, "Empty data", "03", "01")
+		return
+	}
+
+	json.NewResponseSuccess(c, motorsReturn, "Success get all motor return", "03", "02")
 }
