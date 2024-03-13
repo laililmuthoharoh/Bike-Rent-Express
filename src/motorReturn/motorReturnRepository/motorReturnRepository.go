@@ -76,7 +76,7 @@ func (m *motorReturnRepository) Add(createMotorReturnRequest motorReturnDto.Crea
 
 	if transactionExist > 0 {
 		tx.Rollback()
-		return createMotorReturnRequest, errors.New("motorcycle has been returned")
+		return createMotorReturnRequest, errors.New("2")
 	}
 
 	query = "INSERT INTO motor_return(transaction_id, return_date, extra_charge, condition_motor, description) VALUES($1, $2, $3, $4, $5) RETURNING id;"

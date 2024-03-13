@@ -38,6 +38,16 @@ func (t *transactionDelivery) CreateTransaction(c *gin.Context) {
 	resultTransaction, err := t.transactionUC.AddTransaction(transactionRequest)
 
 	if err != nil {
+		if err.Error() == "1" {
+			json.NewResponseBadRequest(c, nil, "motor not available", "01", "01")
+			return
+		}
+
+		if err.Error() == "2" {
+			json.NewResponseBadRequest(c, nil, "balance is not enought", "01", "02")
+			return
+		}
+
 		json.NewResponseError(c, err.Error(), "01", "01")
 		return
 	}

@@ -47,7 +47,7 @@ func (t *transactionRepository) Add(transactionRequest transactionDto.AddTransac
 	err = tx.QueryRow(query, transactionRequest.MotorVehicleId).Scan(&priceMotor)
 	if err != nil {
 		tx.Rollback()
-		return transactionRequest, errors.New("motor not available")
+		return transactionRequest, errors.New("1")
 	}
 	priceMotor *= int(difference)
 
@@ -62,7 +62,7 @@ func (t *transactionRepository) Add(transactionRequest transactionDto.AddTransac
 
 	if userBalance < priceMotor {
 		tx.Rollback()
-		return transactionRequest, errors.New("balance is not enought")
+		return transactionRequest, errors.New("2")
 	}
 
 	result := userBalance - priceMotor

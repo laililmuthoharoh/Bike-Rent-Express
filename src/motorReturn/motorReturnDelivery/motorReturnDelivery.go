@@ -38,6 +38,14 @@ func (m *motorReturnDelivery) CreateMotorReturn(c *gin.Context) {
 
 	motorReturnCreated, err := m.motorReturnUC.AddMotorReturn(createMotorReturnRequest)
 	if err != nil {
+		if err.Error() == "1" {
+			json.NewResponseBadRequest(c, nil, "Not enough balance", "01", "01")
+			return
+		}
+		if err.Error() == "2" {
+			json.NewResponseBadRequest(c, nil, "motorcycle has been returned", "01", "02")
+			return
+		}
 		json.NewResponseError(c, err.Error(), "01", "01")
 		return
 	}
