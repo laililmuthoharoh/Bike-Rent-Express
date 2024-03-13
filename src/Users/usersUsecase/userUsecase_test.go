@@ -70,6 +70,11 @@ func (m *mockUserRepository) UsernameIsReady(username string) (bool, error) {
 	return args.Bool(0), args.Error(1)
 }
 
+func (m *mockUserRepository) GetBalance(id string) (dto.Balance, error) {
+	args := m.Called(id)
+	return args.Get(0).(dto.Balance), args.Error(1)
+}
+
 type UserUCTestSuite struct {
 	suite.Suite
 	userUC             Users.UsersUsecase

@@ -71,6 +71,11 @@ func (m *mockUserUC) ChangePassword(changePasswordRequest dto.ChangePassword) er
 	return args.Error(0)
 }
 
+func (m *mockUserUC) GetBalanceCustomer(id string) (dto.Balance, error) {
+	args := m.Called(id)
+	return args.Get(0).(dto.Balance), args.Error(1)
+}
+
 type UsersDeliveryTestSuite struct {
 	suite.Suite
 	mockUserUC *mockUserUC

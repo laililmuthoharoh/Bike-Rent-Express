@@ -160,3 +160,11 @@ func (c *usersRepository) UsernameIsReady(username string) (bool, error) {
 	err := c.db.QueryRow(query, username).Scan(&result)
 	return result == 0, err
 }
+
+func (c *usersRepository) GetBalance(id string) (dto.Balance, error) {
+	var balance dto.Balance
+	query := "SELECT id, amount, created_at, updated_at FROM balance WHERE user_id = $1"
+
+	err := c.db.QueryRow(query, id).Scan(&balance.ID, &balance.Amount, &balance.CreatedAt, &balance.UpdatedAt)
+	return balance, err
+}

@@ -30,6 +30,7 @@ func NewUsersDelivery(v1Group *gin.RouterGroup, usersUC Users.UsersUsecase) {
 		usersGroup.GET("/:id", middleware.JWTAuth("ADMIN", "USER"), handler.getByID)
 		usersGroup.PUT("/:id/change-password", middleware.JWTAuth("ADMIN", "USER"), handler.ChangePassword)
 		usersGroup.PUT("/:id/top-up", middleware.JWTAuth("USER"), handler.TopUp)
+		usersGroup.GET("/:id/balance", middleware.JWTAuth("USER"), handler.GetBalance)
 
 		usersGroup.POST("/register", handler.RegisterUsers)
 		usersGroup.POST("/login", handler.LoginUsers)
@@ -187,4 +188,20 @@ func (c *usersDelivery) ChangePassword(ctx *gin.Context) {
 	}
 
 	json.NewResponseSuccess(ctx, nil, "Success change password", "07", "03")
+}
+
+func (c *usersDelivery) GetBalance(ctx *gin.Context) {
+	id := ctx.Param("id")
+	balance, err := c.usersUC.GetBalanceCustomer(id)
+	if err != nil {
+		if err.Error() == "1" {
+			json.NewResponseSuccess(ctx, nil, "Balance not found", "08", "01")
+			return
+		}
+		json.NewResponseError(ctx, err.Error(), "08", "01")
+		return
+	}
+
+	json.NewResponseSuccess(ctx, balance, "Success get balance", "08", "02")
+
 }

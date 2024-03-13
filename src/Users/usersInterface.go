@@ -14,6 +14,7 @@ type UsersRepository interface {
 	UpdateBalance(topUpRequest dto.TopUpRequest) error
 	UpdatePassword(changePasswordRequest dto.ChangePassword) error
 	UsernameIsReady(username string) (bool, error)
+	GetBalance(id string) (dto.Balance, error)
 }
 
 type UsersUsecase interface {
@@ -24,4 +25,5 @@ type UsersUsecase interface {
 	LoginUsers(loginRequest model.LoginRequest) (dto.LoginResponse, error)
 	TopUp(topUpRequest dto.TopUpRequest) error
 	ChangePassword(changePasswordRequest dto.ChangePassword) error
+	GetBalanceCustomer(id string) (dto.Balance, error)
 }

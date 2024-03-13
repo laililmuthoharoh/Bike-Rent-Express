@@ -117,3 +117,13 @@ func (c *usersUC) ChangePassword(changePasswordRequest dto.ChangePassword) error
 	err = c.usersRepo.UpdatePassword(changePasswordRequest)
 	return err
 }
+
+func (c *usersUC) GetBalanceCustomer(id string) (dto.Balance, error) {
+	balance, err := c.usersRepo.GetBalance(id)
+	if err != nil {
+		if strings.Contains(err.Error(), "invalid input syntax for type uuid") || err == sql.ErrNoRows {
+			return balance, errors.New("1")
+		}
+	}
+	return balance, err
+}
