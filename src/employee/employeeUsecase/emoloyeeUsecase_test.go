@@ -336,6 +336,20 @@ func (suite *EmployeeUCTestSuite) TestChangePassword_FailedIvalidInputOrNoRows()
 	assert.Equal(suite.T(), "1", err.Error())
 }
 
+func (suite *EmployeeUCTestSuite) TestChangePassword_FailedGetById() {
+	changePasswordRequest := employeeDto.ChangePasswordRequest{
+		PasswordOld: "daniel",
+		NewPassword: "daniel",
+	}
+
+	suite.mockEmployeeRepository.On("GetById", expectEmployee.ID).Return(expectEmployee, errors.New("error"))
+
+	err := suite.employeeUC.ChangePassword(expectEmployee.ID, changePasswordRequest)
+	suite.mockEmployeeRepository.AssertExpectations(suite.T())
+	assert.NotNil(suite.T(), err)
+	assert.Error(suite.T(), err)
+}
+
 func TestEmployeeUCTestSuite(t *testing.T) {
 	suite.Run(t, new(EmployeeUCTestSuite))
 }

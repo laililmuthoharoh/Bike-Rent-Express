@@ -19,4 +19,16 @@ WORKDIR /app
 
 COPY --from=build /app/bike-rent-express /app/bike-rent-express
 
+ENV DB_HOST=db
+ENV DB_PORT=5432
+ENV DB_USER=postgres
+ENV DB_PASS=password123
+ENV DB_NAME=db-bike-rent-express
+ENV MAX_IDLE=1
+ENV MAX_CONN=2
+ENV MAX_LIFE_TIME=1h
+
+ENV PORT=8080
+ENV LOG_MODE=1
+
 ENTRYPOINT ["/app/bike-rent-express"]

@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -29,7 +30,7 @@ var expectEmployee = employeeDto.Employee{
 	UpdatedAt: "2024-03-07T00:00:00Z",
 }
 
-var accessToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAzMTk5NzQsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJhZG1pbjEzIiwicm9sZSI6IkFETUlOIn0.Kr-6qbAUKDBikHdJMUEZ90GG0DvfM_xUo7gxG25nAOI"
+var accessToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTA0MDc1OTgsImlzcyI6ImluY3ViYXRpb24tZ29sYW5nIiwidXNlcm5hbWUiOiJhZG1pbiIsImlkIjoiIiwicm9sZSI6IkFETUlOIn0.aZ5ELFljLjfIoYzjZWi2JZWsrz-aWqN7az2JpVoMPLQ"
 
 func (m *mockEmployeeUsecase) Register(employee employeeDto.CreateEmployeeRequest) (employeeDto.CreateEmployeeRequest, error) {
 	args := m.Called(employee)
@@ -127,7 +128,7 @@ func (suite *EmployeeDeliverySuite) TestAddEmployee_FailedUsernameReady() {
 		Username: expectEmployee.Username,
 		Password: expectEmployee.Password,
 	}
-	expectResponse := `{"responseCode":"2000101","responseMessage":"username already in use"}`
+	expectResponse := `{"responseCode":"4000102","responseMessage":"username already in use"}`
 	suite.mockEmployeeUC.On("Register", createEmployeRequest).Return(createEmployeRequest, errors.New("1"))
 
 	w := httptest.NewRecorder()
@@ -135,7 +136,7 @@ func (suite *EmployeeDeliverySuite) TestAddEmployee_FailedUsernameReady() {
 	req, _ := http.NewRequest(http.MethodPost, "/api/v1/employee/register", bytes.NewBuffer(jsonData))
 
 	suite.router.ServeHTTP(w, req)
-	assert.Equal(suite.T(), 200, w.Code)
+	assert.Equal(suite.T(), 400, w.Code)
 	assert.Equal(suite.T(), expectResponse, w.Body.String())
 }
 
@@ -508,6 +509,8 @@ func (suite *EmployeeDeliverySuite) TestChangePassword_FailedBind() {
 
 	suite.router.ServeHTTP(w, req)
 	assert.Equal(suite.T(), 400, w.Code)
+	fmt.Println(w.Body.String())
+
 	assert.Equal(suite.T(), expectResponse, w.Body.String())
 }
 
@@ -526,7 +529,8 @@ func (suite *EmployeeDeliverySuite) TestChangePassword_FailedDataNotFound1() {
 	req.Header.Add("Authorization", accessToken)
 
 	suite.router.ServeHTTP(w, req)
-	assert.Equal(suite.T(), 200, w.Code)
+	assert.Equal(suite.T(), 400, w.Code)
+	fmt.Println(w.Body.String())
 	assert.Equal(suite.T(), expectResponse, w.Body.String())
 }
 
