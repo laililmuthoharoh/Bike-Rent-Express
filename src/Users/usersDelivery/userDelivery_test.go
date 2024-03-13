@@ -86,11 +86,24 @@ func (suite *UsersDeliveryTestSuite) SetupTest() {
 }
 
 func (suite *UsersDeliveryTestSuite) TestGetAllUsers_Success() {
-	expectResponse := `{"responseCode":"2000101","responseMessage":"Success","data":[{"id":"omosiof32131","nama":"test","username":"test","alamat":"test","role":"USER","cant_rent":true,"created_at":"0000","updated_at":"0000","telepon":"0813123"}]}`
+	expectResponse := `{"responseCode":"2000102","responseMessage":"Success","data":[{"id":"omosiof32131","nama":"test","username":"test","alamat":"test","role":"USER","cant_rent":true,"created_at":"0000","updated_at":"0000","telepon":"0813123"}]}`
 	allUser := []dto.GetUsers{
 		expectUsers,
 	}
 	suite.mockUserUC.On("GetAllUsers").Return(allUser, nil)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodGet, "/api/v1/users", nil)
+	req.Header.Add("Authorization", accessToken)
+
+	suite.router.ServeHTTP(w, req)
+	assert.Equal(suite.T(), 200, w.Code)
+	assert.Equal(suite.T(), expectResponse, w.Body.String())
+}
+
+func (suite *UsersDeliveryTestSuite) TestGetAllUsers_FailedDataEmpty() {
+	expectResponse := `{"responseCode":"2000101","responseMessage":"Data empty"}`
+	suite.mockUserUC.On("GetAllUsers").Return([]dto.GetUsers{}, nil)
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/api/v1/users", nil)
