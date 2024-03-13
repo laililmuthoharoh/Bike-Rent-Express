@@ -23,6 +23,6 @@ volumes:
   pgdata:
     external: true
     name: bike-rent-express-volume
-  networks:
-    bike_rent_express_net:
-      driver: bridge
+networks:
+  bike_rent_express_net:
+    driver: brige
