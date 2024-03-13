@@ -205,8 +205,20 @@ func (suite *EmployeeDeliverySuite) TestGetEmployeeById_FailedGetById() {
 }
 
 func (suite *EmployeeDeliverySuite) TestGetAllEmployee_Success() {
-	expectResponse := `{"responseCode":"2000301","responseMessage":"Success Get All Employee","data":[{"id":"ec22df4c-1c1c-4012-9395-bc0994807e35","name":"dino","telp":"0812321412312","username":"dino123","created_at":"2024-03-07T00:00:00Z","updated_at":"2024-03-07T00:00:00Z"}]}`
+	expectResponse := `{"responseCode":"2000302","responseMessage":"Success Get All Employee","data":[{"id":"ec22df4c-1c1c-4012-9395-bc0994807e35","name":"dino","telp":"0812321412312","username":"dino123","created_at":"2024-03-07T00:00:00Z","updated_at":"2024-03-07T00:00:00Z"}]}`
 	suite.mockEmployeeUC.On("Get").Return([]employeeDto.Employee{expectEmployee}, nil)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodGet, "/api/v1/employee", nil)
+	req.Header.Add("Authorization", accessToken)
+
+	suite.router.ServeHTTP(w, req)
+	assert.Equal(suite.T(), 200, w.Code)
+	assert.Equal(suite.T(), expectResponse, w.Body.String())
+}
+func (suite *EmployeeDeliverySuite) TestGetAllEmployee_FailedDataEmpty() {
+	expectResponse := `{"responseCode":"2000301","responseMessage":"Data empty"}`
+	suite.mockEmployeeUC.On("Get").Return([]employeeDto.Employee{}, nil)
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/api/v1/employee", nil)

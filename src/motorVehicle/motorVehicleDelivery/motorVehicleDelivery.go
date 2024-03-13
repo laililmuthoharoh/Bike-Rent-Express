@@ -37,7 +37,12 @@ func (md motorVehicleDelivery) getAllMotorVehicle(ctx *gin.Context) {
 		return
 	}
 
-	json.NewResponseSuccess(ctx, motor, "success", "01", "01")
+	if len(motor) == 0 {
+		json.NewResponseSuccess(ctx, nil, "Empty data", "01", "01")
+		return
+	}
+
+	json.NewResponseSuccess(ctx, motor, "success", "01", "02")
 }
 
 func (md motorVehicleDelivery) getMotorVehicleById(ctx *gin.Context) {

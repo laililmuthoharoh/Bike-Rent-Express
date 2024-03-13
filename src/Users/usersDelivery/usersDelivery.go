@@ -44,7 +44,13 @@ func (h *usersDelivery) GetAllUsers(ctx *gin.Context) {
 		json.NewResponseError(ctx, err.Error(), "01", "01")
 		return
 	}
-	json.NewResponseSuccess(ctx, users, "Success", "01", "01")
+
+	if len(users) == 0 {
+		json.NewResponseSuccess(ctx, nil, "Data empty", "01", "01")
+		return
+	}
+
+	json.NewResponseSuccess(ctx, users, "Success", "01", "02")
 }
 
 func (h *usersDelivery) UpdateUsers(ctx *gin.Context) {

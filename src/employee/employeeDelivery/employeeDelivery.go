@@ -75,7 +75,12 @@ func (e *employeeDelivery) GetEmployeeAll(c *gin.Context) {
 		return
 	}
 
-	json.NewResponseSuccess(c, resultEmployee, "Success Get All Employee", "03", "01")
+	if len(resultEmployee) == 0 {
+		json.NewResponseSuccess(c, nil, "Data empty", "03", "01")
+		return
+	}
+
+	json.NewResponseSuccess(c, resultEmployee, "Success Get All Employee", "03", "02")
 }
 
 func (e *employeeDelivery) UpdateEmployeeById(c *gin.Context) {
