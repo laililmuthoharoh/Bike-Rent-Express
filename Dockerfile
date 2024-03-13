@@ -6,6 +6,8 @@ WORKDIR /app
 
 COPY . .
 
+COPY .env .
+
 RUN go mod download
 
 RUN go build -o bike-rent-express
