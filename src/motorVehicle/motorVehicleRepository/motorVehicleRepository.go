@@ -82,3 +82,15 @@ func (mr *motorVehicleRepository) DropMotorVehicle(id string) error {
 
 	return err
 }
+
+func (mr *motorVehicleRepository) CheckPlatMotor(plat string) (bool, error) {
+	query := "SELECT COUNT(plat) FROM motor_vehicle WHERE plat = $1"
+	var count int
+	err := mr.db.QueryRow(query, plat).Scan(&count)
+
+	if count > 0 {
+		return false, err
+	} else {
+		return true, err
+	}
+}

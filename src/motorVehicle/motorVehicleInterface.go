@@ -11,6 +11,7 @@ type (
 		InsertMotorVehicle(motor motorVehicleDto.MotorVehicle) (motorVehicleDto.MotorVehicle, error)
 		ChangeMotorVehicle(id string, motor motorVehicleDto.MotorVehicle) (motorVehicleDto.MotorVehicle, error)
 		DropMotorVehicle(id string) error
+		CheckPlatMotor(plat string) (bool, error)
 	}
 
 	MotorVechileUsecase interface {

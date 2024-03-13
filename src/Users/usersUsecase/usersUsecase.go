@@ -91,7 +91,15 @@ func (c *usersUC) LoginUsers(loginRequest model.LoginRequest) (dto.LoginResponse
 }
 
 func (c *usersUC) TopUp(topUpRequest dto.TopUpRequest) error {
-	err := c.usersRepo.UpdateBalance(topUpRequest)
+	balance, err := c.usersRepo.GetBalance(topUpRequest.UserID)
+	if err != nil {
+		if err == sql.ErrNoRows || strings.Contains(err.Error(), "invalid input syntax for type uuid") {
+			return errors.New("1")
+		}
+		return err
+	}
+	topUpRequest.Amount += balance.Amount
+	err = c.usersRepo.UpdateBalance(topUpRequest)
 	return err
 }
 

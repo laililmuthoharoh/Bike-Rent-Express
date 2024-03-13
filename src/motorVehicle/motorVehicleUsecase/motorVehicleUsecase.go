@@ -3,6 +3,8 @@ package motorVehicleUsecase
 import (
 	"bike-rent-express/model/dto/motorVehicleDto"
 	"bike-rent-express/src/motorVehicle"
+	"errors"
+	"strings"
 )
 
 type motorVehicleUsecase struct {
@@ -27,6 +29,9 @@ func (mu motorVehicleUsecase) GetAllMotorVehicle() ([]motorVehicleDto.MotorVehic
 func (mu motorVehicleUsecase) GetMotorVehicleById(id string) (motorVehicleDto.MotorVehicle, error) {
 	motor, err := mu.motorVehicleRepo.RetrieveMotorVehicleById(id)
 	if err != nil {
+		if strings.Contains(err.Error(), "invalid input syntax for type uuid") {
+			return motor, errors.New("1")
+		}
 		return motor, err
 	}
 
@@ -34,6 +39,15 @@ func (mu motorVehicleUsecase) GetMotorVehicleById(id string) (motorVehicleDto.Mo
 }
 
 func (mu motorVehicleUsecase) CreateMotorVehicle(motor motorVehicleDto.CreateMotorVehicle) (motorVehicleDto.MotorVehicle, error) {
+	ready, err := mu.motorVehicleRepo.CheckPlatMotor(motor.Plat)
+	if err != nil {
+		return motorVehicleDto.MotorVehicle{}, err
+	}
+
+	if !ready {
+		return motorVehicleDto.MotorVehicle{}, errors.New("1")
+	}
+
 	newMotor, err := mu.motorVehicleRepo.InsertMotorVehicle(motorVehicleDto.MotorVehicle{
 		Name:           motor.Name,
 		Type:           motor.Type,
@@ -42,6 +56,7 @@ func (mu motorVehicleUsecase) CreateMotorVehicle(motor motorVehicleDto.CreateMot
 		ProductionYear: motor.ProductionYear,
 		Status:         motor.Status,
 	})
+
 	if err != nil {
 		return newMotor, err
 	}
@@ -53,6 +68,18 @@ func (mu motorVehicleUsecase) UpdateMotorVehicle(id string, input motorVehicleDt
 	motor, err := mu.motorVehicleRepo.RetrieveMotorVehicleById(id)
 	if err != nil {
 		return motor, err
+	}
+
+	if input.Plat != motor.Plat {
+		ready, err := mu.motorVehicleRepo.CheckPlatMotor(input.Plat)
+		if err != nil {
+			return motorVehicleDto.MotorVehicle{}, err
+		}
+
+		if !ready {
+			return motorVehicleDto.MotorVehicle{}, errors.New("1")
+		}
+
 	}
 
 	if input.Name != "" {
@@ -82,7 +109,14 @@ func (mu motorVehicleUsecase) UpdateMotorVehicle(id string, input motorVehicleDt
 }
 
 func (mu motorVehicleUsecase) DeleteMotorVehicle(id string) error {
-	err := mu.motorVehicleRepo.DropMotorVehicle(id)
+	motor, err := mu.motorVehicleRepo.RetrieveMotorVehicleById(id)
+	if err != nil {
+		return err
+	}
+	if motor.Status == "NOT_AVAILABLE" {
+		return errors.New("1")
+	}
+	err = mu.motorVehicleRepo.DropMotorVehicle(id)
 	if err != nil {
 		return err
 	}

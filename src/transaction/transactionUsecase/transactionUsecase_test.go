@@ -139,6 +139,11 @@ func (m *mockMotorVehicleRepository) DropMotorVehicle(id string) error {
 	return args.Error(0)
 }
 
+func (m *mockMotorVehicleRepository) CheckPlatMotor(plat string) (bool, error) {
+	args := m.Called(plat)
+	return args.Bool(0), args.Error(1)
+}
+
 var expectMotorVehicle = motorVehicleDto.MotorVehicle{
 	Id:             "1",
 	Name:           "test",

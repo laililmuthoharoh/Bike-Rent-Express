@@ -42,7 +42,7 @@ func (e *employeeDelivery) AddEmployee(c *gin.Context) {
 	resultEmployee, err := e.employeeUC.Register(addEmployeeRequest)
 	if err != nil {
 		if err.Error() == "1" {
-			json.NewResponseSuccess(c, nil, "username already in use", "01", "01")
+			json.NewResponseBadRequest(c, nil, "username already in use", "01", "02")
 			return
 		}
 		json.NewResponseError(c, err.Error(), "01", "01")
@@ -98,7 +98,7 @@ func (e *employeeDelivery) UpdateEmployeeById(c *gin.Context) {
 	employee, err := e.employeeUC.Update(employeUpdateRequest)
 	if err != nil {
 		if err.Error() == "1" || errors.Is(sql.ErrNoRows, err) {
-			json.NewResponseSuccess(c, nil, "Data not found", "04", "01")
+			json.NewResponseBadRequest(c, nil, "Data not found", "04", "02")
 			return
 		}
 		json.NewResponseError(c, err.Error(), "04", "01")
@@ -114,7 +114,7 @@ func (e *employeeDelivery) DeleteEmployeeById(c *gin.Context) {
 	msg, err := e.employeeUC.Delete(id)
 	if err != nil {
 		if err.Error() == "1" {
-			json.NewResponseSuccess(c, nil, "Data not found", "05", "01")
+			json.NewResponseBadRequest(c, nil, "Data not found", "05", "01")
 			return
 		}
 		json.NewResponseError(c, err.Error(), "05", "01")
@@ -165,16 +165,16 @@ func (e *employeeDelivery) ChangePassword(c *gin.Context) {
 	err := e.employeeUC.ChangePassword(id, changePasswordRequest)
 	if err != nil {
 		if err.Error() == "1" {
-			json.NewResponseSuccess(c, nil, "Data not found", "07", "01")
+			json.NewResponseBadRequest(c, nil, "Data not found", "07", "01")
 			return
 		}
 		if err.Error() == "2" {
-			json.NewResponseSuccess(c, nil, "password does not match", "07", "02")
+			json.NewResponseBadRequest(c, nil, "password does not match", "07", "02")
 			return
 		}
 		json.NewResponseError(c, err.Error(), "07", "01")
 		return
 	}
 
-	json.NewResponseSuccess(c, nil, "Success updated password", "07", "03")
+	json.NewResponseSuccess(c, nil, "Success updated password", "07", "01")
 }
