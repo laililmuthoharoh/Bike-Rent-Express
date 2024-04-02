@@ -37,5 +37,5 @@ a business application designed to support and manage motorcycle rental business
 5. Motor Return
    ![Screenshot (898)](https://github.com/laililmuthoharoh/Bike-Rent-Express/assets/124485986/d40802d6-c377-4b74-bdd9-44f2028877c9)
 
-## Unit Testing
+## Unit Test
 ![image](https://github.com/laililmuthoharoh/Bike-Rent-Express/assets/124485986/94eabf35-54f6-424c-98d3-39bbb3da52d4)
