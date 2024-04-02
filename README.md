@@ -3,7 +3,7 @@
 a business application designed to support and manage motorcycle rental business operations. This application can be used by motorcycle rental service providers to improve management efficiency and help facilitate customers in making reservations.
 
 ## Bussines Process
-![image](https://github.com/laililmuthoharoh/Bike-Rent-Express/assets/124485986/b835250f-c3ed-4c1f-b8a6-f3fa90617001)
+![image](https://github.com/laililmuthoharoh/Bike-Rent-Express/assets/124485986/a75d9c0c-96b0-4c48-aba3-ea53be73eb0c)
 
 ## Advantages
 
